@@ -9,8 +9,10 @@ import cors from 'kcors';
 import config from 'config';
 import router from '../modules';
 
+const appKey = config.get('appKey');
 const port = config.get('port');
 const app = new Koa();
+app.keys = [appKey];
 
 app.use(convert(cors()));
 // error handle
@@ -21,14 +23,6 @@ app.use(bodyParser());
 app.use(convert(json()));
 // logger
 app.use(convert(logger()));
-
-// helper func
-// app.use(async (ctx, next) => {
-//   ctx.state = Object.assign({}, ctx.state, {
-//     env: process.env.NODE_ENV
-//   });
-//   await next();
-// });
 
 // router
 app.use(router.routes(), router.allowedMethods());

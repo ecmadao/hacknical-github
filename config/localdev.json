@@ -1,6 +1,6 @@
 {
   "production": false,
-  "port": "6000",
+  "port": "5002",
   "appKey": "hacknical-api-dev",
   "appName": "hacknical-api-dev",
   "redis": "redis://localhost:6379/3",

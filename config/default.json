@@ -1,6 +1,6 @@
 {
   "production": false,
-  "port": "6000",
+  "port": "5002",
   "appKey": "",
   "appName": "",
   "redis": "",
