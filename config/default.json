@@ -1,0 +1,15 @@
+{
+  "production": false,
+  "port": "6000",
+  "appKey": "",
+  "appName": "",
+  "redis": "",
+  "database": {
+    "url": ""
+  },
+  "github": {
+    "clientId": "",
+    "clientSecret": "",
+    "appName": ""
+  }
+}

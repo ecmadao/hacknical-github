@@ -1,0 +1,15 @@
+{
+  "production": false,
+  "port": "6000",
+  "appKey": "hacknical-api-dev",
+  "appName": "hacknical-api-dev",
+  "redis": "redis://localhost:6379/3",
+  "database": {
+    "url": "mongodb://localhost:27017/hawkeye"
+  },
+  "github": {
+    "clientId": "e14173fbe80cde863c5d",
+    "clientSecret": "079c22a6161d7349f9cd33b5403c5e2b26209ec0",
+    "appName": "hacknical-api-dev"
+  }
+}
