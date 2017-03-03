@@ -5,7 +5,7 @@
   "appName": "hacknical-api-dev",
   "redis": "redis://localhost:6379/3",
   "database": {
-    "url": "mongodb://localhost:27017/hawkeye"
+    "url": "mongodb://localhost:27017/hacknical-api"
   },
   "github": {
     "clientId": "e14173fbe80cde863c5d",

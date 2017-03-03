@@ -32,34 +32,34 @@ const postGethub = (url) => {
 
 /* =========================== private funcs =========================== */
 
-const getUserRepos = (login, token, page = 1) => {
-  return fetchGithub(`${API_USERS}/${login}/repos?per_page=100&page=${page}&access_token=${token}`, {
+const getUserRepos = (login, params, page = 1) => {
+  return fetchGithub(`${API_USERS}/${login}/repos?per_page=100&page=${page}&${params}`, {
     parse: true
   });
 };
 
-const getOrgRepos = (org, token, page = 1) => {
-  return fetchGithub(`${API_ORGS}/${org}/repos?per_page=100&page=${page}&access_token=${token}`, {
+const getOrgRepos = (org, params, page = 1) => {
+  return fetchGithub(`${API_ORGS}/${org}/repos?per_page=100&page=${page}&${params}`, {
     parse: true
   });
 }
 
-const getUserPubOrgs = (login, token, page = 1) => {
-  return fetchGithub(`${API_USERS}/${login}/orgs?per_page=100&page=${page}&access_token=${token}`, {
+const getUserPubOrgs = (login, params, page = 1) => {
+  return fetchGithub(`${API_USERS}/${login}/orgs?per_page=100&page=${page}&${params}`, {
     parse: true
   });
 };
 
-const getReposYearlyCommits = (fullname, token) => {
-  return fetchGithub(`${API_REPOS}/${fullname}/stats/commit_activity?access_token=${token}`, {
+const getReposYearlyCommits = (fullname, params) => {
+  return fetchGithub(`${API_REPOS}/${fullname}/stats/commit_activity?${params}`, {
     parse: true
   });
 };
 
-const getReposLanguages = async (fullname, token) => {
+const getReposLanguages = async (fullname, params) => {
   let result = {};
   try {
-    const languages = await fetchGithub(`${API_REPOS}/${fullname}/languages?access_token=${token}`, {
+    const languages = await fetchGithub(`${API_REPOS}/${fullname}/languages?${params}`, {
       parse: true
     });
     let total = 0;
@@ -72,10 +72,10 @@ const getReposLanguages = async (fullname, token) => {
   }
 };
 
-const getReposContributors = async (fullname, token) => {
+const getReposContributors = async (fullname, params) => {
   let results = [];
   try {
-    const contributors = await fetchGithub(`${API_REPOS}/${fullname}/stats/contributors?access_token=${token}`, {
+    const contributors = await fetchGithub(`${API_REPOS}/${fullname}/stats/contributors?${params}`, {
       parse: true
     });
     results = contributors.map((contributor, index) => {
@@ -105,33 +105,39 @@ const getReposContributors = async (fullname, token) => {
 
 /* =========================== github api =========================== */
 
-const getOctocat = () => {
-  return fetchGithub(`${BASE_URL}/octocat?client_id=${clientId}&client_secret=${clientSecret}`);
+const getOctocat = (params) => {
+  return fetchGithub(`${BASE_URL}/octocat?${params}`);
 };
 
-const getZen = () => {
-  return fetchGithub(`${BASE_URL}/zen?client_id=${clientId}&client_secret=${clientSecret}`);
+const getZen = (params) => {
+  return fetchGithub(`${BASE_URL}/zen?${params}`);
 };
 
-const getToken = (code) => {
-  return postGethub(`${API_TOKEN}?client_id=${clientId}&client_secret=${clientSecret}&code=${code}`)
+const getToken = (code, params) => {
+  return postGethub(`${API_TOKEN}?code=${code}&${params}`)
 };
 
-const getUser = (token) => {
-  return fetchGithub(`${API_GET_USER}?access_token=${token}`, {
+const getUser = (login, params) => {
+  return fetchGithub(`${API_USERS}/${login}?${params}`, {
     parse: true
   });
 };
 
-const getOrg = (org, token) => {
-  return fetchGithub(`${API_ORGS}/${org}?access_token=${token}`, {
+const getUserByToken = (params) => {
+  return fetchGithub(`${API_GET_USER}?${params}`, {
+    parse: true
+  });
+}
+
+const getOrg = (org, params) => {
+  return fetchGithub(`${API_ORGS}/${org}?${params}`, {
     parse: true
   });
 };
 
-const getOrgPubRepos = (org, token, pages = 1) => {
+const getOrgPubRepos = (org, params, pages = 1) => {
   const promiseList = new Array(pages).fill(0).map((item, index) => {
-    return getOrgRepos(org, token, index + 1);
+    return getOrgRepos(org, params, index + 1);
   });
   return Promise.all(promiseList).then((datas) => {
     let results = [];
@@ -140,9 +146,9 @@ const getOrgPubRepos = (org, token, pages = 1) => {
   }).catch(() => Promise.resolve([]));
 };
 
-const getPersonalPubRepos = (login, token, pages = 3) => {
+const getPersonalPubRepos = (login, params, pages = 3) => {
   const promiseList = new Array(pages).fill(0).map((item, index) => {
-    return getUserRepos(login, token, index + 1);
+    return getUserRepos(login, params, index + 1);
   });
   return Promise.all(promiseList).then((datas) => {
     let results = [];
@@ -151,9 +157,9 @@ const getPersonalPubRepos = (login, token, pages = 3) => {
   }).catch(() => Promise.resolve([]));
 };
 
-const getPersonalPubOrgs = (login, token, pages = 1) => {
+const getPersonalPubOrgs = (login, params, pages = 1) => {
   const promiseList = new Array(pages).fill(0).map((item, index) => {
-    return getUserPubOrgs(login, token, index + 1);
+    return getUserPubOrgs(login, params, index + 1);
   });
   return Promise.all(promiseList).then((datas) => {
     let results = [];
@@ -162,23 +168,23 @@ const getPersonalPubOrgs = (login, token, pages = 1) => {
   }).catch(() => Promise.resolve([]));
 };
 
-const getAllReposYearlyCommits = (repos, token) => {
+const getAllReposYearlyCommits = (repos, params) => {
   const promiseList = repos.map((item, index) => {
-    return getReposYearlyCommits(item.fullname || item.full_name, token);
+    return getReposYearlyCommits(item.fullname || item.full_name, params);
   });
   return Promise.all(promiseList).catch(() => Promise.resolve([]));
 };
 
-const getAllReposLanguages = (repos, token) => {
+const getAllReposLanguages = (repos, params) => {
   const promiseList = repos.map((item, index) => {
-    return getReposLanguages(item.fullname || item.full_name, token);
+    return getReposLanguages(item.fullname || item.full_name, params);
   });
   return Promise.all(promiseList).catch(() => Promise.resolve([]));
 };
 
-const getAllReposContributors = (repos, token) => {
+const getAllReposContributors = (repos, params) => {
   const promiseList = repos.map((item, index) => {
-    return getReposContributors(item.fullname || item.full_name, token);
+    return getReposContributors(item.fullname || item.full_name, params);
   });
   return Promise.all(promiseList).catch(() => Promise.resolve([]));
 };
@@ -190,6 +196,7 @@ export default {
   getToken,
   // user
   getUser,
+  getUserByToken,
   getPersonalPubRepos,
   getPersonalPubOrgs,
   // org

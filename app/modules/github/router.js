@@ -23,7 +23,7 @@ router.get(
 );
 router.get(
   '/user',
-  params.checkQuery(['token']),
+  params.checkQuery(['login', 'verify']),
   GitHub.getUser
 );
 

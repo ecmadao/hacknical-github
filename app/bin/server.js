@@ -8,6 +8,7 @@ import json from 'koa-json';
 import cors from 'kcors';
 import config from 'config';
 import router from '../modules';
+import verifyMiddlwware from '../middlewares/github_verify';
 
 const appKey = config.get('appKey');
 const port = config.get('port');
@@ -15,6 +16,8 @@ const app = new Koa();
 app.keys = [appKey];
 
 app.use(convert(cors()));
+
+app.use(verifyMiddlwware());
 // error handle
 onerror(app);
 // bodyparser

@@ -3,7 +3,7 @@ import mongoose from '../mongoose/index';
 const Schema = mongoose.Schema;
 
 const GithubReposSchema = new Schema({
-  userId: String,
+  login: String,
   reposId: String,
   full_name: String,
   name: String,

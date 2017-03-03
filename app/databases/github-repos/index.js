@@ -1,33 +1,33 @@
 import GithubRepos from './schema';
 
-const findRepository = async (userId, reposId) => {
+const findRepository = async (login, reposId) => {
   return await GithubRepos.findOne({
-    userId,
+    login,
     reposId
   });
 };
 
-const findRepos = async (userId) => {
-  return await GithubRepos.find({ userId });
+const findRepos = async (login) => {
+  return await GithubRepos.find({ login });
 };
 
-const clearRepos = async (userId) => {
+const clearRepos = async (login) => {
   return await GithubRepos.remove({
-    userId
+    login
   });
 };
 
-const removeRepos = async (userId, reposId = null) => {
+const removeRepos = async (login, reposId = null) => {
   if (reposId === null) {
-    return await clearRepos(userId);
+    return await clearRepos(login);
   }
   return await GithubRepos.remove({
-    userId,
+    login,
     reposId
   });
 };
 
-const setRepository = async (userId, repository) => {
+const setRepository = async (login, repository) => {
   const {
     id,
     full_name,
@@ -51,7 +51,7 @@ const setRepository = async (userId, repository) => {
   } = repository;
   return await GithubRepos.create({
     reposId: id,
-    userId,
+    login,
     full_name,
     name,
     html_url,
@@ -73,14 +73,14 @@ const setRepository = async (userId, repository) => {
   });
 };
 
-const setRepos = async (userId, repos) => {
+const setRepos = async (login, repos) => {
   const setResults = [];
-  await removeRepos(userId);
+  await removeRepos(login);
   for(let i = 0; i < repos.length; i++) {
     const repository = repos[i];
-    const findResult = await findRepository(userId, repository.id);
+    const findResult = await findRepository(login, repository.id);
     if (!findResult) {
-      const result = await setRepository(userId, repository);
+      const result = await setRepository(login, repository);
       setResults.push(result);
     } else {
       setResults.push(findResult);
@@ -89,18 +89,18 @@ const setRepos = async (userId, repos) => {
   return setResults;
 };
 
-const getRepos = async (userId) => {
+const getRepos = async (login) => {
   return await GithubRepos.find({
-    userId
+    login
   });
 };
 
-const resetRepos = async (userId, repos) => {
+const resetRepos = async (login, repos) => {
   const setResults = [];
-  await removeRepos(userId);
+  await removeRepos(login);
   for(let i = 0; i < repos.length; i++) {
     const repository = repos[i];
-    const result = await setRepository(userId, repository);
+    const result = await setRepository(login, repository);
     setResults.push(result);
   }
   return setResults;
