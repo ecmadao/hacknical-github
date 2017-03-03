@@ -1,8 +1,8 @@
 {
   "production": false,
   "port": "5002",
-  "appKey": "hacknical-api-dev",
-  "appName": "hacknical-api-dev",
+  "appKey": "hacknical-local",
+  "appName": "hacknical-local",
   "redis": "redis://localhost:6379/3",
   "database": {
     "url": "mongodb://localhost:27017/hacknical-api"

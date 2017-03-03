@@ -44,10 +44,10 @@ router.get(
 );
 
 router.get(
-  '/userDatas',
+  '/userDatas/repos',
   params.checkApp(),
   params.checkQuery(['login', 'verify']),
-  GitHub.getUserDatas
+  GitHub.getUserRepos
 );
 router.get(
   '/userDatas/orgs',

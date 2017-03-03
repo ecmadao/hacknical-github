@@ -7,7 +7,7 @@ const clientSecret = config.get('github.clientSecret');
 const verifyMiddlwware = () => async (ctx, next) => {
   const { token } = ctx.request.query;
   let verify = {};
-  if (token) {
+  if (token && token != 'undefined' && token != 'null') {
     verify = {
       access_token: token
     };
