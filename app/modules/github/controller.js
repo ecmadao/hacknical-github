@@ -13,7 +13,6 @@ import {
 import dateHelper from '../../utils/date';
 
 const HALF_AN_HOUR = 30 * 60;
-const appName = config.get('github.appName');
 const clientId = config.get('github.clientId');
 
 /* ================== private helper ================== */
@@ -173,17 +172,9 @@ const getOctocat = async (ctx) => {
 };
 
 const getVerify = async (ctx) => {
-  const agent = ctx.headers['user-agent'];
-  let result = null;
-  if (agent === appName) {
-    result = {
-      clientId
-    };
-  }
-
   ctx.body = {
     success: true,
-    result
+    result: clientId
   }
 };
 

@@ -80,7 +80,7 @@ const updateUserOrgs = async (login, orgs = []) => {
 
 const createGithubUser = async (userInfo) => {
   const newGithubInfo = getGithubInfo(userInfo);
-  newGithubInfo.lastLoginTime = new Date();
+  newGithubInfo.lastUpdateTime = new Date();
   const newUser = await GithubUsers.create(newGithubInfo);
   return Promise.resolve({
     success: true,

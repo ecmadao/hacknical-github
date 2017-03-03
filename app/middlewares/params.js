@@ -1,3 +1,7 @@
+import config from 'config';
+
+const appName = config.get('github.appName');
+
 const checkQuery = (params = []) => async (ctx, next) => {
   params.forEach((param) => {
     if (!ctx.request.query[param]) {
@@ -25,8 +29,16 @@ const checkHeaders = (params = []) => async (ctx, next) => {
   await next();
 };
 
+const checkApp = () => async (ctx, next) => {
+  if (appName !== ctx.headers['user-agent']) {
+    throw new Error(`Wrong user-agent!`);
+  }
+  await next();
+};
+
 export default {
   checkQuery,
   checkBody,
-  checkHeaders
+  checkHeaders,
+  checkApp
 }
