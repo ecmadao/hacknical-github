@@ -1,8 +1,6 @@
 import config from 'config';
 import fetch from '../utils/fetch';
 
-// const clientId = config.get('github.clientId');
-// const clientSecret = config.get('github.clientSecret');
 const appName = config.get('github.appName');
 
 const BASE_URL = 'https://api.github.com';

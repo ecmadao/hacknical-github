@@ -37,10 +37,26 @@ router.get(
   params.checkQuery(['login', 'verify']),
   GitHub.getUser
 );
+
 router.get(
   '/userDatas',
   params.checkQuery(['login', 'verify']),
   GitHub.getUserDatas
+);
+router.get(
+  '/userDatas/orgs',
+  params.checkQuery(['login', 'verify']),
+  GitHub.getUserOrgs
+);
+router.get(
+  '/userDatas/refresh',
+  params.checkQuery(['login', 'verify']),
+  GitHub.refreshUserDatas
+);
+router.get(
+  '/userDatas/updateTime',
+  params.checkQuery(['login']),
+  GitHub.getUserUpdateTime
 );
 
 module.exports = router;

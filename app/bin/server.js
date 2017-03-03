@@ -31,7 +31,8 @@ app.use(convert(logger()));
 app.use(router.routes(), router.allowedMethods());
 // error
 app.on('error', (err, ctx) => {
-  logger.error('server error', err, ctx);
+  console.log(err);
+  // logger.error('server error', err, ctx);
 });
 
 app.listen(port, () => {

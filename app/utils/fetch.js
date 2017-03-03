@@ -1,6 +1,7 @@
 import request from 'request';
+import config from 'config';
 
-const retryTimes = [3000, 3000, 3000];
+const retryTimes = config.get('github.timeouts');
 
 const fetchData = (options, parse = false) => {
   return new Promise((resolve, reject) => {
@@ -27,6 +28,7 @@ const fetch = async (options, parse = false, timeout = retryTimes) => {
       return result;
     } catch (e) {
       err = e;
+      console.log(err)
     }
   }
   if (err) { throw new Error(err) }

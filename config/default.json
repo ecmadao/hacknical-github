@@ -10,6 +10,7 @@
   "github": {
     "clientId": "",
     "clientSecret": "",
-    "appName": ""
+    "appName": "",
+    "timeouts": []
   }
 }

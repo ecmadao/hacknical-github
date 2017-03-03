@@ -55,7 +55,7 @@ const updateUser = async (userInfo) => {
   const lastUpdateTime = new Date();
   newGithubInfo.lastUpdateTime = lastUpdateTime;
   const findUser = await findUser(userInfo.login);
-  findUser.githubInfo = newGithubInfo;
+  Object.assign(findUser, newGithubInfo);
   await findUser.save();
   return Promise.resolve({
     success: true,
@@ -88,34 +88,9 @@ const createGithubUser = async (userInfo) => {
   });
 };
 
-// const loginWithGithub = async (userInfo) => {
-//   const newGithubInfo = getGithubInfo(userInfo);
-//   newGithubInfo.lastLoginTime = new Date();
-//
-//   const { login } = userInfo;
-//   const findUser = await findUser(login);
-//
-//   if (findUser) {
-//     Object.assign(findUser, newGithubInfo);
-//     await findUser.save();
-//     return Promise.resolve({
-//       success: true,
-//       result: login
-//     });
-//   }
-//
-//   const newUser = await GithubUsers.create(newGithubInfo);
-//   return Promise.resolve({
-//     success: true,
-//     result: login
-//   });
-// };
-
-
 export default {
   findUser,
   findUserByGithubId,
-  // loginWithGithub,
   updateUser,
   updateUserOrgs,
   createGithubUser

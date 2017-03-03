@@ -3,6 +3,7 @@ import OrgsModel from '../../databases/github-orgs';
 import ReposModel from '../../databases/github-repos';
 import CommitsModel from '../../databases/github-commits';
 import UsersModel from '../../databases/github-users';
+
 import Github from '../../services/github';
 import { flattenObject } from '../../utils/helpers';
 import {
@@ -11,6 +12,7 @@ import {
 } from '../../utils/github';
 import dateHelper from '../../utils/date';
 
+const HALF_AN_HOUR = 30 * 60;
 const appName = config.get('github.appName');
 const clientId = config.get('github.clientId');
 
@@ -153,7 +155,8 @@ const getGithubUser = async (login, verify) => {
 /* ================== router handler ================== */
 
 const getZen = async (ctx) => {
-  const result = await Github.getZen();
+  const { verify } = ctx.request.query;
+  const result = await Github.getZen(verify);
   ctx.body = {
     success: true,
     result
@@ -161,7 +164,8 @@ const getZen = async (ctx) => {
 };
 
 const getOctocat = async (ctx) => {
-  const result = await Github.getOctocat();
+  const { verify } = ctx.request.query;
+  const result = await Github.getOctocat(verify);
   ctx.body = {
     success: true,
     result
@@ -196,7 +200,11 @@ const getToken = async (ctx, next) => {
 const getLogin = async (ctx, next) => {
   const { verify } = ctx.request.query;
   const userInfo = await Github.getUserByToken(verify);
-  await UsersModel.createGithubUser(userInfo);
+
+  const user = await UsersModel.findUser(userInfo.login);
+  if (!user) {
+    await UsersModel.createGithubUser(userInfo);
+  }
 
   ctx.body = {
     success: true,
@@ -226,6 +234,7 @@ const getUserDatas = async (ctx, next) => {
     publicRepos: public_repos
   });
   const commits = await getCommits(login, verify);
+
   ctx.body = {
     success: true,
     result: {
@@ -233,6 +242,62 @@ const getUserDatas = async (ctx, next) => {
       commits: sortByCommits(commits)
     }
   }
+};
+
+const getUserOrgs = async (ctx, next) => {
+  const { login, verify } = ctx.query;
+  const orgs = await getOrgs(login, verify);
+  ctx.body = {
+    success: true,
+    result: orgs
+  };
+};
+
+const refreshUserDatas = async (ctx, next) => {
+  const { login, verify } = ctx.request.query;
+  const user = await UsersModel.findUser(login);
+  const lastUpdateTime = user.lastUpdateTime || user['created_at']
+
+  const timeInterval = dateHelper.getSeconds(new Date()) - dateHelper.getSeconds(lastUpdateTime);
+  if (timeInterval <= HALF_AN_HOUR) {
+    return ctx.body = {
+      success: false,
+      result: parseInt((HALF_AN_HOUR - timeInterval) / 60, 10)
+    };
+  }
+
+  try {
+    const githubUser = await Github.getUserByToken(verify);
+    const updateUserResult = await UsersModel.updateUser(githubUser);
+
+    const { public_repos } = githubUser;
+    const pages = Math.ceil(parseInt(public_repos, 10) / 100);
+    const repos = await fetchRepos(githubLogin, verify, pages);
+    await fetchCommits(repos, login, verify);
+
+    ctx.body = {
+      success: true,
+      result: updateUserResult.result
+    };
+  } catch (err) {
+    ctx.body = {
+      success: false,
+      result: new Date()
+    };
+  }
+
+};
+
+const getUserUpdateTime = async (ctx, next) => {
+  const { login } = ctx.request.query;
+  const findResult = await UsersModel.findUser(login);
+  if (!findResult) {
+    throw new Error('can not find target user');
+  }
+  return ctx.body = {
+    success: true,
+    result: findResult.lastUpdateTime || findResult['created_at']
+  };
 };
 
 
@@ -246,5 +311,8 @@ export default {
   /* ====== */
   getLogin,
   getUser,
-  getUserDatas
+  getUserDatas,
+  getUserOrgs,
+  refreshUserDatas,
+  getUserUpdateTime
 }
