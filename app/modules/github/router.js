@@ -17,14 +17,30 @@ router.get(
 );
 
 router.get(
+  '/verify',
+  params.checkHeaders(['user-agent']),
+  GitHub.getVerify
+);
+
+router.get(
   '/token',
   params.checkQuery(['code']),
   GitHub.getToken
 );
 router.get(
+  '/login',
+  params.checkQuery(['verify']),
+  GitHub.getLogin
+);
+router.get(
   '/user',
   params.checkQuery(['login', 'verify']),
   GitHub.getUser
+);
+router.get(
+  '/userDatas',
+  params.checkQuery(['login', 'verify']),
+  GitHub.getUserDatas
 );
 
 module.exports = router;

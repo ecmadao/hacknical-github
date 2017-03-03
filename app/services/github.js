@@ -1,8 +1,8 @@
 import config from 'config';
 import fetch from '../utils/fetch';
 
-const clientId = config.get('github.clientId');
-const clientSecret = config.get('github.clientSecret');
+// const clientId = config.get('github.clientId');
+// const clientSecret = config.get('github.clientSecret');
 const appName = config.get('github.appName');
 
 const BASE_URL = 'https://api.github.com';
@@ -23,7 +23,7 @@ const fetchGithub = (url, option = {}) => {
   return fetch.get(options, option.parse);
 };
 
-const postGethub = (url) => {
+const postGithub = (url) => {
   const options = {
     url
   };
@@ -114,7 +114,7 @@ const getZen = (params) => {
 };
 
 const getToken = (code, params) => {
-  return postGethub(`${API_TOKEN}?code=${code}&${params}`)
+  return postGithub(`${API_TOKEN}?code=${code}&${params}`)
 };
 
 const getUser = (login, params) => {

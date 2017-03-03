@@ -3,7 +3,6 @@ import { flattenObject } from '../utils/helpers';
 
 const clientId = config.get('github.clientId');
 const clientSecret = config.get('github.clientSecret');
-const appName = config.get('github.appName');
 
 const verifyMiddlwware = () => async (ctx, next) => {
   const { token } = ctx.request.query;

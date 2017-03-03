@@ -1,7 +1,7 @@
-const checkQuery = (querys = []) => async (ctx, next) => {
-  querys.forEach((q) => {
-    if (!ctx.request.query[q]) {
-      throw new Error(`query: ${q} missed!`);
+const checkQuery = (params = []) => async (ctx, next) => {
+  params.forEach((param) => {
+    if (!ctx.request.query[param]) {
+      throw new Error(`query: ${param} missed!`);
     }
   });
   await next();
@@ -16,7 +16,17 @@ const checkBody = (params = []) => async (ctx, next) => {
   await next();
 };
 
+const checkHeaders = (params = []) => async (ctx, next) => {
+  params.forEach((param) => {
+    if (!ctx.headers[param]) {
+      throw new Error(`header: ${param} missed!`);
+    }
+  });
+  await next();
+};
+
 export default {
   checkQuery,
-  checkBody
+  checkBody,
+  checkHeaders
 }

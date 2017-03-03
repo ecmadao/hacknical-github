@@ -1,3 +1,4 @@
+import config from 'config';
 import OrgsModel from '../../databases/github-orgs';
 import ReposModel from '../../databases/github-repos';
 import CommitsModel from '../../databases/github-commits';
@@ -9,6 +10,9 @@ import {
   sortByCommits
 } from '../../utils/github';
 import dateHelper from '../../utils/date';
+
+const appName = config.get('github.appName');
+const clientId = config.get('github.clientId');
 
 /* ================== private helper ================== */
 
@@ -164,18 +168,49 @@ const getOctocat = async (ctx) => {
   }
 };
 
+const getVerify = async (ctx) => {
+  const agent = ctx.headers['user-agent'];
+  let result = null;
+  if (agent === appName) {
+    result = {
+      clientId
+    };
+  }
+
+  ctx.body = {
+    success: true,
+    result
+  }
+};
+
 const getToken = async (ctx, next) => {
-  const { code } = ctx.request.query;
-  const token = await Github.getToken(code);
+  const { code, verify } = ctx.request.query;
+  const result = await Github.getToken(code, verify);
+  const token = result.match(/^access_token=(\w+)&/)[1];
   ctx.body = {
     success: true,
     result: token
   }
 };
 
+const getLogin = async (ctx, next) => {
+  const { verify } = ctx.request.query;
+  const userInfo = await Github.getUserByToken(verify);
+  await UsersModel.createGithubUser(userInfo);
+
+  ctx.body = {
+    success: true,
+    result: {
+      id: userInfo.id,
+      login: userInfo.login,
+      email: userInfo.email,
+      name: userInfo.name || userInfo.login
+    }
+  };
+};
+
 const getUser = async (ctx, next) => {
   const { verify, login } = ctx.request.query;
-  console.log(verify);
   const user = await getGithubUser(login, verify);
   ctx.body = {
     success: true,
@@ -207,6 +242,9 @@ export default {
   getOctocat,
   /* ====== */
   getToken,
+  getVerify,
+  /* ====== */
+  getLogin,
   getUser,
   getUserDatas
 }
