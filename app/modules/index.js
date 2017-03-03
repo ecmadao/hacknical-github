@@ -15,4 +15,8 @@ fs.readdirSync(__dirname)
     router.use(route.routes(), route.allowedMethods());
   });
 
+router.get('/', async (ctx, next) => {
+  ctx.body = 'welcome to hacknical core server!'
+});
+
 export default router;
