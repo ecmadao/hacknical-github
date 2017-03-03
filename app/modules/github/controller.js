@@ -119,12 +119,10 @@ const refreshUserDatas = async (ctx, next) => {
   try {
     const githubUser = await Github.getUserByToken(verify);
     const updateUserResult = await UsersModel.updateUser(githubUser);
-
     const { public_repos } = githubUser;
     const pages = Math.ceil(parseInt(public_repos, 10) / 100);
-    const repos = await Helper.fetchRepos(githubLogin, verify, pages);
+    const repos = await Helper.fetchRepos(login, verify, pages);
     await Helper.fetchCommits(repos, login, verify);
-
     ctx.body = {
       success: true,
       result: updateUserResult.result

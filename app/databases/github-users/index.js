@@ -54,9 +54,9 @@ const updateUser = async (userInfo) => {
   const newGithubInfo = getGithubInfo(userInfo);
   const lastUpdateTime = new Date();
   newGithubInfo.lastUpdateTime = lastUpdateTime;
-  const findUser = await findUser(userInfo.login);
-  Object.assign(findUser, newGithubInfo);
-  await findUser.save();
+  const user = await findUser(userInfo.login);
+  Object.assign(user, newGithubInfo);
+  await user.save();
   return Promise.resolve({
     success: true,
     result: lastUpdateTime
