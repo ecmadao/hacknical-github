@@ -130,7 +130,7 @@ const createOrg = async (orgInfo) => {
 
   let findOrg = await findOrgByLogin(login);
   if (findOrg) {
-    findOrg = Object.assign({}, findOrg, newOrgInfo);
+    Object.assign(findOrg, newOrgInfo);
     await findOrg.save();
     return Promise.resolve({
       success: true,
