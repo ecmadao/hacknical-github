@@ -44,25 +44,25 @@ router.get(
 );
 
 router.get(
-  '/userDatas/repos',
+  '/user/repos',
   params.checkApp(),
   params.checkQuery(['login', 'verify']),
   GitHub.getUserRepos
 );
 router.get(
-  '/userDatas/orgs',
+  '/user/orgs',
   params.checkApp(),
   params.checkQuery(['login', 'verify']),
   GitHub.getUserOrgs
 );
 router.get(
-  '/userDatas/refresh',
+  '/user/refresh',
   params.checkApp(),
   params.checkQuery(['login', 'verify']),
   GitHub.refreshUserDatas
 );
 router.get(
-  '/userDatas/updateTime',
+  '/user/updateTime',
   params.checkApp(),
   params.checkQuery(['login']),
   GitHub.getUserUpdateTime

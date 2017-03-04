@@ -30,8 +30,8 @@ const checkHeaders = (params = []) => async (ctx, next) => {
 };
 
 const checkApp = () => async (ctx, next) => {
-  if (appName !== ctx.headers['user-agent']) {
-    throw new Error(`Wrong user-agent!`);
+  if (appName !== ctx.headers['hacknical-app-name']) {
+    throw new Error(`Wrong header!`);
   }
   await next();
 };
