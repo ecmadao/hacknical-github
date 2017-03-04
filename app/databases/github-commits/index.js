@@ -1,7 +1,7 @@
-import GithubCommits from './schema';
+import GitHubCommits from './schema';
 
 const clearUserCommits = async (login) => {
-  return await GithubCommits.remove({
+  return await GitHubCommits.remove({
     login
   });
 };
@@ -18,7 +18,7 @@ const setCommits = async (login, datas) => {
       pushed_at,
       totalCommits
     } = data;
-    await GithubCommits.create({
+    await GitHubCommits.create({
       name,
       login,
       reposId,
@@ -34,12 +34,12 @@ const setCommits = async (login, datas) => {
 };
 
 const getCommits = async (login) => {
-  const findResults = await GithubCommits.find({ login });
+  const findResults = await GitHubCommits.find({ login });
   return findResults;
 };
 
 const getReposCommits = async (login, reposId) => {
-  const findResult = await GithubCommits.findOne({
+  const findResult = await GitHubCommits.findOne({
     login,
     reposId
   });

@@ -2,7 +2,7 @@ import mongoose from '../mongoose/index';
 
 const Schema = mongoose.Schema;
 
-const GithubReposSchema = new Schema({
+const GitHubReposSchema = new Schema({
   login: String,
   reposId: String,
   full_name: String,
@@ -25,4 +25,4 @@ const GithubReposSchema = new Schema({
 	subscribers_count: Number
 });
 
-export default mongoose.model('GithubRepos', GithubReposSchema);
+export default mongoose.model('GithubRepos', GitHubReposSchema);

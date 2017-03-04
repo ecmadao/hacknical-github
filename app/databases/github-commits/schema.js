@@ -2,7 +2,7 @@ import mongoose from '../mongoose/index';
 
 const Schema = mongoose.Schema;
 
-const GithubCommitsSchema = new Schema({
+const GitHubCommitsSchema = new Schema({
   login: String,
   reposId: String,
   name: String,
@@ -16,4 +16,4 @@ const GithubCommitsSchema = new Schema({
   pushed_at: String
 });
 
-export default mongoose.model('GithubCommits', GithubCommitsSchema);
+export default mongoose.model('GithubCommits', GitHubCommitsSchema);

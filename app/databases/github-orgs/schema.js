@@ -2,7 +2,7 @@ import mongoose from '../mongoose/index';
 
 const Schema = mongoose.Schema;
 
-const GithubOrgsSchema = new Schema({
+const GitHubOrgsSchema = new Schema({
   name: String,
   login: String,
   avatar_url: String,
@@ -43,4 +43,4 @@ const GithubOrgsSchema = new Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
-export default mongoose.model('GithubOrgs', GithubOrgsSchema);
+export default mongoose.model('GithubOrgs', GitHubOrgsSchema);

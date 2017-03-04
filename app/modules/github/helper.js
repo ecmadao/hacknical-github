@@ -4,7 +4,7 @@ import ReposModel from '../../databases/github-repos';
 import CommitsModel from '../../databases/github-commits';
 import UsersModel from '../../databases/github-users';
 
-import Github from '../../services/github';
+import GitHub from '../../services/github';
 import {
   validateReposList,
   sortByCommits
@@ -16,9 +16,9 @@ import {
  * ===== repos =====
  */
 const fetchRepos = async (login, verify, pages = 2) => {
-  const multiRepos = await Github.getPersonalPubRepos(login, verify, pages);
+  const multiRepos = await GitHub.getPersonalPubRepos(login, verify, pages);
   try {
-    const reposLanguages = await Github.getAllReposLanguages(multiRepos, verify);
+    const reposLanguages = await GitHub.getAllReposLanguages(multiRepos, verify);
     multiRepos.forEach((repository, index) => repository.languages = reposLanguages[index]);
   } catch (err) {}
   const setResults = await ReposModel.setRepos(login, multiRepos);
@@ -41,7 +41,7 @@ const getRepos = async (login, verify, options) => {
 const fetchCommits = async (repos, login, verify) => {
   const reposList = validateReposList(repos);
   try {
-    const fetchedCommits = await Github.getAllReposYearlyCommits(reposList, verify);
+    const fetchedCommits = await GitHub.getAllReposYearlyCommits(reposList, verify);
     const results = fetchedCommits.map((commits, index) => {
       const repository = reposList[index];
       const { reposId, name, created_at, pushed_at } = repository;
@@ -77,22 +77,22 @@ const getCommits = async (login, verify) => {
  * ===== orgs =====
  */
 const fetchOrg = async (orgLogin, verify) => {
-  const org = await Github.getOrg(orgLogin, verify);
+  const org = await GitHub.getOrg(orgLogin, verify);
   if (!org.login) {
     return {};
   }
 
-  const repos = await Github.getOrgPubRepos(orgLogin, verify);
+  const repos = await GitHub.getOrgPubRepos(orgLogin, verify);
 
   // set repos languages
   try {
-    const reposLanguages = await Github.getAllReposLanguages(repos, verify);
+    const reposLanguages = await GitHub.getAllReposLanguages(repos, verify);
     repos.forEach((repository, index) => repository.languages = reposLanguages[index]);
   } catch (err) {}
 
   // set repos contributors
   try {
-    const reposContributors = await Github.getAllReposContributors(repos, verify);
+    const reposContributors = await GitHub.getAllReposContributors(repos, verify);
     repos.forEach((repository, index) => repository.contributors = reposContributors[index]);
   } catch (err) {}
 
@@ -102,7 +102,7 @@ const fetchOrg = async (orgLogin, verify) => {
 };
 
 const fetchUserOrgs = async (login, verify) => {
-  const pubOrgs = await Github.getPersonalPubOrgs(login, verify);
+  const pubOrgs = await GitHub.getPersonalPubOrgs(login, verify);
   await UsersModel.updateUserOrgs(login, pubOrgs);
   return pubOrgs;
 };
@@ -136,8 +136,8 @@ const getOrgs = async (login, verify) => {
  * ==== user =====
  */
 const fetchUser = async (login, verify) => {
-  const userInfo = await Github.getUser(login, verify);
-  const addResut = await UsersModel.createGithubUser(userInfo);
+  const userInfo = await GitHub.getUser(login, verify);
+  const addResut = await UsersModel.createGitHubUser(userInfo);
   return addResut.result;
 };
 

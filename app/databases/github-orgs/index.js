@@ -1,5 +1,5 @@
 
-import GithubOrgs from './schema';
+import GitHubOrgs from './schema';
 
 /**
  * private
@@ -91,11 +91,11 @@ const getReposInfo = (repos) => {
 /* === API === */
 
 const findOrgByLogin = async (login) => {
-  return await GithubOrgs.findOne({ login });
+  return await GitHubOrgs.findOne({ login });
 };
 
 const findOrgsByLogin = async (logins) => {
-  return await GithubOrgs.find({
+  return await GitHubOrgs.find({
     login: {
       "$in": logins
     }
@@ -137,7 +137,7 @@ const createOrg = async (orgInfo) => {
       result: findOrg
     });
   }
-  const newOrg = await GithubOrgs.create(newOrgInfo);
+  const newOrg = await GitHubOrgs.create(newOrgInfo);
   return Promise.resolve({
     success: true,
     result: newOrg

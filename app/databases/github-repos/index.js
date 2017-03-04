@@ -1,18 +1,18 @@
-import GithubRepos from './schema';
+import GitHubRepos from './schema';
 
 const findRepository = async (login, reposId) => {
-  return await GithubRepos.findOne({
+  return await GitHubRepos.findOne({
     login,
     reposId
   });
 };
 
 const findRepos = async (login) => {
-  return await GithubRepos.find({ login });
+  return await GitHubRepos.find({ login });
 };
 
 const clearRepos = async (login) => {
-  return await GithubRepos.remove({
+  return await GitHubRepos.remove({
     login
   });
 };
@@ -21,7 +21,7 @@ const removeRepos = async (login, reposId = null) => {
   if (reposId === null) {
     return await clearRepos(login);
   }
-  return await GithubRepos.remove({
+  return await GitHubRepos.remove({
     login,
     reposId
   });
@@ -49,7 +49,7 @@ const setRepository = async (login, repository) => {
   	watchers,
   	subscribers_count
   } = repository;
-  return await GithubRepos.create({
+  return await GitHubRepos.create({
     reposId: id,
     login,
     full_name,
@@ -90,7 +90,7 @@ const setRepos = async (login, repos) => {
 };
 
 const getRepos = async (login) => {
-  return await GithubRepos.find({
+  return await GitHubRepos.find({
     login
   });
 };

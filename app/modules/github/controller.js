@@ -1,6 +1,6 @@
 import config from 'config';
 import UsersModel from '../../databases/github-users';
-import Github from '../../services/github';
+import GitHub from '../../services/github';
 import dateHelper from '../../utils/date';
 import Helper from './helper';
 import { sortByCommits } from '../../utils/github';
@@ -14,7 +14,7 @@ const clientId = config.get('github.clientId');
 
 const getZen = async (ctx) => {
   const { verify } = ctx.request.query;
-  const result = await Github.getZen(verify);
+  const result = await GitHub.getZen(verify);
   ctx.body = {
     success: true,
     result
@@ -23,7 +23,7 @@ const getZen = async (ctx) => {
 
 const getOctocat = async (ctx) => {
   const { verify } = ctx.request.query;
-  const result = await Github.getOctocat(verify);
+  const result = await GitHub.getOctocat(verify);
   ctx.body = {
     success: true,
     result
@@ -39,7 +39,7 @@ const getVerify = async (ctx) => {
 
 const getToken = async (ctx, next) => {
   const { code, verify } = ctx.request.query;
-  const result = await Github.getToken(code, verify);
+  const result = await GitHub.getToken(code, verify);
   const token = result.match(/^access_token=(\w+)&/)[1];
   ctx.body = {
     success: true,
@@ -49,11 +49,11 @@ const getToken = async (ctx, next) => {
 
 const getLogin = async (ctx, next) => {
   const { verify } = ctx.request.query;
-  const userInfo = await Github.getUserByToken(verify);
+  const userInfo = await GitHub.getUserByToken(verify);
 
   const user = await UsersModel.findUser(userInfo.login);
   if (!user) {
-    await UsersModel.createGithubUser(userInfo);
+    await UsersModel.createGitHubUser(userInfo);
   }
 
   ctx.body = {
@@ -117,7 +117,7 @@ const refreshUserDatas = async (ctx, next) => {
   }
 
   try {
-    const githubUser = await Github.getUserByToken(verify);
+    const githubUser = await GitHub.getUserByToken(verify);
     const updateUserResult = await UsersModel.updateUser(githubUser);
     const { public_repos } = githubUser;
     const pages = Math.ceil(parseInt(public_repos, 10) / 100);

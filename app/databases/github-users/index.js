@@ -1,9 +1,9 @@
-import GithubUsers from './schema';
+import GitHubUsers from './schema';
 
 /**
  * private
  */
-const getGithubInfo = (userInfo) => {
+const getGitHubInfo = (userInfo) => {
   const {
     id,
     login,
@@ -21,7 +21,7 @@ const getGithubInfo = (userInfo) => {
     followers,
     following
   } = userInfo;
-  const newGithubInfo = {
+  const newGitHubInfo = {
     id,
     login,
     name,
@@ -38,24 +38,24 @@ const getGithubInfo = (userInfo) => {
     followers,
     following
   };
-  return newGithubInfo;
+  return newGitHubInfo;
 };
 
 const findUser = async (login) => {
-  return await GithubUsers.findOne({ login });
+  return await GitHubUsers.findOne({ login });
 };
 
-const findUserByGithubId = async (id) => {
-  return await GithubUsers.findOne({ id });
+const findUserByGitHubId = async (id) => {
+  return await GitHubUsers.findOne({ id });
 };
 
 
 const updateUser = async (userInfo) => {
-  const newGithubInfo = getGithubInfo(userInfo);
+  const newGitHubInfo = getGitHubInfo(userInfo);
   const lastUpdateTime = new Date();
-  newGithubInfo.lastUpdateTime = lastUpdateTime;
+  newGitHubInfo.lastUpdateTime = lastUpdateTime;
   const user = await findUser(userInfo.login);
-  Object.assign(user, newGithubInfo);
+  Object.assign(user, newGitHubInfo);
   await user.save();
   return Promise.resolve({
     success: true,
@@ -78,10 +78,10 @@ const updateUserOrgs = async (login, orgs = []) => {
   });
 };
 
-const createGithubUser = async (userInfo) => {
-  const newGithubInfo = getGithubInfo(userInfo);
-  newGithubInfo.lastUpdateTime = new Date();
-  const newUser = await GithubUsers.create(newGithubInfo);
+const createGitHubUser = async (userInfo) => {
+  const newGitHubInfo = getGitHubInfo(userInfo);
+  newGitHubInfo.lastUpdateTime = new Date();
+  const newUser = await GitHubUsers.create(newGitHubInfo);
   return Promise.resolve({
     success: true,
     result: newUser
@@ -90,8 +90,8 @@ const createGithubUser = async (userInfo) => {
 
 export default {
   findUser,
-  findUserByGithubId,
+  findUserByGitHubId,
   updateUser,
   updateUserOrgs,
-  createGithubUser
+  createGitHubUser
 }
