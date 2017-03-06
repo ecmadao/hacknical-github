@@ -5,7 +5,7 @@ import dateHelper from '../../utils/date';
 import Helper from './helper';
 import { sortByCommits } from '../../utils/github';
 
-const HALF_AN_HOUR = 30 * 60;
+const HALF_AN_HOUR = 60 * 60;
 const clientId = config.get('github.clientId');
 
 
@@ -118,11 +118,12 @@ const refreshUserDatas = async (ctx, next) => {
 
   try {
     const githubUser = await GitHub.getUserByToken(verify);
-    const updateUserResult = await UsersModel.updateUser(githubUser);
     const { public_repos } = githubUser;
     const pages = Math.ceil(parseInt(public_repos, 10) / 100);
     const repos = await Helper.fetchRepos(login, verify, pages);
     await Helper.fetchCommits(repos, login, verify);
+    await Helper.updateOrgs(login, verify);
+    const updateUserResult = await UsersModel.updateUser(githubUser);
     ctx.body = {
       success: true,
       result: updateUserResult.result

@@ -26,12 +26,12 @@ const fetchRepos = async (login, verify, pages = 2) => {
 };
 
 const getRepos = async (login, verify, options) => {
-  const { publicRepos } = options;
-  const pages = Math.ceil(publicRepos / 100);
   const findResult = await ReposModel.getRepos(login);
   if (findResult.length) {
     return findResult;
   }
+  const { publicRepos } = options;
+  const pages = Math.ceil(publicRepos / 100);
   return await fetchRepos(login, verify, pages);
 };
 
@@ -114,6 +114,18 @@ const getUserOrgs = async (login, verify) => {
   return await fetchUserOrgs(login, verify);
 };
 
+const updateOrgs = async (login, verify) => {
+  try {
+    const userOrgs = await fetchUserOrgs(login, verify);
+    for(let i = 0; i < userOrgs.length; i++) {
+      const orgLogin = userOrgs[i].login;
+      await fetchOrg(orgLogin, verify);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const getDetailOrgs = async (pubOrgs, verify) => {
   const orgs = [];
   for(let i = 0; i < pubOrgs.length; i++) {
@@ -153,5 +165,6 @@ export default {
   fetchCommits,
   getCommits,
   getOrgs,
+  updateOrgs,
   getUser
 }
