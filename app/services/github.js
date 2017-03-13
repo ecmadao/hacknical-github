@@ -49,34 +49,37 @@ const getUserPubOrgs = (login, params, page = 1) => {
 };
 
 const getReposYearlyCommits = (fullname, params) => {
-  return fetchGitHub(`${API_REPOS}/${fullname}/stats/commit_activity?${params}`, {
-    parse: true
+  return new Promise(async (resolve, reject) => {
+    const result = await fetchGitHub(`${API_REPOS}/${fullname}/stats/commit_activity?${params}`, {
+      parse: true
+    });
+    resolve(result);
+  }).catch((err) => {
+    return Promise.resolve([]);
   });
 };
 
-const getReposLanguages = async (fullname, params) => {
-  let result = {};
-  try {
+const getReposLanguages = (fullname, params) => {
+  return new Promise(async (resolve, reject) => {
+    let result = {};
     const languages = await fetchGitHub(`${API_REPOS}/${fullname}/languages?${params}`, {
       parse: true
     });
     let total = 0;
     Object.keys(languages).forEach(key => total += languages[key]);
     Object.keys(languages).forEach(key => result[key] = languages[key] / total);
-  } catch (err) {
-    result = {};
-  } finally {
-    return Promise.resolve(result);
-  }
+    resolve(result);
+  }).catch((err) => {
+    return Promise.resolve({});
+  })
 };
 
-const getReposContributors = async (fullname, params) => {
-  let results = [];
-  try {
+const getReposContributors = (fullname, params) => {
+  return new Promise(async (resolve, reject) => {
     const contributors = await fetchGitHub(`${API_REPOS}/${fullname}/stats/contributors?${params}`, {
       parse: true
     });
-    results = contributors.map((contributor, index) => {
+    const results = contributors.map((contributor, index) => {
       const { total, weeks, author } = contributor;
       const weeklyCommits = weeks.map((week, index) => {
         const { w, a, d, c } = week;
@@ -93,11 +96,10 @@ const getReposContributors = async (fullname, params) => {
         weeks: weeklyCommits
       }
     });
-  } catch (err) {
-    results = [];
-  } finally {
-    return Promise.resolve(results);
-  }
+    resolve(results);
+  }).catch((err) => {
+    return Promise.resolve([]);
+  });
 };
 
 
