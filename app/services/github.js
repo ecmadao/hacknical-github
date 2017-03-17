@@ -55,6 +55,7 @@ const getReposYearlyCommits = (fullname, params) => {
     });
     resolve(result);
   }).catch((err) => {
+    console.log(err);
     return Promise.resolve([]);
   });
 };
@@ -70,6 +71,7 @@ const getReposLanguages = (fullname, params) => {
     Object.keys(languages).forEach(key => result[key] = languages[key] / total);
     resolve(result);
   }).catch((err) => {
+    console.log(err);
     return Promise.resolve({});
   })
 };
@@ -79,6 +81,7 @@ const getReposContributors = (fullname, params) => {
     const contributors = await fetchGitHub(`${API_REPOS}/${fullname}/stats/contributors?${params}`, {
       parse: true
     });
+    console.log(contributors);
     const results = contributors.map((contributor, index) => {
       const { total, weeks, author } = contributor;
       const weeklyCommits = weeks.map((week, index) => {
@@ -98,6 +101,7 @@ const getReposContributors = (fullname, params) => {
     });
     resolve(results);
   }).catch((err) => {
+    console.log(err);
     return Promise.resolve([]);
   });
 };
@@ -172,21 +176,21 @@ const getAllReposYearlyCommits = (repos, params) => {
   const promiseList = repos.map((item, index) => {
     return getReposYearlyCommits(item.fullname || item.full_name, params);
   });
-  return Promise.all(promiseList).catch(() => Promise.resolve([]));
+  return Promise.all(promiseList).then(datas => Promise.resolve(datas)).catch(() => Promise.resolve([]));
 };
 
 const getAllReposLanguages = (repos, params) => {
   const promiseList = repos.map((item, index) => {
     return getReposLanguages(item.fullname || item.full_name, params);
   });
-  return Promise.all(promiseList).catch(() => Promise.resolve([]));
+  return Promise.all(promiseList).then(datas => Promise.resolve(datas)).catch(() => Promise.resolve([]));
 };
 
 const getAllReposContributors = (repos, params) => {
   const promiseList = repos.map((item, index) => {
     return getReposContributors(item.fullname || item.full_name, params);
   });
-  return Promise.all(promiseList).catch(() => Promise.resolve([]));
+  return Promise.all(promiseList).then(datas => Promise.resolve(datas)).catch(() => Promise.resolve([]));
 };
 
 export default {
