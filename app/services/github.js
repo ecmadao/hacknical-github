@@ -1,5 +1,9 @@
 import config from 'config';
 import fetch from '../utils/fetch';
+import {
+  flatArray,
+  splitArray
+} from '../utils/helpers';
 
 const appName = config.get('github.appName');
 
@@ -48,41 +52,42 @@ const getUserPubOrgs = (login, params, page = 1) => {
   });
 };
 
-const getReposYearlyCommits = (fullname, params) => {
-  return new Promise(async (resolve, reject) => {
-    const result = await fetchGitHub(`${API_REPOS}/${fullname}/stats/commit_activity?${params}`, {
+const getReposYearlyCommits = async (fullname, params) => {
+  let result = [];
+  try {
+    result = await fetchGitHub(`${API_REPOS}/${fullname}/stats/commit_activity?${params}`, {
       parse: true
     });
-    resolve(result);
-  }).catch((err) => {
-    console.log(err);
-    return Promise.resolve([]);
-  });
+  } catch (err) {
+    result = [];
+  } finally {
+    return result
+  }
 };
 
-const getReposLanguages = (fullname, params) => {
-  return new Promise(async (resolve, reject) => {
-    let result = {};
+const getReposLanguages = async (fullname, params) => {
+  let result = {};
+  try {
     const languages = await fetchGitHub(`${API_REPOS}/${fullname}/languages?${params}`, {
       parse: true
     });
     let total = 0;
     Object.keys(languages).forEach(key => total += languages[key]);
     Object.keys(languages).forEach(key => result[key] = languages[key] / total);
-    resolve(result);
-  }).catch((err) => {
-    console.log(err);
-    return Promise.resolve({});
-  })
+  } catch (err) {
+    result = {};
+  } finally {
+    return result;
+  }
 };
 
-const getReposContributors = (fullname, params) => {
-  return new Promise(async (resolve, reject) => {
+const getReposContributors = async (fullname, params) => {
+  let results = [];
+  try {
     const contributors = await fetchGitHub(`${API_REPOS}/${fullname}/stats/contributors?${params}`, {
       parse: true
     });
-    console.log(contributors);
-    const results = contributors.map((contributor, index) => {
+    results = contributors.map((contributor, index) => {
       const { total, weeks, author } = contributor;
       const weeklyCommits = weeks.map((week, index) => {
         const { w, a, d, c } = week;
@@ -99,11 +104,11 @@ const getReposContributors = (fullname, params) => {
         weeks: weeklyCommits
       }
     });
-    resolve(results);
-  }).catch((err) => {
-    console.log(err);
-    return Promise.resolve([]);
-  });
+  } catch (err) {
+    results = [];
+  } finally {
+    return results;
+  }
 };
 
 
@@ -172,25 +177,50 @@ const getPersonalPubOrgs = (login, params, pages = 1) => {
   }).catch(() => Promise.resolve([]));
 };
 
-const getAllReposYearlyCommits = (repos, params) => {
-  const promiseList = repos.map((item, index) => {
-    return getReposYearlyCommits(item.fullname || item.full_name, params);
-  });
-  return Promise.all(promiseList).then(datas => Promise.resolve(datas)).catch(() => Promise.resolve([]));
+const getAllReposYearlyCommits = async (repositories, params) => {
+  const repos = splitArray(repositories);
+  const results = [];
+  for(let i = 0; i < repos.length; i++) {
+    const repository = repos[i];
+    const promiseList = repository.map((item, index) => {
+      return getReposYearlyCommits(item.fullname || item.full_name, params);
+    });
+    const commits = await Promise.all(promiseList).catch(() => Promise.resolve([]));
+    results.push(...commits);
+  }
+
+  return Promise.resolve(results);
 };
 
-const getAllReposLanguages = (repos, params) => {
-  const promiseList = repos.map((item, index) => {
-    return getReposLanguages(item.fullname || item.full_name, params);
-  });
-  return Promise.all(promiseList).then(datas => Promise.resolve(datas)).catch(() => Promise.resolve([]));
+const getAllReposLanguages = async (repositories, params) => {
+  const repos = splitArray(repositories);
+  const results = [];
+  for(let i = 0; i < repos.length; i++) {
+    const repository = repos[i];
+    const promiseList = repository.map((item, index) => {
+      return getReposLanguages(item.fullname || item.full_name, params);
+    });
+    const languages = await Promise.all(promiseList).catch(() => Promise.resolve([]));
+    results.push(...languages);
+  }
+
+  return Promise.resolve(results);
 };
 
-const getAllReposContributors = (repos, params) => {
-  const promiseList = repos.map((item, index) => {
-    return getReposContributors(item.fullname || item.full_name, params);
-  });
-  return Promise.all(promiseList).then(datas => Promise.resolve(datas)).catch(() => Promise.resolve([]));
+const getAllReposContributors = async (repositories, params) => {
+
+  const repos = splitArray(repositories);
+  const results = [];
+  for(let i = 0; i < repos.length; i++) {
+    const repository = repos[i];
+    const promiseList = repository.map((item, index) => {
+      return getReposContributors(item.fullname || item.full_name, params);
+    });
+    const contributors = await Promise.all(promiseList).catch(() => Promise.resolve([]));
+    results.push(...contributors);
+  }
+
+  return Promise.resolve(results);
 };
 
 export default {
