@@ -59,6 +59,7 @@ const getReposYearlyCommits = async (fullname, params) => {
       parse: true
     });
   } catch (err) {
+    console.log(err)
     result = [];
   } finally {
     return result
@@ -75,6 +76,7 @@ const getReposLanguages = async (fullname, params) => {
     Object.keys(languages).forEach(key => total += languages[key]);
     Object.keys(languages).forEach(key => result[key] = languages[key] / total);
   } catch (err) {
+    console.log(err)
     result = {};
   } finally {
     return result;
@@ -105,6 +107,7 @@ const getReposContributors = async (fullname, params) => {
       }
     });
   } catch (err) {
+    console.log(err)
     results = [];
   } finally {
     return results;
@@ -208,7 +211,6 @@ const getAllReposLanguages = async (repositories, params) => {
 };
 
 const getAllReposContributors = async (repositories, params) => {
-
   const repos = splitArray(repositories);
   const results = [];
   for(let i = 0; i < repos.length; i++) {

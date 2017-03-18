@@ -122,7 +122,6 @@ const refreshUserDatas = async (ctx, next) => {
     const pages = Math.ceil(parseInt(public_repos, 10) / 100);
     const repos = await Helper.fetchRepos(login, verify, pages);
     await Helper.fetchCommits(repos, login, verify);
-    await Helper.updateOrgs(login, verify);
     const updateUserResult = await UsersModel.updateUser(githubUser);
 
     ctx.body = {
@@ -131,8 +130,23 @@ const refreshUserDatas = async (ctx, next) => {
     };
   } catch (err) {
     ctx.body = {
-      success: false,
+      success: false
+    };
+  }
+};
+
+const refreshUserOrgs = async (ctx, next) => {
+  const { login, verify } = ctx.request.query;
+  const user = await UsersModel.findUser(login);
+  try {
+    await Helper.updateOrgs(login, verify);
+    ctx.body = {
+      success: true,
       result: new Date()
+    };
+  } catch (err) {
+    ctx.body = {
+      success: false
     };
   }
 };
@@ -163,5 +177,6 @@ export default {
   getUserRepos,
   getUserOrgs,
   refreshUserDatas,
+  refreshUserOrgs,
   getUserUpdateTime
 }

@@ -56,6 +56,12 @@ router.get(
   GitHub.getUserOrgs
 );
 router.get(
+  '/user/orgs/refresh',
+  params.checkApp(),
+  params.checkQuery(['login', 'verify']),
+  GitHub.refreshUserOrgs
+);
+router.get(
   '/user/refresh',
   params.checkApp(),
   params.checkQuery(['login', 'verify']),
