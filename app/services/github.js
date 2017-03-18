@@ -163,8 +163,8 @@ const getPersonalPubRepos = (login, params, pages = 3) => {
     return getUserRepos(login, params, index + 1);
   });
   return Promise.all(promiseList).then((datas) => {
-    let results = [];
-    datas.forEach(data => results = [...results, ...data]);
+    const results = [];
+    datas.forEach(data => results.push(...data));
     return Promise.resolve(results);
   }).catch(() => Promise.resolve([]));
 };

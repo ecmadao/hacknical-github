@@ -9,7 +9,7 @@ export const getReposInYears = (repos, years = 1) => {
 };
 
 export const validateReposList = (repos) => {
-  const reposList = getReposInYears(repos).filter(repository => !repository.fork).map((repository) => {
+  const reposList = repos.filter(repository => !repository.fork).map((repository) => {
     const { name, full_name, reposId, created_at, pushed_at } = repository;
     return {
       name,
