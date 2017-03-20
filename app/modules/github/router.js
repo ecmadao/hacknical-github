@@ -50,6 +50,24 @@ router.get(
   GitHub.getUserRepos
 );
 router.get(
+  '/user/repos/refresh',
+  params.checkApp(),
+  params.checkQuery(['login', 'verify']),
+  GitHub.refreshUserRepos
+);
+router.get(
+  '/user/commits',
+  params.checkApp(),
+  params.checkQuery(['login', 'verify']),
+  GitHub.getUserCommits
+);
+router.get(
+  '/user/commits/refresh',
+  params.checkApp(),
+  params.checkQuery(['login', 'verify']),
+  GitHub.refreshUserCommits
+);
+router.get(
   '/user/orgs',
   params.checkApp(),
   params.checkQuery(['login', 'verify']),
@@ -60,12 +78,6 @@ router.get(
   params.checkApp(),
   params.checkQuery(['login', 'verify']),
   GitHub.refreshUserOrgs
-);
-router.get(
-  '/user/refresh',
-  params.checkApp(),
-  params.checkQuery(['login', 'verify']),
-  GitHub.refreshUserDatas
 );
 router.get(
   '/user/updateTime',

@@ -83,16 +83,25 @@ const getUserRepos = async (ctx, next) => {
   const repos = await Helper.getRepos(login, verify, {
     publicRepos: public_repos
   });
-  const commits = await Helper.getCommits(login, verify);
 
   ctx.body = {
     success: true,
     result: {
-      repos,
-      commits: sortByCommits(commits)
+      repos
     }
   };
 };
+
+const getUserCommits = async (ctx, next) => {
+  const { login, verify } = ctx.request.query;
+  const commits = await Helper.getCommits(login, verify);
+  ctx.body = {
+    success: true,
+    result: {
+      commits: sortByCommits(commits)
+    }
+  };
+}
 
 const getUserOrgs = async (ctx, next) => {
   const { login, verify } = ctx.query;
@@ -103,7 +112,7 @@ const getUserOrgs = async (ctx, next) => {
   };
 };
 
-const refreshUserDatas = async (ctx, next) => {
+const refreshUserRepos = async (ctx, next) => {
   const { login, verify } = ctx.request.query;
   const user = await UsersModel.findUser(login);
   const lastUpdateTime = user.lastUpdateTime || user['created_at']
@@ -120,8 +129,7 @@ const refreshUserDatas = async (ctx, next) => {
     const githubUser = await GitHub.getUserByToken(verify);
     const { public_repos } = githubUser;
     const pages = Math.ceil(parseInt(public_repos, 10) / 100);
-    const repos = await Helper.fetchRepos(login, verify, pages);
-    await Helper.fetchCommits(repos, login, verify);
+    await Helper.fetchRepos(login, verify, pages);
     const updateUserResult = await UsersModel.updateUser(githubUser);
 
     ctx.body = {
@@ -135,9 +143,30 @@ const refreshUserDatas = async (ctx, next) => {
   }
 };
 
+const refreshUserCommits = async (ctx, next) => {
+  const { login, verify } = ctx.request.query;
+
+  try {
+    const user = await Helper.getUser(login, verify);
+    const { public_repos } = user;
+    const repos = await Helper.getRepos(login, verify, {
+      publicRepos: public_repos
+    });
+    await Helper.fetchCommits(repos, login, verify);
+
+    ctx.body = {
+      success: true,
+      result: new Date()
+    };
+  } catch (err) {
+    ctx.body = {
+      success: false
+    };
+  }
+};
+
 const refreshUserOrgs = async (ctx, next) => {
   const { login, verify } = ctx.request.query;
-  const user = await UsersModel.findUser(login);
   try {
     await Helper.updateOrgs(login, verify);
     ctx.body = {
@@ -175,8 +204,10 @@ export default {
   getLogin,
   getUser,
   getUserRepos,
+  getUserCommits,
   getUserOrgs,
-  refreshUserDatas,
+  refreshUserRepos,
+  refreshUserCommits,
   refreshUserOrgs,
   getUserUpdateTime
 }
