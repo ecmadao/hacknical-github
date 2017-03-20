@@ -44,7 +44,7 @@ const getOrgRepos = (org, params, page = 1) => {
   return fetchGitHub(`${API_ORGS}/${org}/repos?per_page=100&page=${page}&${params}`, {
     parse: true
   });
-}
+};
 
 const getUserPubOrgs = (login, params, page = 1) => {
   return fetchGitHub(`${API_USERS}/${login}/orgs?per_page=100&page=${page}&${params}`, {
@@ -139,7 +139,7 @@ const getUserByToken = (params) => {
   return fetchGitHub(`${API_GET_USER}?${params}`, {
     parse: true
   });
-}
+};
 
 const getOrg = (org, params) => {
   return fetchGitHub(`${API_ORGS}/${org}?${params}`, {

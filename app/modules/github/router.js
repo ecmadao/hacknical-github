@@ -23,13 +23,13 @@ router.get(
   params.checkApp(),
   GitHub.getVerify
 );
-
 router.get(
   '/token',
   params.checkApp(),
   params.checkQuery(['code']),
   GitHub.getToken
 );
+
 router.get(
   '/login',
   params.checkApp(),

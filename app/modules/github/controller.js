@@ -101,7 +101,7 @@ const getUserCommits = async (ctx, next) => {
       commits: sortByCommits(commits)
     }
   };
-}
+};
 
 const getUserOrgs = async (ctx, next) => {
   const { login, verify } = ctx.query;
@@ -206,6 +206,7 @@ export default {
   getUserRepos,
   getUserCommits,
   getUserOrgs,
+  /* ====== */
   refreshUserRepos,
   refreshUserCommits,
   refreshUserOrgs,

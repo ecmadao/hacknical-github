@@ -13,7 +13,7 @@ import {
 /* ================== private helper ================== */
 
 /**
- * ===== repos =====
+ * =============== repos ===============
  */
 const fetchRepos = async (login, verify, pages = 2) => {
   const multiRepos = await GitHub.getPersonalPubRepos(login, verify, pages);
@@ -36,7 +36,7 @@ const getRepos = async (login, verify, options) => {
 };
 
 /**
- * ===== commits =====
+ * =============== commits ===============
  */
 const fetchCommits = async (repos, login, verify) => {
   const reposList = validateReposList(repos);
@@ -74,9 +74,9 @@ const getCommits = async (login, verify) => {
 };
 
 /**
- * ===== orgs =====
+ * =============== orgs ===============
  */
-const fetchOrg = async (orgLogin, verify) => {
+const fetchOrgDetail = async (orgLogin, verify) => {
   const org = await GitHub.getOrg(orgLogin, verify);
   if (!org.login) {
     return {};
@@ -85,10 +85,10 @@ const fetchOrg = async (orgLogin, verify) => {
   const repos = await GitHub.getOrgPubRepos(orgLogin, verify);
 
   // set repos languages
-  try {
-    const reposLanguages = await GitHub.getAllReposLanguages(repos, verify);
-    repos.forEach((repository, index) => repository.languages = reposLanguages[index]);
-  } catch (err) {}
+  // try {
+  //   const reposLanguages = await GitHub.getAllReposLanguages(repos, verify);
+  //   repos.forEach((repository, index) => repository.languages = reposLanguages[index]);
+  // } catch (err) {}
 
   // set repos contributors
   try {
@@ -119,7 +119,7 @@ const updateOrgs = async (login, verify) => {
     const userOrgs = await fetchUserOrgs(login, verify);
     for(let i = 0; i < userOrgs.length; i++) {
       const orgLogin = userOrgs[i].login;
-      await fetchOrg(orgLogin, verify);
+      await fetchOrgDetail(orgLogin, verify);
     }
   } catch (err) {
     console.log(err);
@@ -132,7 +132,7 @@ const getDetailOrgs = async (pubOrgs, verify) => {
     const orgLogin = pubOrgs[i].login;
     let org = await OrgsModel.find(orgLogin);
     if (!org) {
-      org = await fetchOrg(orgLogin, verify);
+      org = await fetchOrgDetail(orgLogin, verify);
     }
     orgs.push(org);
   }
@@ -145,7 +145,7 @@ const getOrgs = async (login, verify) => {
 };
 
 /*
- * ==== user =====
+ * =============== user ===============
  */
 const fetchUser = async (login, verify) => {
   const userInfo = await GitHub.getUser(login, verify);
