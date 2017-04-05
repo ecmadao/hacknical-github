@@ -3,43 +3,23 @@ import GitHubUsers from './schema';
 /**
  * private
  */
-const getGitHubInfo = (userInfo) => {
-  const {
-    id,
-    login,
-    name,
-    avatar_url,
-    company,
-    blog,
-    location,
-    email,
-    bio,
-    created_at,
-    updated_at,
-    public_repos,
-    public_gists,
-    followers,
-    following
-  } = userInfo;
-  const newGitHubInfo = {
-    id,
-    login,
-    name,
-    avatar_url,
-    company,
-    blog,
-    location,
-    email,
-    bio,
-    created_at,
-    updated_at,
-    public_repos,
-    public_gists,
-    followers,
-    following
-  };
-  return newGitHubInfo;
-};
+const getGitHubInfo = (userInfo) => ({
+  id: userInfo.id,
+  login: userInfo.login,
+  name: userInfo.name,
+  avatar_url: userInfo.avatar_url,
+  company: userInfo.company,
+  blog: userInfo.blog,
+  location: userInfo.location,
+  email: userInfo.email,
+  bio: userInfo.bio,
+  created_at: userInfo.created_at,
+  updated_at: userInfo.updated_at,
+  public_repos: userInfo.public_repos,
+  public_gists: userInfo.public_gists,
+  followers: userInfo.followers,
+  following: userInfo.following
+});
 
 const findUser = async (login) => {
   return await GitHubUsers.findOne({ login });

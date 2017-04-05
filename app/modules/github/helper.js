@@ -35,6 +35,15 @@ const getRepos = async (login, verify, options) => {
   return await fetchRepos(login, verify, pages);
 };
 
+const getUserPublicRepos = async (login, verify) => {
+  const user = await getUser(login, verify);
+  const { public_repos } = user;
+  const repos = await getRepos(login, verify, {
+    publicRepos: public_repos
+  });
+  return repos;
+};
+
 /**
  * =============== commits ===============
  */
@@ -94,7 +103,9 @@ const fetchOrgDetail = async (orgLogin, verify) => {
   try {
     const reposContributors = await GitHub.getAllReposContributors(repos, verify);
     repos.forEach((repository, index) => repository.contributors = reposContributors[index]);
-  } catch (err) {}
+  } catch (err) {
+    console.log(err);
+  }
 
   org.repos = repos;
   await OrgsModel.create(org);
@@ -160,10 +171,14 @@ const getUser = async (login, verify) => {
 };
 
 export default {
+  // repos
   fetchRepos,
   getRepos,
+  getUserPublicRepos,
+  // commits
   fetchCommits,
   getCommits,
+  // orgs
   getOrgs,
   updateOrgs,
   getUser

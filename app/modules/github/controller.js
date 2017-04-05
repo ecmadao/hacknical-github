@@ -78,11 +78,7 @@ const getUser = async (ctx, next) => {
 
 const getUserRepos = async (ctx, next) => {
   const { login, verify } = ctx.request.query;
-  const user = await Helper.getUser(login, verify);
-  const { public_repos } = user;
-  const repos = await Helper.getRepos(login, verify, {
-    publicRepos: public_repos
-  });
+  const repos = await Helper.getUserPublicRepos(login, verify);
 
   ctx.body = {
     success: true,
@@ -147,11 +143,7 @@ const refreshUserCommits = async (ctx, next) => {
   const { login, verify } = ctx.request.query;
 
   try {
-    const user = await Helper.getUser(login, verify);
-    const { public_repos } = user;
-    const repos = await Helper.getRepos(login, verify, {
-      publicRepos: public_repos
-    });
+    const repos = await Helper.getUserPublicRepos(login, verify);
     await Helper.fetchCommits(repos, login, verify);
 
     ctx.body = {

@@ -107,13 +107,35 @@ const getReposContributors = async (fullname, params) => {
       }
     });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     results = [];
   } finally {
     return results;
   }
 };
 
+const fetchByPromiseList = (promiseList) => {
+  return Promise.all(promiseList).then((datas) => {
+    let results = [];
+    datas.forEach(data => results = [...results, ...data]);
+    return Promise.resolve(results);
+  }).catch(() => Promise.resolve([]));
+};
+
+const mapReposToGet = async ({ repositories, params }, func) => {
+  const repos = splitArray(repositories);
+  const results = [];
+  for(let i = 0; i < repos.length; i++) {
+    const repository = repos[i];
+    const promiseList = repository.map((item, index) => {
+      return func(item.fullname || item.full_name, params);
+    });
+    const datas = await Promise.all(promiseList).catch(() => Promise.resolve([]));
+    results.push(...datas);
+  }
+
+  return Promise.resolve(results);
+};
 
 /* =========================== github api =========================== */
 
@@ -151,78 +173,33 @@ const getOrgPubRepos = (org, params, pages = 1) => {
   const promiseList = new Array(pages).fill(0).map((item, index) => {
     return getOrgRepos(org, params, index + 1);
   });
-  return Promise.all(promiseList).then((datas) => {
-    let results = [];
-    datas.forEach(data => results = [...results, ...data]);
-    return Promise.resolve(results);
-  }).catch(() => Promise.resolve([]));
+  return fetchByPromiseList(promiseList);
 };
 
 const getPersonalPubRepos = (login, params, pages = 3) => {
   const promiseList = new Array(pages).fill(0).map((item, index) => {
     return getUserRepos(login, params, index + 1);
   });
-  return Promise.all(promiseList).then((datas) => {
-    const results = [];
-    datas.forEach(data => results.push(...data));
-    return Promise.resolve(results);
-  }).catch(() => Promise.resolve([]));
+  return fetchByPromiseList(promiseList);
 };
 
 const getPersonalPubOrgs = (login, params, pages = 1) => {
   const promiseList = new Array(pages).fill(0).map((item, index) => {
     return getUserPubOrgs(login, params, index + 1);
   });
-  return Promise.all(promiseList).then((datas) => {
-    let results = [];
-    datas.forEach(data => results = [...results, ...data]);
-    return Promise.resolve(results);
-  }).catch(() => Promise.resolve([]));
+  return fetchByPromiseList(promiseList);
 };
 
 const getAllReposYearlyCommits = async (repositories, params) => {
-  const repos = splitArray(repositories);
-  const results = [];
-  for(let i = 0; i < repos.length; i++) {
-    const repository = repos[i];
-    const promiseList = repository.map((item, index) => {
-      return getReposYearlyCommits(item.fullname || item.full_name, params);
-    });
-    const commits = await Promise.all(promiseList).catch(() => Promise.resolve([]));
-    results.push(...commits);
-  }
-
-  return Promise.resolve(results);
+  return await mapReposToGet({ repositories, params }, getReposYearlyCommits);
 };
 
 const getAllReposLanguages = async (repositories, params) => {
-  const repos = splitArray(repositories);
-  const results = [];
-  for(let i = 0; i < repos.length; i++) {
-    const repository = repos[i];
-    const promiseList = repository.map((item, index) => {
-      return getReposLanguages(item.fullname || item.full_name, params);
-    });
-    const languages = await Promise.all(promiseList).catch(() => Promise.resolve([]));
-    results.push(...languages);
-  }
-
-  return Promise.resolve(results);
+  return await mapReposToGet({ repositories, params }, getReposLanguages);
 };
 
 const getAllReposContributors = async (repositories, params) => {
-  const repos = splitArray(repositories);
-  const results = [];
-  for(let i = 0; i < repos.length; i++) {
-    const repository = repos[i];
-    const promiseList = repository.map((item, index) => {
-      return getReposContributors(item.fullname || item.full_name, params);
-    });
-    const contributors = await Promise.all(promiseList).catch(() => Promise.resolve([]));
-    results.push(...contributors);
-  }
-
-  return Promise.resolve(results);
+  return await mapReposToGet({ repositories, params }, getReposContributors);
 };
 
 export default {

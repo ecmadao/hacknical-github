@@ -4,89 +4,46 @@ import GitHubOrgs from './schema';
 /**
  * private
  */
-const getOrgInfo = (orgInfo) => {
-  const {
-    login,
-    name,
-    avatar_url,
-    company,
-    blog,
-    location,
-    email,
-    description,
-    created_at,
-    updated_at,
-    public_repos,
-    public_gists,
-    followers,
-    following,
-    repos,
-    html_url,
-    type
-  } = orgInfo;
-  return {
-    login,
-    name,
-    avatar_url,
-    company,
-    blog,
-    location,
-    email,
-    description,
-    created_at,
-    updated_at,
-    public_repos,
-    public_gists,
-    followers,
-    following,
-    html_url,
-    type,
-    repos: repos || []
-  };
-};
+const getOrgInfo = (orgInfo) => ({
+  login: orgInfo.login,
+  name: orgInfo.name,
+  avatar_url: orgInfo.avatar_url,
+  company: orgInfo.company,
+  blog: orgInfo.blog,
+  location: orgInfo.location,
+  email: orgInfo.email,
+  description: orgInfo.description,
+  created_at: orgInfo.created_at,
+  updated_at: orgInfo.updated_at,
+  public_repos: orgInfo.public_repos,
+  public_gists: orgInfo.public_gists,
+  followers: orgInfo.followers,
+  following: orgInfo.following,
+  html_url: orgInfo.html_url,
+  type: orgInfo.type,
+  repos: orgInfo.repos || []
+});
 
-const getReposInfo = (repos) => {
-  const {
-    full_name,
-    name,
-    html_url,
-    description,
-    fork,
-    created_at,
-    updated_at,
-    pushed_at,
-    homepage,
-    size,
-    stargazers_count,
-    watchers_count,
-    language,
-    languages,
-    contributors,
-    forks_count,
-    forks,
-    watchers
-  } = repos;
-  return {
-    full_name,
-    name,
-    html_url,
-    description,
-    fork,
-    created_at,
-    updated_at,
-    pushed_at,
-    homepage,
-    size,
-    stargazers_count,
-    watchers_count,
-    language,
-    languages,
-    contributors,
-    forks_count,
-    forks,
-    watchers
-  }
-};
+const getReposInfo = (repos) => ({
+  full_name: repos.full_name,
+  name: repos.name,
+  html_url: repos.html_url,
+  description: repos.description,
+  fork: repos.fork,
+  created_at: repos.created_at,
+  updated_at: repos.updated_at,
+  pushed_at: repos.pushed_at,
+  homepage: repos.homepage,
+  size: repos.size,
+  stargazers_count: repos.stargazers_count,
+  watchers_count: repos.watchers_count,
+  language: repos.language,
+  languages: repos.languages,
+  contributors: repos.contributors,
+  forks_count: repos.forks_count,
+  forks: repos.forks,
+  watchers: repos.watchers
+});
 
 /* === API === */
 
