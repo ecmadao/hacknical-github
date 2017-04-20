@@ -2,5 +2,4 @@
 /config/development.json
 /dist
 /node_modules
-/public/dll
 .idea

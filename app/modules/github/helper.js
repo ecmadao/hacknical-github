@@ -182,4 +182,4 @@ export default {
   getOrgs,
   updateOrgs,
   getUser
-}
+};

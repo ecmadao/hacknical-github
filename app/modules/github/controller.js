@@ -203,4 +203,4 @@ export default {
   refreshUserCommits,
   refreshUserOrgs,
   getUserUpdateTime
-}
+};

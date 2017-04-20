@@ -7,4 +7,4 @@ const getSeconds = (date) => parseInt(formatDate(new Date(date))('X'));
 export default {
   getSeconds,
   getDateBeforeYears: (years) => moment().add(-parseInt(years), 'years').format('L')
-}
+};

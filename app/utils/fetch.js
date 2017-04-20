@@ -42,4 +42,4 @@ export default {
     options.method = 'POST';
     return fetch(options, parse, timeout)
   }
-}
+};
