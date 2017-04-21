@@ -1,11 +1,9 @@
-import config from 'config';
 import fetch from '../utils/fetch';
 import {
   flatArray,
-  splitArray
+  splitArray,
+  flattenObject
 } from '../utils/helpers';
-
-const appName = config.get('github.appName');
 
 const BASE_URL = 'https://api.github.com';
 const API_TOKEN = 'https://github.com/login/oauth/access_token';
@@ -17,46 +15,63 @@ const API_REPOS = `${BASE_URL}/repos`;
 
 /* =========================== basic funcs =========================== */
 
-const fetchGitHub = (url, option = {}) => {
-  const options = {
-    url,
-    headers: { 'User-Agent': appName }
-  };
-  return fetch.get(options, option.parse);
+const fetchGitHub = (options) => {
+  const { url } = options;
+  options.json = true;
+  return fetch.get(options);
 };
 
-const postGitHub = (url) => {
-  const options = {
-    url
-  };
+const postGitHub = (options) => {
+  options.json = true;
   return fetch.post(options);
 };
 
 /* =========================== private funcs =========================== */
 
-const getUserRepos = (login, params, page = 1) => {
-  return fetchGitHub(`${API_USERS}/${login}/repos?per_page=100&page=${page}&${params}`, {
-    parse: true
+const getUserRepos = (login, verify, page = 1) => {
+  const { qs, headers } = verify;
+  qs['per_page'] = 100;
+  qs['page'] = page;
+
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${API_USERS}/${login}/repos`
   });
 };
 
-const getOrgRepos = (org, params, page = 1) => {
-  return fetchGitHub(`${API_ORGS}/${org}/repos?per_page=100&page=${page}&${params}`, {
-    parse: true
+const getOrgRepos = (org, verify, page = 1) => {
+  const { qs, headers } = verify;
+  qs['per_page'] = 100;
+  qs['page'] = page;
+
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${API_ORGS}/${org}/repos`
   });
 };
 
-const getUserPubOrgs = (login, params, page = 1) => {
-  return fetchGitHub(`${API_USERS}/${login}/orgs?per_page=100&page=${page}&${params}`, {
-    parse: true
+const getUserPubOrgs = (login, verify, page = 1) => {
+  const { qs, headers } = verify;
+  qs['per_page'] = 100;
+  qs['page'] = page;
+
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${API_USERS}/${login}/orgs`
   });
 };
 
-const getReposYearlyCommits = async (fullname, params) => {
+const getReposYearlyCommits = async (fullname, verify) => {
   let result = [];
+  const { qs, headers } = verify;
   try {
-    result = await fetchGitHub(`${API_REPOS}/${fullname}/stats/commit_activity?${params}`, {
-      parse: true
+    result = await fetchGitHub({
+      qs,
+      headers,
+      url: `${API_REPOS}/${fullname}/stats/commit_activity`
     });
   } catch (err) {
     console.log(err)
@@ -66,28 +81,34 @@ const getReposYearlyCommits = async (fullname, params) => {
   }
 };
 
-const getReposLanguages = async (fullname, params) => {
+const getReposLanguages = async (fullname, verify) => {
   let result = {};
+  const { qs, headers } = verify;
   try {
-    const languages = await fetchGitHub(`${API_REPOS}/${fullname}/languages?${params}`, {
-      parse: true
+    const languages = await fetchGitHub({
+      qs,
+      headers,
+      url: `${API_REPOS}/${fullname}/languages`
     });
     let total = 0;
     Object.keys(languages).forEach(key => total += languages[key]);
     Object.keys(languages).forEach(key => result[key] = languages[key] / total);
   } catch (err) {
-    console.log(err)
+    console.log(err);
     result = {};
   } finally {
     return result;
   }
 };
 
-const getReposContributors = async (fullname, params) => {
+const getReposContributors = async (fullname, verify) => {
   let results = [];
+  const { qs, headers } = verify;
   try {
-    const contributors = await fetchGitHub(`${API_REPOS}/${fullname}/stats/contributors?${params}`, {
-      parse: true
+    const contributors = await fetchGitHub({
+      qs,
+      headers,
+      url: `${API_REPOS}/${fullname}/stats/contributors`
     });
     results = contributors.map((contributor, index) => {
       const { total, weeks, author } = contributor;
@@ -139,33 +160,56 @@ const mapReposToGet = async ({ repositories, params }, func) => {
 
 /* =========================== github api =========================== */
 
-const getOctocat = (params) => {
-  return fetchGitHub(`${BASE_URL}/octocat?${params}`);
-};
-
-const getZen = (params) => {
-  return fetchGitHub(`${BASE_URL}/zen?${params}`);
-};
-
-const getToken = (code, params) => {
-  return postGitHub(`${API_TOKEN}?code=${code}&${params}`)
-};
-
-const getUser = (login, params) => {
-  return fetchGitHub(`${API_USERS}/${login}?${params}`, {
-    parse: true
+const getOctocat = (verify) => {
+  const { qs, headers } = verify;
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${BASE_URL}/octocat`
   });
 };
 
-const getUserByToken = (params) => {
-  return fetchGitHub(`${API_GET_USER}?${params}`, {
-    parse: true
+const getZen = (verify) => {
+  const { qs, headers } = verify;
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${BASE_URL}/zen`
   });
 };
 
-const getOrg = (org, params) => {
-  return fetchGitHub(`${API_ORGS}/${org}?${params}`, {
-    parse: true
+const getToken = (code, verify) => {
+  const { qs, headers } = verify;
+  return postGitHub({
+    headers,
+    url: `${API_TOKEN}?code=${code}&${flattenObject(qs)}`
+  });
+};
+
+const getUser = (login, verify) => {
+  const { qs, headers } = verify;
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${API_USERS}/${login}`
+  });
+};
+
+const getUserByToken = (verify) => {
+  const { qs, headers } = verify;
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${API_GET_USER}`
+  });
+};
+
+const getOrg = (org, verify) => {
+  const { qs, headers } = verify;
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${API_ORGS}/${org}`
   });
 };
 

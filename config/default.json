@@ -7,10 +7,5 @@
   "database": {
     "url": ""
   },
-  "github": {
-    "clientId": "",
-    "clientSecret": "",
-    "appName": "",
-    "timeouts": []
-  }
+  "app": {}
 }

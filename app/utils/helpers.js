@@ -1,4 +1,6 @@
 const SPLIT_NUM = 20;
+const checkObject = (obj) => Object.prototype.toString.call(obj) === '[object Object]';
+const checkArray = (array) => Object.prototype.toString.call(array) === '[object Array]';
 
 /**
  * split array by max array length
@@ -36,7 +38,11 @@ export const flatArray = (arraies) => {
 export const flattenObject = (object) => {
   let result = '';
   Object.keys(object).forEach((key) => {
-    result += `${key}=${object[key]}&`;
+    const item = object[key];
+    const value = checkObject(item)
+      ? `${flattenObject(item)}`
+      : `${key}=${item}`;
+    result += `${value}&`;
   });
-  return result
+  return result.replace(/&$/, '');
 };

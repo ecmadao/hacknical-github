@@ -1,6 +1,4 @@
-import config from 'config';
-
-const appName = config.get('github.appName');
+import verifyApp from '../utils/verify';
 
 const checkQuery = (params = []) => async (ctx, next) => {
   params.forEach((param) => {
@@ -30,9 +28,8 @@ const checkHeaders = (params = []) => async (ctx, next) => {
 };
 
 const checkApp = () => async (ctx, next) => {
-  if (appName !== ctx.headers['hacknical-app-name']) {
-    throw new Error(`Wrong header!`);
-  }
+  const appName = ctx.headers['app-name'];
+  ctx.state.appName = verifyApp(appName);
   await next();
 };
 

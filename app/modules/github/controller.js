@@ -6,8 +6,7 @@ import Helper from './helper';
 import { sortByCommits } from '../../utils/github';
 
 const HALF_AN_HOUR = 30 * 60;
-const clientId = config.get('github.clientId');
-
+const app = config.get('app');
 
 
 /* ================== router handler ================== */
@@ -33,14 +32,14 @@ const getOctocat = async (ctx) => {
 const getVerify = async (ctx) => {
   ctx.body = {
     success: true,
-    result: clientId
+    result: app[ctx.state.appName].clientId
   };
 };
 
 const getToken = async (ctx, next) => {
   const { code, verify } = ctx.request.query;
   const result = await GitHub.getToken(code, verify);
-  const token = result.match(/^access_token=(\w+)&/)[1];
+  const token = result.access_token;
   ctx.body = {
     success: true,
     result: token
