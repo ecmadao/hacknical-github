@@ -17,6 +17,11 @@
       "clientId": "8b91eabebd11756e79b3",
       "clientSecret": "80071b1c1d14aca980a6caa79b7311200a4779a8",
       "appName": "jarvis-local"
+    },
+    "jarvis-extension-local": {
+      "clientId": "6cb1f015708c8f46bfc5",
+      "clientSecret": "8afb114582821dcf43f7cb0984bce17616921b1b",
+      "appName": "jarvis-extension-local"
     }
   },
   "timeouts": [4000, 4000, 4000]

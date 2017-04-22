@@ -7,5 +7,6 @@
   "database": {
     "url": ""
   },
-  "app": {}
+  "app": {},
+  "timeouts": [4000, 4000, 4000]
 }
