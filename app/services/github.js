@@ -28,6 +28,15 @@ const postGitHub = (options) => {
 
 /* =========================== private funcs =========================== */
 
+const getSingleRepos = (fullname, verify) => {
+  const { qs, headers } = verify;
+  return fetchGitHub({
+    qs,
+    headers,
+    url: `${API_REPOS}/${fullname}`
+  });
+};
+
 const getUserRepos = (login, verify, page = 1) => {
   const { qs, headers } = verify;
   qs['per_page'] = 100;
@@ -251,6 +260,8 @@ export default {
   getZen,
   getOctocat,
   getToken,
+  // repos
+  getSingleRepos,
   // user
   getUser,
   getUserByToken,
@@ -262,5 +273,6 @@ export default {
   // repos
   getAllReposYearlyCommits,
   getAllReposLanguages,
+  getReposLanguages,
   getAllReposContributors
 }

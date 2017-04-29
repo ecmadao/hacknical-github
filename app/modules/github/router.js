@@ -49,6 +49,14 @@ router.get(
   params.checkQuery(['login', 'verify']),
   GitHub.getUser
 );
+router.get(
+  '/repository',
+  params.checkApp(),
+  verify(),
+  params.checkQuery(['verify', 'fullname']),
+  GitHub.getRepository
+);
+
 
 router.get(
   '/user/repos',

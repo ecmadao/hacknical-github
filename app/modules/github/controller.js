@@ -183,6 +183,15 @@ const getUserUpdateTime = async (ctx, next) => {
   };
 };
 
+const getRepository = async (ctx, next) => {
+  const { verify, fullname } = ctx.request.query;
+  const repository = await Helper.getRepository(fullname, verify);
+  return ctx.body = {
+    success: true,
+    result: repository
+  };
+};
+
 
 export default {
   /* ====== */
@@ -194,6 +203,8 @@ export default {
   /* ====== */
   getLogin,
   getUser,
+  getRepository,
+  /* ====== */
   getUserRepos,
   getUserCommits,
   getUserOrgs,

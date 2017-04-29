@@ -11,6 +11,13 @@ import {
 } from '../../utils/github';
 
 /* ================== private helper ================== */
+const fetchRepository = async (fullname, verify) => {
+  const repository = await GitHub.getSingleRepos(fullname, verify);
+  repository.languages = await GitHub.getReposLanguages(fullname, verify);
+  const login = repository.owner.login;
+  const setResult = await ReposModel.setRepository(login, repository);
+  return setResult;
+};
 
 /**
  * =============== repos ===============
@@ -23,6 +30,12 @@ const fetchRepos = async (login, verify, pages = 2) => {
   } catch (err) {}
   const setResults = await ReposModel.setRepos(login, multiRepos);
   return setResults;
+};
+
+const getRepository = async (fullname, verify) => {
+  const findResult = await ReposModel.getRepository(fullname);
+  if (findResult) return findResult;
+  return await fetchRepository(fullname, verify);
 };
 
 const getRepos = async (login, verify, options) => {
@@ -174,6 +187,7 @@ export default {
   // repos
   fetchRepos,
   getRepos,
+  getRepository,
   getUserPublicRepos,
   // commits
   fetchCommits,

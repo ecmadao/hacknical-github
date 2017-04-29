@@ -27,7 +27,7 @@ const removeRepos = async (login, reposId = null) => {
   });
 };
 
-const setRepository = async (login, repository) => {
+const createRepos = async (login, repository) => {
   const {
     id,
     full_name,
@@ -73,29 +73,15 @@ const setRepository = async (login, repository) => {
   });
 };
 
-const setRepos = async (login, repos) => {
-  const setResults = [];
-  await removeRepos(login);
-  for(let i = 0; i < repos.length; i++) {
-    const repository = repos[i];
-    const findResult = await findRepository(login, repository.id);
-    if (!findResult) {
-      const result = await setRepository(login, repository);
-      setResults.push(result);
-    } else {
-      setResults.push(findResult);
-    }
+const setRepository = async (login, repository) => {
+  const findResult = await findRepository(login, repository.id);
+  if (findResult) {
+    return findResult;
   }
-  return setResults;
+  return await createRepos(login, repository);
 };
 
-const getRepos = async (login) => {
-  return await GitHubRepos.find({
-    login
-  });
-};
-
-const resetRepos = async (login, repos) => {
+const setRepos = async (login, repos) => {
   const setResults = [];
   await removeRepos(login);
   for(let i = 0; i < repos.length; i++) {
@@ -106,10 +92,34 @@ const resetRepos = async (login, repos) => {
   return setResults;
 };
 
+const getRepos = async (login) => {
+  return await GitHubRepos.find({
+    login
+  });
+};
+
+const getRepository = async (fullname) => {
+  return await GitHubRepos.findOne({
+    full_name: fullname
+  });
+};
+
+const resetRepos = async (login, repos) => {
+  const setResults = [];
+  await removeRepos(login);
+  for(let i = 0; i < repos.length; i++) {
+    const repository = repos[i];
+    const result = await createRepos(login, repository);
+    setResults.push(result);
+  }
+  return setResults;
+};
+
 export default {
   removeRepos,
+  getRepository,
   setRepository,
   setRepos,
   getRepos,
   resetRepos
-}
+};
