@@ -47,7 +47,8 @@ const createRepos = async (login, repository) => {
   	forks_count,
   	forks,
   	watchers,
-  	subscribers_count
+  	subscribers_count,
+    owner
   } = repository;
   return await GitHubRepos.create({
     reposId: id,
@@ -69,7 +70,12 @@ const createRepos = async (login, repository) => {
   	forks_count,
   	forks,
   	watchers,
-  	subscribers_count
+  	subscribers_count,
+    owner: {
+      login: owner.login,
+      avatar_url: owner.avatar_url,
+      html_url: owner.html_url
+    }
   });
 };
 

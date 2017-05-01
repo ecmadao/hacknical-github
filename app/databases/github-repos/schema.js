@@ -22,7 +22,12 @@ const GitHubReposSchema = new Schema({
 	forks_count: Number,
 	forks: Number,
 	watchers: Number,
-	subscribers_count: Number
+	subscribers_count: Number,
+  owner: {
+    login: String,
+    avatar_url: String,
+    html_url: String
+  }
 });
 
 export default mongoose.model('GithubRepos', GitHubReposSchema);
