@@ -12,7 +12,7 @@ import {
 
 /* ================== private helper ================== */
 const fetchRepository = async (fullname, verify) => {
-  const repository = await GitHub.getSingleRepos(fullname, verify);
+  const repository = await GitHub.getRepository(fullname, verify);
   repository.languages = await GitHub.getReposLanguages(fullname, verify);
   const login = repository.owner.login;
   const setResult = await ReposModel.setRepository(login, repository);

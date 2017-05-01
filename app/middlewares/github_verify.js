@@ -4,7 +4,7 @@ import { flattenObject } from '../utils/helpers';
 const app = config.get('app');
 
 const verifyMiddlwware = () => async (ctx, next) => {
-  const { token } = ctx.request.query;
+  const token = ctx.request.query.token || ctx.request.body.token;
   const { appName } = ctx.state;
   const headers = { 'User-Agent': appName };
 

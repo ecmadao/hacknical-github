@@ -49,12 +49,29 @@ router.get(
   params.checkQuery(['login', 'verify']),
   GitHub.getUser
 );
+
 router.get(
   '/repository',
   params.checkApp(),
   verify(),
   params.checkQuery(['verify', 'fullname']),
   GitHub.getRepository
+);
+router.put(
+  '/repository/star',
+  params.checkApp(),
+  verify(),
+  params.checkQuery(['verify']),
+  params.checkBody(['fullname']),
+  GitHub.starRepository
+);
+router.delete(
+  '/repository/star',
+  params.checkApp(),
+  verify(),
+  params.checkQuery(['verify']),
+  params.checkBody(['fullname']),
+  GitHub.unstarRepository
 );
 
 

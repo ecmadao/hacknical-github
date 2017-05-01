@@ -192,6 +192,27 @@ const getRepository = async (ctx, next) => {
   };
 };
 
+const starRepository = async (ctx, next) => {
+  const { verify } = ctx.request.query;
+  const { fullname } = ctx.request.body;
+  const result = await GitHub.starRepository(fullname, verify);
+
+  return ctx.body = {
+    success: true,
+    result
+  };
+};
+
+const unstarRepository = async (ctx, next) => {
+  const { verify } = ctx.request.query;
+  const { fullname } = ctx.request.body;
+  const result = await GitHub.unstarRepository(fullname, verify);
+
+  return ctx.body = {
+    success: true,
+    result
+  };
+};
 
 export default {
   /* ====== */
@@ -204,6 +225,8 @@ export default {
   getLogin,
   getUser,
   getRepository,
+  starRepository,
+  unstarRepository,
   /* ====== */
   getUserRepos,
   getUserCommits,

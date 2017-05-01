@@ -18,8 +18,6 @@ const fetchData = (options) => {
         } finally {
           resolve(result);
         }
-        // const result = parse ? JSON.parse(body) : body;
-        // resolve(result);
       }
       reject(err);
     });
@@ -27,6 +25,7 @@ const fetchData = (options) => {
 };
 
 const fetch = async (options, timeout = retryTimes) => {
+  options.json = true;
   let err = null;
   for (let i = 0; i < timeout.length; i++) {
     try {
@@ -48,6 +47,14 @@ export default {
   },
   post: (options, timeout) => {
     options.method = 'POST';
+    return fetch(options, timeout)
+  },
+  put: (options, timeout) => {
+    options.method = 'PUT';
+    return fetch(options, timeout)
+  },
+  delete: (options, timeout) => {
+    options.method = 'DELETE';
     return fetch(options, timeout)
   }
 };

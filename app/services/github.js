@@ -13,27 +13,32 @@ const API_USERS = `${BASE_URL}/users`;
 const API_ORGS = `${BASE_URL}/orgs`;
 const API_REPOS = `${BASE_URL}/repos`;
 
-/* =========================== basic funcs =========================== */
 
-const fetchGitHub = (options) => {
-  const { url } = options;
-  options.json = true;
-  return fetch.get(options);
-};
-
-const postGitHub = (options) => {
-  options.json = true;
-  return fetch.post(options);
-};
-
-/* =========================== private funcs =========================== */
-
-const getSingleRepos = (fullname, verify) => {
+/* ===================== repository =====================*/
+const getRepository = (fullname, verify) => {
   const { qs, headers } = verify;
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${API_REPOS}/${fullname}`
+  });
+};
+
+const starRepository = (fullname, verify) => {
+  const { qs, headers } = verify;
+  return fetch.put({
+    qs,
+    headers,
+    url: `${API_GET_USER}/starred/${fullname}`
+  });
+};
+
+const unstarRepository = (fullname, verify) => {
+  const { qs, headers } = verify;
+  return fetch.delete({
+    qs,
+    headers,
+    url: `${API_GET_USER}/starred/${fullname}`
   });
 };
 
@@ -42,7 +47,7 @@ const getUserRepos = (login, verify, page = 1) => {
   qs['per_page'] = 100;
   qs['page'] = page;
 
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${API_USERS}/${login}/repos`
@@ -54,7 +59,7 @@ const getOrgRepos = (org, verify, page = 1) => {
   qs['per_page'] = 100;
   qs['page'] = page;
 
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${API_ORGS}/${org}/repos`
@@ -66,7 +71,7 @@ const getUserPubOrgs = (login, verify, page = 1) => {
   qs['per_page'] = 100;
   qs['page'] = page;
 
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${API_USERS}/${login}/orgs`
@@ -77,7 +82,7 @@ const getReposYearlyCommits = async (fullname, verify) => {
   let result = [];
   const { qs, headers } = verify;
   try {
-    result = await fetchGitHub({
+    result = await fetch.get({
       qs,
       headers,
       url: `${API_REPOS}/${fullname}/stats/commit_activity`
@@ -94,7 +99,7 @@ const getReposLanguages = async (fullname, verify) => {
   let result = {};
   const { qs, headers } = verify;
   try {
-    const languages = await fetchGitHub({
+    const languages = await fetch.get({
       qs,
       headers,
       url: `${API_REPOS}/${fullname}/languages`
@@ -114,7 +119,7 @@ const getReposContributors = async (fullname, verify) => {
   let results = [];
   const { qs, headers } = verify;
   try {
-    const contributors = await fetchGitHub({
+    const contributors = await fetch.get({
       qs,
       headers,
       url: `${API_REPOS}/${fullname}/stats/contributors`
@@ -171,7 +176,7 @@ const mapReposToGet = async ({ repositories, params }, func) => {
 
 const getOctocat = (verify) => {
   const { qs, headers } = verify;
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${BASE_URL}/octocat`
@@ -180,7 +185,7 @@ const getOctocat = (verify) => {
 
 const getZen = (verify) => {
   const { qs, headers } = verify;
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${BASE_URL}/zen`
@@ -189,7 +194,7 @@ const getZen = (verify) => {
 
 const getToken = (code, verify) => {
   const { qs, headers } = verify;
-  return postGitHub({
+  return fetch.post({
     headers,
     url: `${API_TOKEN}?code=${code}&${flattenObject(qs)}`
   });
@@ -197,7 +202,7 @@ const getToken = (code, verify) => {
 
 const getUser = (login, verify) => {
   const { qs, headers } = verify;
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${API_USERS}/${login}`
@@ -206,7 +211,7 @@ const getUser = (login, verify) => {
 
 const getUserByToken = (verify) => {
   const { qs, headers } = verify;
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${API_GET_USER}`
@@ -215,7 +220,7 @@ const getUserByToken = (verify) => {
 
 const getOrg = (org, verify) => {
   const { qs, headers } = verify;
-  return fetchGitHub({
+  return fetch.get({
     qs,
     headers,
     url: `${API_ORGS}/${org}`
@@ -261,7 +266,9 @@ export default {
   getOctocat,
   getToken,
   // repos
-  getSingleRepos,
+  getRepository,
+  starRepository,
+  unstarRepository,
   // user
   getUser,
   getUserByToken,
