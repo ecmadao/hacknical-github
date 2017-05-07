@@ -1,4 +1,5 @@
 import config from 'config';
+import log from '../../utils/log';
 import OrgsModel from '../../databases/github-orgs';
 import ReposModel from '../../databases/github-repos';
 import CommitsModel from '../../databases/github-commits';
@@ -117,7 +118,7 @@ const fetchOrgDetail = async (orgLogin, verify) => {
     const reposContributors = await GitHub.getAllReposContributors(repos, verify);
     repos.forEach((repository, index) => repository.contributors = reposContributors[index]);
   } catch (err) {
-    console.log(err);
+    log.error(err);
   }
 
   org.repos = repos;
@@ -146,7 +147,7 @@ const updateOrgs = async (login, verify) => {
       await fetchOrgDetail(orgLogin, verify);
     }
   } catch (err) {
-    console.log(err);
+    log.error(err);
   }
 };
 

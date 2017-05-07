@@ -24,5 +24,22 @@
       "appName": "jarvis-extension-local"
     }
   },
+  "auth": [
+    {
+      "name": "hacknical-local",
+      "publicKey": "07a9c1c",
+      "secretKey": "6cf75c66dcc02caa7e0eef7170a9"
+    },
+    {
+      "name": "jarvis-local",
+      "publicKey": "8c8f46bfc5",
+      "secretKey": "8afb114582821dcf43f7cb0984bce1"
+    },
+    {
+      "name": "jarvis-extension-local",
+      "publicKey": "f015708c8f4",
+      "secretKey": "82821dcf43f7cfb11b09845828bce"
+    }
+  ],
   "timeouts": [4000, 4000, 4000]
 }

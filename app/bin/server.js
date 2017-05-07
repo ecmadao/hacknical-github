@@ -8,6 +8,8 @@ import json from 'koa-json';
 import cors from 'kcors';
 import config from 'config';
 import router from '../modules';
+import log from '../utils/log';
+import authMiddleware from '../middlewares/auth';
 
 const appKey = config.get('appKey');
 const port = config.get('port');
@@ -24,17 +26,18 @@ app.use(bodyParser());
 app.use(convert(json()));
 // logger
 app.use(convert(logger()));
+// auth
+app.use(authMiddleware());
 
 // router
 app.use(router.routes(), router.allowedMethods());
 // error
 app.on('error', (err, ctx) => {
-  console.log(err);
-  // logger.error('server error', err, ctx);
+  log.error(err);
 });
 
 app.listen(port, () => {
-  console.log(`hacknical-api server is running at port ${port}`);
+  log.info(`${config.get('appName')} server is running at port ${port}`);
 });
 
 export default app;
