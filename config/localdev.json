@@ -40,6 +40,5 @@
       "publicKey": "f015708c8f4",
       "secretKey": "82821dcf43f7cfb11b09845828bce"
     }
-  ],
-  "timeouts": [4000, 4000, 4000]
+  ]
 }
