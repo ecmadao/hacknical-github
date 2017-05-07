@@ -27,7 +27,13 @@ app.use(convert(json()));
 // logger
 app.use(convert(logger()));
 // auth
-app.use(authMiddleware());
+app.use(authMiddleware({
+  whiteList: [
+    /^\/api\/github\/zen/,
+    /^\/api\/github\/octocat/,
+    /^\/api\/github\/verify/
+  ]
+}));
 
 // router
 app.use(router.routes(), router.allowedMethods());

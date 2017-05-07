@@ -1,5 +1,4 @@
 import config from 'config';
-import { flattenObject } from '../utils/helpers';
 
 const app = config.get('app');
 

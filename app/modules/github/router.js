@@ -1,6 +1,7 @@
 import koaRouter from 'koa-router';
 import GitHub from './controller';
 import params from '../../middlewares/params';
+import verify from '../../middlewares/github_verify';
 
 const router = koaRouter({
   prefix: '/api/github'
@@ -9,15 +10,21 @@ const router = koaRouter({
 // zen & octocat
 router.get(
   '/zen',
+  params.checkApp(),
+  verify(),
   GitHub.getZen
 );
 router.get(
   '/octocat',
+  params.checkApp(),
+  verify(),
   GitHub.getOctocat
 );
 
 router.get(
   '/verify',
+  params.checkApp(),
+  verify(),
   GitHub.getVerify
 );
 router.get(

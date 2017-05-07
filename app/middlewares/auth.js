@@ -77,8 +77,9 @@ const rawBodyParser = bodyParser({
 const authMiddleware = (options = {}) => async (ctx, next) => {
   const whiteList = options.whiteList || [];
   const { url } = ctx.request;
+
   if (whiteList.some(reg => reg.test(url))) {
-    await next();
+    return await next();
   }
   await rawBodyParser(ctx, async () => {
     if (isEmpty(ctx.request.body)) {
