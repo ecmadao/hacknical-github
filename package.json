@@ -22,7 +22,7 @@
     "local:app:start": {
       "command": "./node_modules/.bin/nodemon app/index.js",
       "env": {
-        "DEBUG": "hacknical-local*",
+        "DEBUG": "hacknical-api-local*",
         "NODE_ENV": "localdev"
       }
     }

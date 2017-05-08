@@ -9,7 +9,9 @@ import cors from 'kcors';
 import config from 'config';
 import router from '../modules';
 import log from '../utils/log';
+import params from '../middlewares/params';
 import authMiddleware from '../middlewares/auth';
+import verifyMiddleware from '../middlewares/verify';
 
 const appKey = config.get('appKey');
 const port = config.get('port');
@@ -26,6 +28,8 @@ app.use(bodyParser());
 app.use(convert(json()));
 // logger
 app.use(convert(logger()));
+// check if validate app
+app.use(params.checkApp('app-name'));
 // auth
 app.use(authMiddleware({
   whiteList: [
@@ -34,6 +38,8 @@ app.use(authMiddleware({
     /^\/api\/github\/verify/
   ]
 }));
+// verify token params
+app.use(verifyMiddleware());
 
 // router
 app.use(router.routes(), router.allowedMethods());

@@ -2,7 +2,6 @@ import passport from 'koa-passport';
 import bodyParser from 'koa-bodyparser';
 import crypto from 'crypto';
 import config from 'config';
-import verifyMiddlwware from './verify';
 
 const auth = config.get('auth');
 
@@ -97,7 +96,6 @@ const authMiddleware = (options = {}) => async (ctx, next) => {
         if (err) {
           throw new Error(err);
         }
-        verifyMiddlwware(user, ctx);
         await next();
       })(ctx, next);
     });

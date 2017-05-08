@@ -13,10 +13,10 @@
       "clientSecret": "1fff26cf75c66dcc02caa7e0eef7170a9940aa3c",
       "appName": "hacknical-local"
     },
-    "jarvis-local": {
+    "jarvis-server-local": {
       "clientId": "8b91eabebd11756e79b3",
       "clientSecret": "80071b1c1d14aca980a6caa79b7311200a4779a8",
-      "appName": "jarvis-local"
+      "appName": "jarvis-server-local"
     },
     "jarvis-extension-local": {
       "clientId": "6cb1f015708c8f46bfc5",
@@ -31,14 +31,9 @@
       "secretKey": "6cf75c66dcc02caa7e0eef7170a9"
     },
     {
-      "name": "jarvis-local",
+      "name": "jarvis-server-local",
       "publicKey": "8c8f46bfc5",
       "secretKey": "8afb114582821dcf43f7cb0984bce1"
-    },
-    {
-      "name": "jarvis-extension-local",
-      "publicKey": "f015708c8f4",
-      "secretKey": "82821dcf43f7cfb11b09845828bce"
     }
   ]
 }
