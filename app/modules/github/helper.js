@@ -17,7 +17,8 @@ const fetchRepository = async (fullname, verify) => {
   repository.languages = await GitHub.getReposLanguages(fullname, verify);
   const login = repository.owner.login;
   const setResult = await ReposModel.setRepository(login, repository);
-  return repository;
+  delete setResult['_id'];
+  return setResult;
 };
 
 /**

@@ -19,7 +19,7 @@ export const validateReposList = (repos) => {
       fullname: full_name,
     }
   });
-  return reposList
+  return reposList;
 };
 
 const sortCommits = (thisRepos, nextRepos) => {
