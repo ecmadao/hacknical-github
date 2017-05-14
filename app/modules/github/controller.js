@@ -61,7 +61,9 @@ const getLogin = async (ctx, next) => {
       id: userInfo.id,
       login: userInfo.login,
       email: userInfo.email,
-      name: userInfo.name || userInfo.login
+      name: userInfo.name || userInfo.login,
+      avatar_url: userInfo.avatar_url || '',
+      html_url: userInfo.html_url || ''
     }
   };
 };
