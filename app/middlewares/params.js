@@ -27,7 +27,7 @@ const checkHeaders = (params = []) => async (ctx, next) => {
   await next();
 };
 
-const checkApp = (key = 'app-name') => async (ctx, next) => {
+const checkApp = (key = 'x-app-name') => async (ctx, next) => {
   const appName = ctx.headers[key];
   ctx.state.appName = verifyApp(appName);
   await next();

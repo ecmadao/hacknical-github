@@ -13,10 +13,10 @@
       "clientSecret": "1fff26cf75c66dcc02caa7e0eef7170a9940aa3c",
       "appName": "hacknical-local"
     },
-    "jarvim-server-local": {
+    "jarvim-web-local": {
       "clientId": "8b91eabebd11756e79b3",
       "clientSecret": "80071b1c1d14aca980a6caa79b7311200a4779a8",
-      "appName": "jarvim-server-local"
+      "appName": "jarvim-web-local"
     },
     "jarvim-extension-local": {
       "clientId": "6cb1f015708c8f46bfc5",

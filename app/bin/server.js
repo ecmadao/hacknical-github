@@ -29,7 +29,7 @@ app.use(convert(json()));
 // logger
 app.use(convert(logger()));
 // check if validate app
-app.use(params.checkApp('app-name'));
+app.use(params.checkApp('x-app-name'));
 // auth
 app.use(authMiddleware({
   whiteList: [
