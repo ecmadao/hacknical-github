@@ -10,8 +10,7 @@ const isEmpty = obj => Object.keys(obj).length === 0;
 const getSignString = (request, secretKey) => {
   const contentType = request.headers['content-type'] || '';
   const type = contentType.split(';')[0];
-
-  const body = request.body || '';
+  const body = request.rawBody || '';
   return crypto.createHmac('sha1', secretKey)
     .update(
       new Buffer(
@@ -81,13 +80,14 @@ const authMiddleware = (options = {}) => async (ctx, next) => {
     return await next();
   }
   await rawBodyParser(ctx, async () => {
+    ctx.request.rawBody = '';
     if (isEmpty(ctx.request.body)) {
       ctx.request.body = '';
     } else {
       try {
-        ctx.request.body = JSON.parse(ctx.request.body);
+        ctx.request.rawBody = JSON.stringify(ctx.request.body);
       } catch (err) {
-        ctx.request.body = {};
+        ctx.request.rawBody = '';
       }
     }
 
