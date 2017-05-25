@@ -1,21 +1,13 @@
 import GitHubRepos from './schema';
 
-const findRepository = async (login, reposId) => {
-  return await GitHubRepos.findOne({
-    login,
-    reposId
-  });
-};
+const findRepository = async (login, reposId) => await GitHubRepos.findOne({
+  login,
+  reposId
+});
 
-const findRepos = async (login) => {
-  return await GitHubRepos.find({ login });
-};
+// const findRepos = async login => await GitHubRepos.find({ login });
 
-const clearRepos = async (login) => {
-  return await GitHubRepos.remove({
-    login
-  });
-};
+const clearRepos = async login => await GitHubRepos.remove({ login });
 
 const removeRepos = async (login, reposId = null) => {
   if (reposId === null) {
@@ -40,15 +32,16 @@ const createRepos = async (login, repository) => {
     pushed_at,
     homepage,
     size,
-  	stargazers_count,
-  	watchers_count,
-  	language,
+    stargazers_count,
+    watchers_count,
+    language,
     languages,
-  	forks_count,
-  	forks,
-  	watchers,
-  	subscribers_count,
-    owner
+    forks_count,
+    forks,
+    watchers,
+    subscribers_count,
+    owner,
+    topics = null
   } = repository;
   return await GitHubRepos.create({
     reposId: id,
@@ -63,14 +56,15 @@ const createRepos = async (login, repository) => {
     pushed_at,
     homepage,
     size,
-  	stargazers_count,
-  	watchers_count,
-  	language,
+    stargazers_count,
+    watchers_count,
+    language,
     languages: languages || {},
-  	forks_count,
-  	forks,
-  	watchers,
-  	subscribers_count,
+    forks_count,
+    forks,
+    watchers,
+    subscribers_count,
+    topics,
     owner: {
       login: owner.login,
       avatar_url: owner.avatar_url,
@@ -90,7 +84,7 @@ const setRepository = async (login, repository) => {
 const setRepos = async (login, repos) => {
   const setResults = [];
   await removeRepos(login);
-  for(let i = 0; i < repos.length; i++) {
+  for (let i = 0; i < repos.length; i += 1) {
     const repository = repos[i];
     const result = await setRepository(login, repository);
     setResults.push(result);
@@ -98,22 +92,18 @@ const setRepos = async (login, repos) => {
   return setResults;
 };
 
-const getRepos = async (login) => {
-  return await GitHubRepos.find({
-    login
-  });
-};
+const getRepos = async login => await GitHubRepos.find({
+  login
+});
 
-const getRepository = async (fullname) => {
-  return await GitHubRepos.findOne({
-    full_name: fullname
-  });
-};
+const getRepository = async fullname => await GitHubRepos.findOne({
+  full_name: fullname
+});
 
 const resetRepos = async (login, repos) => {
   const setResults = [];
   await removeRepos(login);
-  for(let i = 0; i < repos.length; i++) {
+  for (let i = 0; i < repos.length; i += 1) {
     const repository = repos[i];
     const result = await createRepos(login, repository);
     setResults.push(result);

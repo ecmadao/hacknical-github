@@ -36,7 +36,7 @@ const getVerify = async (ctx) => {
   };
 };
 
-const getToken = async (ctx, next) => {
+const getToken = async (ctx) => {
   const { code, verify } = ctx.request.query;
   const result = await GitHub.getToken(code, verify);
   const token = result.access_token;
@@ -46,7 +46,7 @@ const getToken = async (ctx, next) => {
   };
 };
 
-const getLogin = async (ctx, next) => {
+const getLogin = async (ctx) => {
   const { verify } = ctx.request.query;
   const userInfo = await GitHub.getUserByToken(verify);
 
@@ -68,7 +68,7 @@ const getLogin = async (ctx, next) => {
   };
 };
 
-const getUser = async (ctx, next) => {
+const getUser = async (ctx) => {
   const { verify, login } = ctx.request.query;
   const user = await Helper.getUser(login, verify);
   ctx.body = {
@@ -77,7 +77,7 @@ const getUser = async (ctx, next) => {
   };
 };
 
-const getUserRepos = async (ctx, next) => {
+const getUserRepos = async (ctx) => {
   const { login, verify } = ctx.request.query;
   const repos = await Helper.getUserPublicRepos(login, verify);
 
@@ -89,7 +89,7 @@ const getUserRepos = async (ctx, next) => {
   };
 };
 
-const getUserCommits = async (ctx, next) => {
+const getUserCommits = async (ctx) => {
   const { login, verify } = ctx.request.query;
   const commits = await Helper.getCommits(login, verify);
   ctx.body = {
@@ -100,7 +100,7 @@ const getUserCommits = async (ctx, next) => {
   };
 };
 
-const getUserOrgs = async (ctx, next) => {
+const getUserOrgs = async (ctx) => {
   const { login, verify } = ctx.query;
   const orgs = await Helper.getOrgs(login, verify);
   ctx.body = {
@@ -109,17 +109,18 @@ const getUserOrgs = async (ctx, next) => {
   };
 };
 
-const refreshUserRepos = async (ctx, next) => {
+const refreshUserRepos = async (ctx) => {
   const { login, verify } = ctx.request.query;
   const user = await UsersModel.findUser(login);
-  const lastUpdateTime = user.lastUpdateTime || user['created_at']
+  const lastUpdateTime = user.lastUpdateTime || user.created_at;
 
   const timeInterval = dateHelper.getSeconds(new Date()) - dateHelper.getSeconds(lastUpdateTime);
   if (timeInterval <= HALF_AN_HOUR) {
-    return ctx.body = {
+    ctx.body = {
       success: false,
       result: parseInt((HALF_AN_HOUR - timeInterval) / 60, 10)
     };
+    return;
   }
 
   try {
@@ -140,7 +141,7 @@ const refreshUserRepos = async (ctx, next) => {
   }
 };
 
-const refreshUserCommits = async (ctx, next) => {
+const refreshUserCommits = async (ctx) => {
   const { login, verify } = ctx.request.query;
 
   try {
@@ -158,7 +159,7 @@ const refreshUserCommits = async (ctx, next) => {
   }
 };
 
-const refreshUserOrgs = async (ctx, next) => {
+const refreshUserOrgs = async (ctx) => {
   const { login, verify } = ctx.request.query;
   try {
     await Helper.updateOrgs(login, verify);
@@ -173,44 +174,44 @@ const refreshUserOrgs = async (ctx, next) => {
   }
 };
 
-const getUserUpdateTime = async (ctx, next) => {
+const getUserUpdateTime = async (ctx) => {
   const { login } = ctx.request.query;
   const findResult = await UsersModel.findUser(login);
   if (!findResult) {
     throw new Error('can not find target user');
   }
-  return ctx.body = {
+  ctx.body = {
     success: true,
-    result: findResult.lastUpdateTime || findResult['created_at']
+    result: findResult.lastUpdateTime || findResult.created_at
   };
 };
 
-const getRepository = async (ctx, next) => {
+const getRepository = async (ctx) => {
   const { verify, fullname } = ctx.request.query;
   const repository = await Helper.getRepository(fullname, verify);
-  return ctx.body = {
+  ctx.body = {
     success: true,
     result: repository
   };
 };
 
-const starRepository = async (ctx, next) => {
+const starRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
   const result = await GitHub.starRepository(fullname, verify);
 
-  return ctx.body = {
+  ctx.body = {
     success: true,
     result
   };
 };
 
-const unstarRepository = async (ctx, next) => {
+const unstarRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
   const result = await GitHub.unstarRepository(fullname, verify);
 
-  return ctx.body = {
+  ctx.body = {
     success: true,
     result
   };

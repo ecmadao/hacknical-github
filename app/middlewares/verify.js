@@ -11,7 +11,7 @@ const verifyMiddlwware = () => async (ctx, next) => {
   const headers = { 'User-Agent': appName };
 
   let verify = {};
-  if (token && token != 'undefined' && token != 'null') {
+  if (token && String(token) !== 'undefined' && String(token) !== 'null') {
     verify = { access_token: token };
   } else {
     const clientId = app[appName].clientId;

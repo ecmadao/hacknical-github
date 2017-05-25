@@ -15,19 +15,20 @@ const GitHubReposSchema = new Schema({
   pushed_at: String,
   homepage: String,
   size: Number,
-	stargazers_count: Number,
-	watchers_count: Number,
-	language: String,
+  stargazers_count: Number,
+  watchers_count: Number,
+  language: String,
   languages: Object,
-	forks_count: Number,
-	forks: Number,
-	watchers: Number,
-	subscribers_count: Number,
+  forks_count: Number,
+  forks: Number,
+  watchers: Number,
+  subscribers_count: Number,
   owner: {
     login: String,
     avatar_url: String,
     html_url: String
-  }
+  },
+  topics: Array
 });
 
 export default mongoose.model('GithubRepos', GitHubReposSchema);

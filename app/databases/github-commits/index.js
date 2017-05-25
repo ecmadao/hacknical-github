@@ -1,14 +1,12 @@
 import GitHubCommits from './schema';
 
-const clearUserCommits = async (login) => {
-  return await GitHubCommits.remove({
-    login
-  });
-};
+const clearUserCommits = async login => await GitHubCommits.remove({
+  login
+});
 
 const setCommits = async (login, datas) => {
   await clearUserCommits(login);
-  for(let i = 0; i < datas.length; i++) {
+  for (let i = 0; i < datas.length; i += 1) {
     const data = datas[i];
     const {
       reposId,
@@ -53,4 +51,4 @@ export default {
   setCommits,
   getCommits,
   getReposCommits
-}
+};

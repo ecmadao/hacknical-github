@@ -3,9 +3,7 @@ import dateHelper from './date';
 export const getReposInYears = (repos, years = 1) => {
   const oneYearBefore = dateHelper.getDateBeforeYears(years);
   const seconds = dateHelper.getSeconds(oneYearBefore);
-  return repos.filter((repository) => {
-    return dateHelper.getSeconds(repository.created_at) >= seconds
-  });
+  return repos.filter(repository => dateHelper.getSeconds(repository.created_at) >= seconds);
 };
 
 export const validateReposList = (repos) => {
@@ -17,15 +15,11 @@ export const validateReposList = (repos) => {
       pushed_at,
       created_at,
       fullname: full_name,
-    }
+    };
   });
   return reposList;
 };
 
-const sortCommits = (thisRepos, nextRepos) => {
-  return nextRepos.totalCommits - thisRepos.totalCommits;
-};
+const sortCommits = (thisRepos, nextRepos) => nextRepos.totalCommits - thisRepos.totalCommits;
 
-export const sortByCommits = (repos) => {
-  return repos.sort(sortCommits);
-};
+export const sortByCommits = repos => repos.sort(sortCommits);

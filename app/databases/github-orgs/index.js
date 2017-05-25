@@ -4,7 +4,7 @@ import GitHubOrgs from './schema';
 /**
  * private
  */
-const getOrgInfo = (orgInfo) => ({
+const getOrgInfo = orgInfo => ({
   login: orgInfo.login,
   name: orgInfo.name,
   avatar_url: orgInfo.avatar_url,
@@ -24,7 +24,7 @@ const getOrgInfo = (orgInfo) => ({
   repos: orgInfo.repos || []
 });
 
-const getReposInfo = (repos) => ({
+const getReposInfo = repos => ({
   full_name: repos.full_name,
   name: repos.name,
   html_url: repos.html_url,
@@ -47,17 +47,13 @@ const getReposInfo = (repos) => ({
 
 /* === API === */
 
-const findOrgByLogin = async (login) => {
-  return await GitHubOrgs.findOne({ login });
-};
+const findOrgByLogin = async login => await GitHubOrgs.findOne({ login });
 
-const findOrgsByLogin = async (logins) => {
-  return await GitHubOrgs.find({
-    login: {
-      "$in": logins
-    }
-  });
-};
+const findOrgsByLogin = async logins => await GitHubOrgs.find({
+  login: {
+    $in: logins
+  }
+});
 
 const updateOrg = async (login) => {
 
@@ -107,4 +103,4 @@ export default {
   create: createOrg,
   update: updateOrg,
   updateRepos: updateOrgRepos
-}
+};

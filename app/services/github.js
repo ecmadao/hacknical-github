@@ -1,7 +1,6 @@
 import fetch from '../utils/fetch';
 import log from '../utils/log';
 import {
-  flatArray,
   splitArray,
   flattenObject
 } from '../utils/helpers';
@@ -45,8 +44,8 @@ const unstarRepository = (fullname, verify) => {
 
 const getUserRepos = (login, verify, page = 1) => {
   const { qs, headers } = verify;
-  qs['per_page'] = 100;
-  qs['page'] = page;
+  qs.per_page = 100;
+  qs.page = page;
 
   return fetch.get({
     qs,
@@ -57,8 +56,8 @@ const getUserRepos = (login, verify, page = 1) => {
 
 const getOrgRepos = (org, verify, page = 1) => {
   const { qs, headers } = verify;
-  qs['per_page'] = 100;
-  qs['page'] = page;
+  qs.per_page = 100;
+  qs.page = page;
 
   return fetch.get({
     qs,
@@ -69,8 +68,8 @@ const getOrgRepos = (org, verify, page = 1) => {
 
 const getUserPubOrgs = (login, verify, page = 1) => {
   const { qs, headers } = verify;
-  qs['per_page'] = 100;
-  qs['page'] = page;
+  qs.per_page = 100;
+  qs.page = page;
 
   return fetch.get({
     qs,
@@ -89,11 +88,10 @@ const getReposYearlyCommits = async (fullname, verify) => {
       url: `${API_REPOS}/${fullname}/stats/commit_activity`
     });
   } catch (err) {
-    log.error(err)
+    log.error(err);
     result = [];
-  } finally {
-    return result
   }
+  return result;
 };
 
 const getReposLanguages = async (fullname, verify) => {
@@ -106,14 +104,13 @@ const getReposLanguages = async (fullname, verify) => {
       url: `${API_REPOS}/${fullname}/languages`
     });
     let total = 0;
-    Object.keys(languages).forEach(key => total += languages[key]);
-    Object.keys(languages).forEach(key => result[key] = languages[key] / total);
+    Object.keys(languages).forEach(key => (total += languages[key]));
+    Object.keys(languages).forEach(key => (result[key] = languages[key] / total));
   } catch (err) {
     log.error(err);
     result = {};
-  } finally {
-    return result;
   }
+  return result;
 };
 
 const getReposContributors = async (fullname, verify) => {
@@ -125,14 +122,14 @@ const getReposContributors = async (fullname, verify) => {
       headers,
       url: `${API_REPOS}/${fullname}/stats/contributors`
     });
-    results = contributors.map((contributor, index) => {
+    results = contributors.map((contributor) => {
       const { total, weeks, author } = contributor;
-      const weeklyCommits = weeks.map((week, index) => {
+      const weeklyCommits = weeks.map((week) => {
         const { w, a, d, c } = week;
         return {
           week: w,
           data: parseInt((a + d + c), 10)
-        }
+        };
       });
       const { avatar_url, login } = author;
       return {
@@ -140,20 +137,19 @@ const getReposContributors = async (fullname, verify) => {
         login,
         avatar_url,
         weeks: weeklyCommits
-      }
+      };
     });
   } catch (err) {
     log.error(err);
     results = [];
-  } finally {
-    return results;
   }
+  return results;
 };
 
 const fetchByPromiseList = (promiseList) => {
   return Promise.all(promiseList).then((datas) => {
     let results = [];
-    datas.forEach(data => results = [...results, ...data]);
+    datas.forEach(data => (results = [...results, ...data]));
     return Promise.resolve(results);
   }).catch(() => Promise.resolve([]));
 };
@@ -161,11 +157,9 @@ const fetchByPromiseList = (promiseList) => {
 const mapReposToGet = async ({ repositories, params }, func) => {
   const repos = splitArray(repositories);
   const results = [];
-  for(let i = 0; i < repos.length; i++) {
+  for (let i = 0; i < repos.length; i += 1) {
     const repository = repos[i];
-    const promiseList = repository.map((item, index) => {
-      return func(item.fullname || item.full_name, params);
-    });
+    const promiseList = repository.map(item => func(item.fullname || item.full_name, params));
     const datas = await Promise.all(promiseList).catch(() => Promise.resolve([]));
     results.push(...datas);
   }
@@ -229,37 +223,31 @@ const getOrg = (org, verify) => {
 };
 
 const getOrgPubRepos = (org, params, pages = 1) => {
-  const promiseList = new Array(pages).fill(0).map((item, index) => {
-    return getOrgRepos(org, params, index + 1);
-  });
+  const promiseList = new Array(pages).fill(0).map(
+    (item, index) => getOrgRepos(org, params, index + 1));
   return fetchByPromiseList(promiseList);
 };
 
 const getPersonalPubRepos = (login, params, pages = 3) => {
-  const promiseList = new Array(pages).fill(0).map((item, index) => {
-    return getUserRepos(login, params, index + 1);
-  });
+  const promiseList = new Array(pages).fill(0).map(
+    (item, index) => getUserRepos(login, params, index + 1));
   return fetchByPromiseList(promiseList);
 };
 
 const getPersonalPubOrgs = (login, params, pages = 1) => {
-  const promiseList = new Array(pages).fill(0).map((item, index) => {
-    return getUserPubOrgs(login, params, index + 1);
-  });
+  const promiseList = new Array(pages).fill(0).map(
+    (item, index) => getUserPubOrgs(login, params, index + 1));
   return fetchByPromiseList(promiseList);
 };
 
-const getAllReposYearlyCommits = async (repositories, params) => {
-  return await mapReposToGet({ repositories, params }, getReposYearlyCommits);
-};
+const getAllReposYearlyCommits = async (repositories, params) =>
+  await mapReposToGet({ repositories, params }, getReposYearlyCommits);
 
-const getAllReposLanguages = async (repositories, params) => {
-  return await mapReposToGet({ repositories, params }, getReposLanguages);
-};
+const getAllReposLanguages = async (repositories, params) =>
+  await mapReposToGet({ repositories, params }, getReposLanguages);
 
-const getAllReposContributors = async (repositories, params) => {
-  return await mapReposToGet({ repositories, params }, getReposContributors);
-};
+const getAllReposContributors = async (repositories, params) =>
+  await mapReposToGet({ repositories, params }, getReposContributors);
 
 export default {
   // others
@@ -283,4 +271,4 @@ export default {
   getAllReposLanguages,
   getReposLanguages,
   getAllReposContributors
-}
+};

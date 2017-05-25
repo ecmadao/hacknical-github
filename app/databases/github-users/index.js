@@ -3,7 +3,7 @@ import GitHubUsers from './schema';
 /**
  * private
  */
-const getGitHubInfo = (userInfo) => ({
+const getGitHubInfo = userInfo => ({
   id: userInfo.id,
   login: userInfo.login,
   name: userInfo.name,
@@ -21,13 +21,9 @@ const getGitHubInfo = (userInfo) => ({
   following: userInfo.following
 });
 
-const findUser = async (login) => {
-  return await GitHubUsers.findOne({ login });
-};
+const findUser = async login => await GitHubUsers.findOne({ login });
 
-const findUserByGitHubId = async (id) => {
-  return await GitHubUsers.findOne({ id });
-};
+const findUserByGitHubId = async id => await GitHubUsers.findOne({ id });
 
 
 const updateUser = async (userInfo) => {
@@ -74,4 +70,4 @@ export default {
   updateUser,
   updateUserOrgs,
   createGitHubUser
-}
+};

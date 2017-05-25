@@ -58,6 +58,7 @@ class HmacStrategy extends passport.Strategy {
     } catch (e) {
       return this.error(e);
     }
+    return null;
   }
 }
 
@@ -92,7 +93,7 @@ const authMiddleware = (options = {}) => async (ctx, next) => {
     }
 
     await initialize(ctx, async () => {
-      await passport.authenticate('hmac', { session: false }, async (err, user) => {
+      await passport.authenticate('hmac', { session: false }, async (err) => {
         if (err) {
           throw new Error(err);
         }

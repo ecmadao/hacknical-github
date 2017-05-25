@@ -1,5 +1,4 @@
 import Koa from 'koa';
-import path from 'path';
 import logger from 'koa-logger';
 import convert from 'koa-convert';
 import bodyParser from 'koa-bodyparser';
@@ -33,9 +32,7 @@ app.use(params.checkApp('x-app-name'));
 // auth
 app.use(authMiddleware({
   whiteList: [
-    /^\/api\/github\/zen/,
-    /^\/api\/github\/octocat/,
-    /^\/api\/github\/verify/
+    /^\/api\/github\/(zen)|(octocat)|(verify)/
   ]
 }));
 // verify token params
@@ -44,7 +41,7 @@ app.use(verifyMiddleware());
 // router
 app.use(router.routes(), router.allowedMethods());
 // error
-app.on('error', (err, ctx) => {
+app.on('error', (err) => {
   log.error(err);
 });
 

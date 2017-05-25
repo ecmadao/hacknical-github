@@ -1,4 +1,3 @@
-import config from 'config';
 import log from '../../utils/log';
 import OrgsModel from '../../databases/github-orgs';
 import ReposModel from '../../databases/github-repos';
@@ -17,7 +16,7 @@ const fetchRepository = async (fullname, verify) => {
   repository.languages = await GitHub.getReposLanguages(fullname, verify);
   const login = repository.owner.login;
   const setResult = await ReposModel.setRepository(login, repository);
-  delete setResult['_id'];
+  delete setResult._id;
   return setResult;
 };
 
@@ -28,8 +27,10 @@ const fetchRepos = async (login, verify, pages = 2) => {
   const multiRepos = await GitHub.getPersonalPubRepos(login, verify, pages);
   try {
     const reposLanguages = await GitHub.getAllReposLanguages(multiRepos, verify);
-    multiRepos.forEach((repository, index) => repository.languages = reposLanguages[index]);
-  } catch (err) {}
+    multiRepos.forEach((repository, index) => (repository.languages = reposLanguages[index]));
+  } catch (err) {
+    log.error(err);
+  }
   const setResults = await ReposModel.setRepos(login, multiRepos);
   return setResults;
 };
@@ -70,7 +71,7 @@ const fetchCommits = async (repos, login, verify) => {
       const repository = reposList[index];
       const { reposId, name, created_at, pushed_at } = repository;
       let totalCommits = 0;
-      commits.forEach(commit => totalCommits += commit.total);
+      commits.forEach(commit => (totalCommits += commit.total));
       return {
         commits,
         totalCommits,
@@ -78,7 +79,7 @@ const fetchCommits = async (repos, login, verify) => {
         name,
         created_at,
         pushed_at
-      }
+      };
     });
     const sortResult = sortByCommits(results);
     await CommitsModel.setCommits(login, sortResult);
@@ -117,7 +118,7 @@ const fetchOrgDetail = async (orgLogin, verify) => {
   // set repos contributors
   try {
     const reposContributors = await GitHub.getAllReposContributors(repos, verify);
-    repos.forEach((repository, index) => repository.contributors = reposContributors[index]);
+    repos.forEach((repository, index) => (repository.contributors = reposContributors[index]));
   } catch (err) {
     log.error(err);
   }
@@ -136,14 +137,14 @@ const fetchUserOrgs = async (login, verify) => {
 const getUserOrgs = async (login, verify) => {
   const findUser = await UsersModel.findUser(login);
   const pubOrgs = findUser.orgs;
-  if (pubOrgs && pubOrgs.length) { return pubOrgs }
+  if (pubOrgs && pubOrgs.length) { return pubOrgs; }
   return await fetchUserOrgs(login, verify);
 };
 
 const updateOrgs = async (login, verify) => {
   try {
     const userOrgs = await fetchUserOrgs(login, verify);
-    for(let i = 0; i < userOrgs.length; i++) {
+    for (let i = 0; i < userOrgs.length; i += 1) {
       const orgLogin = userOrgs[i].login;
       await fetchOrgDetail(orgLogin, verify);
     }
@@ -154,7 +155,7 @@ const updateOrgs = async (login, verify) => {
 
 const getDetailOrgs = async (pubOrgs, verify) => {
   const orgs = [];
-  for(let i = 0; i < pubOrgs.length; i++) {
+  for (let i = 0; i < pubOrgs.length; i += 1) {
     const orgLogin = pubOrgs[i].login;
     let org = await OrgsModel.find(orgLogin);
     if (!org) {
@@ -181,7 +182,7 @@ const fetchUser = async (login, verify) => {
 
 const getUser = async (login, verify) => {
   const user = await UsersModel.findUser(login);
-  if (user) { return user }
+  if (user) { return user; }
   return await fetchUser(login, verify);
 };
 

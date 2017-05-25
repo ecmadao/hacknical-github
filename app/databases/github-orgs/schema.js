@@ -30,13 +30,13 @@ const GitHubOrgsSchema = new Schema({
     pushed_at: String,
     homepage: String,
     size: Number,
-  	stargazers_count: Number,
-  	watchers_count: Number,
-  	language: String,
+    stargazers_count: Number,
+    watchers_count: Number,
+    language: String,
     languages: { type: Object, default: {} },
-  	forks_count: Number,
-  	forks: Number,
-  	watchers: Number,
+    forks_count: Number,
+    forks: Number,
+    watchers: Number,
     contributors: { type: Array, default: [] }
   }]
 }, {
