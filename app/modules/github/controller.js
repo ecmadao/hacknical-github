@@ -187,8 +187,15 @@ const getUserUpdateTime = async (ctx) => {
 };
 
 const getRepository = async (ctx) => {
-  const { verify, fullname } = ctx.request.query;
-  const repository = await Helper.getRepository(fullname, verify);
+  const {
+    verify,
+    fullname,
+    required = ''
+  } = ctx.request.query;
+
+  const repository = await Helper.getRepository(
+    fullname, verify, required.split(',')
+  );
   ctx.body = {
     success: true,
     result: repository

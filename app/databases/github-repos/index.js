@@ -76,7 +76,8 @@ const createRepos = async (login, repository) => {
 const setRepository = async (login, repository) => {
   const findResult = await findRepository(login, repository.id);
   if (findResult) {
-    return findResult;
+    Object.assign(findResult, repository);
+    return await findResult.save();
   }
   return await createRepos(login, repository);
 };
@@ -92,9 +93,7 @@ const setRepos = async (login, repos) => {
   return setResults;
 };
 
-const getRepos = async login => await GitHubRepos.find({
-  login
-});
+const getRepos = async login => await GitHubRepos.find({ login });
 
 const getRepository = async fullname => await GitHubRepos.findOne({
   full_name: fullname

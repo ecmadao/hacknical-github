@@ -17,6 +17,7 @@ const API_REPOS = `${BASE_URL}/repos`;
 /* ===================== repository =====================*/
 const getRepository = (fullname, verify) => {
   const { qs, headers } = verify;
+  headers.Accept = 'application/vnd.github.mercy-preview+json';
   return fetch.get({
     qs,
     headers,
@@ -146,13 +147,12 @@ const getReposContributors = async (fullname, verify) => {
   return results;
 };
 
-const fetchByPromiseList = (promiseList) => {
-  return Promise.all(promiseList).then((datas) => {
+const fetchByPromiseList = promiseList =>
+  Promise.all(promiseList).then((datas) => {
     let results = [];
     datas.forEach(data => (results = [...results, ...data]));
     return Promise.resolve(results);
   }).catch(() => Promise.resolve([]));
-};
 
 const mapReposToGet = async ({ repositories, params }, func) => {
   const repos = splitArray(repositories);
