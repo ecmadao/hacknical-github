@@ -43,9 +43,9 @@ const unstarRepository = (fullname, verify) => {
   });
 };
 
-const getUserRepos = (login, verify, page = 1) => {
+const getUserRepos = ({ login, verify, page = 1, perPage = 100 }) => {
   const { qs, headers } = verify;
-  qs.per_page = 100;
+  qs.per_page = perPage;
   qs.page = page;
 
   return fetch.get({
@@ -55,9 +55,21 @@ const getUserRepos = (login, verify, page = 1) => {
   });
 };
 
-const getOrgRepos = (org, verify, page = 1) => {
+const getUserStarred = ({ login, verify, page = 1, perPage = 30 }) => {
   const { qs, headers } = verify;
-  qs.per_page = 100;
+  qs.per_page = perPage;
+  qs.page = page;
+
+  return fetch.get({
+    qs,
+    headers,
+    url: `${API_USERS}/${login}/starred`
+  });
+};
+
+const getOrgRepos = ({ org, verify, page = 1, perPage = 100 }) => {
+  const { qs, headers } = verify;
+  qs.per_page = perPage;
   qs.page = page;
 
   return fetch.get({
@@ -67,9 +79,9 @@ const getOrgRepos = (org, verify, page = 1) => {
   });
 };
 
-const getUserPubOrgs = (login, verify, page = 1) => {
+const getUserPubOrgs = ({ login, verify, page = 1, perPage = 100 }) => {
   const { qs, headers } = verify;
-  qs.per_page = 100;
+  qs.per_page = perPage;
   qs.page = page;
 
   return fetch.get({
@@ -154,13 +166,19 @@ const fetchByPromiseList = promiseList =>
     return Promise.resolve(results);
   }).catch(() => Promise.resolve([]));
 
+
+const fetchMultiDatas = (func, options = {}) =>
+  func(options).catch(() => Promise.resolve([]));
+
 const mapReposToGet = async ({ repositories, params }, func) => {
   const repos = splitArray(repositories);
   const results = [];
   for (let i = 0; i < repos.length; i += 1) {
     const repository = repos[i];
-    const promiseList = repository.map(item => func(item.fullname || item.full_name, params));
-    const datas = await Promise.all(promiseList).catch(() => Promise.resolve([]));
+    const promiseList = repository.map(
+      item => func(item.fullname || item.full_name, params));
+    const datas =
+      await Promise.all(promiseList).catch(() => Promise.resolve([]));
     results.push(...datas);
   }
 
@@ -222,21 +240,51 @@ const getOrg = (org, verify) => {
   });
 };
 
-const getOrgPubRepos = (org, params, pages = 1) => {
+const getOrgPubRepos = (org, verify, perPage, pages = 2) => {
   const promiseList = new Array(pages).fill(0).map(
-    (item, index) => getOrgRepos(org, params, index + 1));
+    (item, index) => fetchMultiDatas(getOrgRepos, {
+      org,
+      perPage,
+      verify,
+      page: index + 1
+    })
+  );
   return fetchByPromiseList(promiseList);
 };
 
-const getPersonalPubRepos = (login, params, pages = 3) => {
+const getPersonalStarred = (login, verify, perPage, pages = 1) => {
   const promiseList = new Array(pages).fill(0).map(
-    (item, index) => getUserRepos(login, params, index + 1));
+    (item, index) => fetchMultiDatas(getUserStarred, {
+      login,
+      perPage,
+      verify,
+      page: index + 1
+    })
+  );
   return fetchByPromiseList(promiseList);
 };
 
-const getPersonalPubOrgs = (login, params, pages = 1) => {
+const getPersonalPubRepos = (login, verify, perPage, pages = 6) => {
   const promiseList = new Array(pages).fill(0).map(
-    (item, index) => getUserPubOrgs(login, params, index + 1));
+    (item, index) => fetchMultiDatas(getUserRepos, {
+      login,
+      perPage,
+      verify,
+      page: index + 1,
+    })
+  );
+  return fetchByPromiseList(promiseList);
+};
+
+const getPersonalPubOrgs = (login, verify, perPage, pages = 2) => {
+  const promiseList = new Array(pages).fill(0).map(
+    (item, index) => fetchMultiDatas(getUserPubOrgs, {
+      login,
+      perPage,
+      verify,
+      page: index + 1
+    })
+  );
   return fetchByPromiseList(promiseList);
 };
 
@@ -261,6 +309,8 @@ export default {
   // user
   getUser,
   getUserByToken,
+  getUserStarred,
+  getPersonalStarred,
   getPersonalPubRepos,
   getPersonalPubOrgs,
   // org

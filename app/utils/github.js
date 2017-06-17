@@ -23,3 +23,10 @@ export const validateReposList = (repos) => {
 const sortCommits = (thisRepos, nextRepos) => nextRepos.totalCommits - thisRepos.totalCommits;
 
 export const sortByCommits = repos => repos.sort(sortCommits);
+
+/* ========= CONST VALUE ========== */
+export const PER_PAGE = {
+  REPOS: 50,
+  ORGS: 20,
+  STARRED: 30
+};

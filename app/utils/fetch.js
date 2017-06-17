@@ -1,5 +1,6 @@
 import request from 'request';
 import config from 'config';
+import logger from './log';
 
 const retryTimes = config.get('timeouts');
 
@@ -36,7 +37,7 @@ const fetch = async (options, timeout = retryTimes) => {
     }
   }
   if (err) {
-    throw new Error(err);
+    logger.error(err);
   }
   return null;
 };

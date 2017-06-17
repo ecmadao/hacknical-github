@@ -3,7 +3,10 @@ import UsersModel from '../../databases/github-users';
 import GitHub from '../../services/github';
 import dateHelper from '../../utils/date';
 import Helper from './helper';
-import { sortByCommits } from '../../utils/github';
+import {
+  PER_PAGE,
+  sortByCommits
+} from '../../utils/github';
 
 const HALF_AN_HOUR = 30 * 60;
 const app = config.get('app');
@@ -89,6 +92,28 @@ const getUserRepos = async (ctx) => {
   };
 };
 
+const getUserStarred = async (ctx) => {
+  const {
+    login,
+    verify,
+    page = 1,
+    per_page = 30,
+  } = ctx.request.query;
+  const repos = await Helper.getUserStarred({
+    login,
+    verify,
+    page,
+    per_page
+  });
+
+  ctx.body = {
+    success: true,
+    result: {
+      repos
+    }
+  };
+};
+
 const getUserCommits = async (ctx) => {
   const { login, verify } = ctx.request.query;
   const commits = await Helper.getCommits(login, verify);
@@ -126,8 +151,13 @@ const refreshUserRepos = async (ctx) => {
   try {
     const githubUser = await GitHub.getUserByToken(verify);
     const { public_repos } = githubUser;
-    const pages = Math.ceil(parseInt(public_repos, 10) / 100);
-    await Helper.fetchRepos(login, verify, pages);
+    const pages = Math.ceil(parseInt(public_repos, 10) / PER_PAGE.REPOS);
+    await Helper.fetchRepos({
+      login,
+      verify,
+      pages,
+      perPage: PER_PAGE.REPOS
+    });
     const updateUserResult = await UsersModel.updateUser(githubUser);
 
     ctx.body = {
@@ -239,6 +269,7 @@ export default {
   unstarRepository,
   /* ====== */
   getUserRepos,
+  getUserStarred,
   getUserCommits,
   getUserOrgs,
   /* ====== */

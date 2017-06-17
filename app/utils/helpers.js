@@ -1,6 +1,11 @@
 const SPLIT_NUM = 20;
-const checkObject = obj => Object.prototype.toString.call(obj) === '[object Object]';
-// const checkArray = array => Object.prototype.toString.call(array) === '[object Array]';
+const checkObject = obj =>
+  Object.prototype.toString.call(obj) === '[object Object]';
+
+// const checkArray = array =>
+//   Object.prototype.toString.call(array) === '[object Array]';
+
+export const isEmptyObject = obj => Object.keys(obj).length === 0;
 
 /**
  * split array by max array length
@@ -16,7 +21,8 @@ export const splitArray = (array, max = SPLIT_NUM) => {
     return [array];
   }
   const loop = Math.floor(arrayLength / max) + 1;
-  return new Array(loop).fill(0).map((i, index) => array.slice(index * max, (index + 1) * max));
+  return new Array(loop).fill(0).map(
+    (i, index) => array.slice(index * max, (index + 1) * max));
 };
 
 /**
