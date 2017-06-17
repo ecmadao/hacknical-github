@@ -84,12 +84,12 @@ const getUserPublicRepos = async (login, verify) => {
   return repos;
 };
 
-const getUserStarred = async ({ login, verify, per_page = PER_PAGE.STARRED, page = 1 }) => {
-  const repos = GitHub.getUserStarred({
+const getUserStarred = async ({ login, verify, perPage = PER_PAGE.STARRED, page = 1 }) => {
+  const repos = await GitHub.getUserStarred({
     page,
     login,
     verify,
-    per_page
+    perPage
   });
 
   const results = [];

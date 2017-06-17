@@ -97,20 +97,18 @@ const getUserStarred = async (ctx) => {
     login,
     verify,
     page = 1,
-    per_page = 30,
+    perPage = 30,
   } = ctx.request.query;
   const repos = await Helper.getUserStarred({
     login,
     verify,
     page,
-    per_page
+    perPage
   });
 
   ctx.body = {
     success: true,
-    result: {
-      repos
-    }
+    result: repos
   };
 };
 

@@ -166,9 +166,29 @@ const fetchByPromiseList = promiseList =>
     return Promise.resolve(results);
   }).catch(() => Promise.resolve([]));
 
-
-const fetchMultiDatas = (func, options = {}) =>
+const fetchDatas = (func, options = {}) =>
   func(options).catch(() => Promise.resolve([]));
+
+const fetchMultiDatas = async (pages, func,  options = {}) => {
+  let page = 1;
+  const results = [];
+  const pagesArray  = splitArray(new Array(pages).fill(0));
+
+  for (let i = 0; i < pagesArray.length; i += 1) {
+    const pageArray = pagesArray[i];
+    const promiseList = pageArray.map((item, index) => {
+      page += index;
+      return fetchDatas(func, {
+        page,
+        ...options,
+      });
+    });
+
+    const datas = await fetchByPromiseList(promiseList);
+    results.push(...datas);
+  }
+  return Promise.resolve(results);
+};
 
 const mapReposToGet = async ({ repositories, params }, func) => {
   const repos = splitArray(repositories);
@@ -240,53 +260,33 @@ const getOrg = (org, verify) => {
   });
 };
 
-const getOrgPubRepos = (org, verify, perPage, pages = 2) => {
-  const promiseList = new Array(pages).fill(0).map(
-    (item, index) => fetchMultiDatas(getOrgRepos, {
-      org,
-      perPage,
-      verify,
-      page: index + 1
-    })
-  );
-  return fetchByPromiseList(promiseList);
-};
+const getOrgPubRepos = (org, verify, perPage, pages = 2) =>
+  fetchMultiDatas(pages, getOrgRepos, {
+    org,
+    perPage,
+    verify,
+  });
 
-const getPersonalStarred = (login, verify, perPage, pages = 1) => {
-  const promiseList = new Array(pages).fill(0).map(
-    (item, index) => fetchMultiDatas(getUserStarred, {
-      login,
-      perPage,
-      verify,
-      page: index + 1
-    })
-  );
-  return fetchByPromiseList(promiseList);
-};
+const getPersonalStarred = (login, verify, perPage, pages = 1) =>
+  fetchMultiDatas(pages, getUserStarred, {
+    login,
+    perPage,
+    verify,
+  });
 
-const getPersonalPubRepos = (login, verify, perPage, pages = 6) => {
-  const promiseList = new Array(pages).fill(0).map(
-    (item, index) => fetchMultiDatas(getUserRepos, {
-      login,
-      perPage,
-      verify,
-      page: index + 1,
-    })
-  );
-  return fetchByPromiseList(promiseList);
-};
+const getPersonalPubRepos = (login, verify, perPage, pages = 6) =>
+  fetchMultiDatas(pages, getUserRepos, {
+    login,
+    perPage,
+    verify,
+  });
 
-const getPersonalPubOrgs = (login, verify, perPage, pages = 2) => {
-  const promiseList = new Array(pages).fill(0).map(
-    (item, index) => fetchMultiDatas(getUserPubOrgs, {
-      login,
-      perPage,
-      verify,
-      page: index + 1
-    })
-  );
-  return fetchByPromiseList(promiseList);
-};
+const getPersonalPubOrgs = (login, verify, perPage, pages = 2) =>
+  fetchMultiDatas(pages, getUserPubOrgs, {
+    login,
+    perPage,
+    verify,
+  });
 
 const getAllReposYearlyCommits = async (repositories, params) =>
   await mapReposToGet({ repositories, params }, getReposYearlyCommits);
