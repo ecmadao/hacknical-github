@@ -4,32 +4,36 @@ import logger from './log';
 
 const retryTimes = config.get('timeouts');
 
-const fetchData = options => new Promise((resolve, reject) => {
-  request(options, (err, httpResponse, body) => {
-    if (err) {
-      reject(err);
+const handleBody = (httpResponse, body) => {
+  if (body) {
+    let result = null;
+    try {
+      result = JSON.parse(body);
+    } catch (e) {
+      result = body;
     }
-    if (body) {
-      let result = null;
-      try {
-        result = JSON.parse(body);
-      } catch (e) {
-        result = body;
-      } finally {
-        resolve(result);
-      }
-    }
-    reject(err);
-  });
-});
+    return result;
+  }
+};
 
-const fetch = async (options, timeout = retryTimes) => {
+const fetchData = (options, handler) =>
+  new Promise((resolve, reject) => {
+    request(options, (err, httpResponse, body) => {
+      if (err) {
+        reject(err);
+      }
+      const result = handler(httpResponse, body);
+      resolve(result);
+    });
+  });
+
+export const fetch = async (options, timeout = retryTimes, handler = handleBody) => {
   options.json = true;
   let err = null;
   for (let i = 0; i < timeout.length; i += 1) {
     try {
       options.timeout = timeout[i];
-      const result = await fetchData(options);
+      const result = await fetchData(options, handler);
       err = null;
       return result;
     } catch (e) {
