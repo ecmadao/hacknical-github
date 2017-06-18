@@ -67,6 +67,11 @@ router.get(
   GitHub.getUserStarred
 );
 router.get(
+  '/user/starred/count',
+  params.checkQuery(['login', 'verify']),
+  GitHub.getUserStarredCount
+);
+router.get(
   '/user/repos/refresh',
   params.checkQuery(['login', 'verify']),
   GitHub.refreshUserRepos

@@ -28,5 +28,17 @@ export const sortByCommits = repos => repos.sort(sortCommits);
 export const PER_PAGE = {
   REPOS: 50,
   ORGS: 20,
-  STARRED: 30
+  STARRED: 50
+};
+
+export const BASE_URL = 'https://api.github.com';
+
+export const GITHUB = {
+  API_GET_USER: `${BASE_URL}/user`,
+  API_USERS: `${BASE_URL}/users`,
+  API_ORGS: `${BASE_URL}/orgs`,
+  API_REPOS: `${BASE_URL}/repos`,
+  OCTOCAT: `${BASE_URL}/octocat`,
+  ZEN: `${BASE_URL}/zen`,
+  API_TOKEN: 'https://github.com/login/oauth/access_token'
 };

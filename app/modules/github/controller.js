@@ -7,6 +7,9 @@ import {
   PER_PAGE,
   sortByCommits
 } from '../../utils/github';
+import {
+  starredCount
+} from '../../utils/starred-count';
 
 const HALF_AN_HOUR = 30 * 60;
 const app = config.get('app');
@@ -109,6 +112,15 @@ const getUserStarred = async (ctx) => {
   ctx.body = {
     success: true,
     result: repos
+  };
+};
+
+const getUserStarredCount = async (ctx) => {
+  const { login, verify } = ctx.request.query;
+  const count = await starredCount(login, verify);
+  ctx.body = {
+    success: true,
+    result: count
   };
 };
 
@@ -268,6 +280,7 @@ export default {
   /* ====== */
   getUserRepos,
   getUserStarred,
+  getUserStarredCount,
   getUserCommits,
   getUserOrgs,
   /* ====== */

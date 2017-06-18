@@ -1,18 +1,22 @@
+/* eslint no-loop-func: "off" */
+
 import fetch from '../utils/fetch';
 import log from '../utils/log';
 import {
   splitArray,
   flattenObject
 } from '../utils/helpers';
+import {
+  GITHUB
+} from '../utils/github';
 
-const BASE_URL = 'https://api.github.com';
-const API_TOKEN = 'https://github.com/login/oauth/access_token';
-const API_GET_USER = `${BASE_URL}/user`;
-
-const API_USERS = `${BASE_URL}/users`;
-const API_ORGS = `${BASE_URL}/orgs`;
-const API_REPOS = `${BASE_URL}/repos`;
-
+const {
+  API_TOKEN,
+  API_GET_USER,
+  API_USERS,
+  API_ORGS,
+  API_REPOS
+} = GITHUB;
 
 /* ===================== repository =====================*/
 const getRepository = (fullname, verify) => {
@@ -170,14 +174,14 @@ const fetchDatas = (func, options = {}) =>
   func(options).catch(() => Promise.resolve([]));
 
 const fetchMultiDatas = async (pages, func,  options = {}) => {
-  let page = 1;
+  let page = 0;
   const results = [];
   const pagesArray  = splitArray(new Array(pages).fill(0));
 
   for (let i = 0; i < pagesArray.length; i += 1) {
     const pageArray = pagesArray[i];
     const promiseList = pageArray.map((item, index) => {
-      page += index;
+      page += (index + 1);
       return fetchDatas(func, {
         page,
         ...options,
@@ -212,7 +216,7 @@ const getOctocat = (verify) => {
   return fetch.get({
     qs,
     headers,
-    url: `${BASE_URL}/octocat`
+    url: GITHUB.OCTOCAT
   });
 };
 
@@ -221,7 +225,7 @@ const getZen = (verify) => {
   return fetch.get({
     qs,
     headers,
-    url: `${BASE_URL}/zen`
+    url: GITHUB.ZEN
   });
 };
 
