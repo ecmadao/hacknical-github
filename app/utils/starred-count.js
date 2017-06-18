@@ -6,17 +6,18 @@ import { PER_PAGE, GITHUB } from './github';
 
 const retryTimes = config.get('timeouts');
 
-const fetchData = (url, options = {}) =>
-  new Promise((resolve, reject) => {
-    got.get(url, options).then((res) => {
-      const parsed = parse(res.headers.link);
-      const pageCount = (parsed && parsed.last)
-        ? parseInt(parsed.last.page, 10)
-        : 1;
-      resolve(pageCount);
-    }).catch((e) => {
-      reject(e);
-    });
+const fetchData = async (url, options = {}) =>
+  got.get(url, options).then((res) => {
+    console.log(url)
+    console.log(options)
+    console.log(res);
+    const parsed = parse(res.headers.link);
+    const pageCount = (parsed && parsed.last)
+      ? parseInt(parsed.last.page, 10)
+      : 1;
+    return pageCount;
+  }).catch((e) => {
+    throw new Error(e);
   });
 
 const fetch = async (url, options, timeout = retryTimes) => {
