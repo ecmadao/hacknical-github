@@ -1,4 +1,4 @@
-import log from '../../utils/log';
+import logger from '../../utils/log';
 import OrgsModel from '../../databases/github-orgs';
 import ReposModel from '../../databases/github-repos';
 import CommitsModel from '../../databases/github-commits';
@@ -45,7 +45,7 @@ const fetchRepos = async (options = {}) => {
     multiRepos.forEach(
       (repository, index) => (repository.languages = reposLanguages[index]));
   } catch (err) {
-    log.error(err);
+    logger.error(err);
   }
   const setResults = await ReposModel.setRepos(login, multiRepos);
   return setResults;
@@ -166,7 +166,7 @@ const fetchOrgDetail = async (orgLogin, verify) => {
     repos.forEach((repository, index) =>
       (repository.contributors = reposContributors[index]));
   } catch (err) {
-    log.error(err);
+    logger.error(err);
   }
 
   org.repos = repos;
@@ -195,7 +195,7 @@ const updateOrgs = async (login, verify) => {
       await fetchOrgDetail(orgLogin, verify);
     }
   } catch (err) {
-    log.error(err);
+    logger.error(err);
   }
 };
 

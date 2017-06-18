@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import logger from 'koa-logger';
+import log from 'koa-logger';
 import convert from 'koa-convert';
 import bodyParser from 'koa-bodyparser';
 import onerror from 'koa-onerror';
@@ -7,7 +7,7 @@ import json from 'koa-json';
 import cors from 'kcors';
 import config from 'config';
 import router from '../modules';
-import log from '../utils/log';
+import logger from '../utils/log';
 import params from '../middlewares/params';
 import authMiddleware from '../middlewares/auth';
 import verifyMiddleware from '../middlewares/verify';
@@ -25,8 +25,8 @@ onerror(app);
 app.use(bodyParser());
 // json parse
 app.use(convert(json()));
-// logger
-app.use(convert(logger()));
+// koa-logger
+app.use(convert(log()));
 // check if validate app
 app.use(params.checkApp('x-app-name'));
 // auth
@@ -42,11 +42,11 @@ app.use(verifyMiddleware());
 app.use(router.routes(), router.allowedMethods());
 // error
 app.on('error', (err) => {
-  log.error(err);
+  logger.error(err);
 });
 
 app.listen(port, () => {
-  log.info(`${config.get('appName')} server is running at port ${port}`);
+  logger.info(`[SERVER START][${config.get('appName')}][Running at port ${port}]`);
 });
 
 export default app;

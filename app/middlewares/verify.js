@@ -1,11 +1,11 @@
 import config from 'config';
-import log from '../utils/log';
+import logger from '../utils/log';
 
 const app = config.get('app');
 
 const verifyMiddlwware = () => async (ctx, next) => {
   const { appName } = ctx.state;
-  log.info(`verify of: ${appName}`);
+  logger.info(`[VERIFY APPLICATION]${appName}`);
 
   const token = ctx.request.query.token || ctx.request.body.token;
   const headers = { 'User-Agent': appName };

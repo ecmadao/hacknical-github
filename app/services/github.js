@@ -1,7 +1,7 @@
 /* eslint no-loop-func: "off" */
 
 import fetch from '../utils/fetch';
-import log from '../utils/log';
+import logger from '../utils/log';
 import {
   splitArray,
   flattenObject
@@ -105,7 +105,7 @@ const getReposYearlyCommits = async (fullname, verify) => {
       url: `${API_REPOS}/${fullname}/stats/commit_activity`
     });
   } catch (err) {
-    log.error(err);
+    logger.error(err);
     result = [];
   }
   return result;
@@ -124,7 +124,7 @@ const getReposLanguages = async (fullname, verify) => {
     Object.keys(languages).forEach(key => (total += languages[key]));
     Object.keys(languages).forEach(key => (result[key] = languages[key] / total));
   } catch (err) {
-    log.error(err);
+    logger.error(err);
     result = {};
   }
   return result;
@@ -157,7 +157,7 @@ const getReposContributors = async (fullname, verify) => {
       };
     });
   } catch (err) {
-    log.error(err);
+    logger.error(err);
     results = [];
   }
   return results;
