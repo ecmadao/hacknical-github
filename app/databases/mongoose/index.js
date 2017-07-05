@@ -6,7 +6,7 @@ const mongodbUrl = config.get('database.url');
 
 function handleErr(err) {
   if (err) {
-    logger.error('connect to %s error: ', mongodbUrl, err.message);
+    logger.error(`[MONGO:CONNECT:ERROR][${mongodbUrl}][${err.message}]`);
     process.exit(1);
   }
 }
@@ -16,6 +16,7 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   mongoose.connect(mongodbUrl, handleErr);
 }
+logger.info(`[MONGO:CONNECT:SUCCEED][${mongodbUrl}]`);
 
 mongoose.Promise = global.Promise;
 

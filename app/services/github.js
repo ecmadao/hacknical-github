@@ -6,9 +6,7 @@ import {
   splitArray,
   flattenObject
 } from '../utils/helpers';
-import {
-  GITHUB
-} from '../utils/github';
+import { GITHUB } from '../utils/github';
 
 const {
   API_TOKEN,

@@ -27,7 +27,8 @@ const fetchData = (options, handler) =>
     });
   });
 
-export const fetch = async (options, timeout = retryTimes, handler = handleBody) => {
+
+export const baseFetch = async (options, timeout = retryTimes, handler = handleBody) => {
   options.json = true;
   let err = null;
   for (let i = 0; i < timeout.length; i += 1) {
@@ -49,18 +50,18 @@ export const fetch = async (options, timeout = retryTimes, handler = handleBody)
 export default {
   get: (options, timeout) => {
     options.method = 'GET';
-    return fetch(options, timeout);
+    return baseFetch(options, timeout);
   },
   post: (options, timeout) => {
     options.method = 'POST';
-    return fetch(options, timeout);
+    return baseFetch(options, timeout);
   },
   put: (options, timeout) => {
     options.method = 'PUT';
-    return fetch(options, timeout);
+    return baseFetch(options, timeout);
   },
   delete: (options, timeout) => {
     options.method = 'DELETE';
-    return fetch(options, timeout);
+    return baseFetch(options, timeout);
   }
 };

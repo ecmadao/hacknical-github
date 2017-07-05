@@ -56,7 +56,6 @@ const findOrgsByLogin = async logins => await GitHubOrgs.find({
 });
 
 const updateOrg = async (login) => {
-
 };
 
 const updateOrgRepos = async (login, repos) => {
@@ -81,7 +80,7 @@ const createOrg = async (orgInfo) => {
   const newRepos = repos.map(repository => getReposInfo(repository));
   newOrgInfo.repos = newRepos;
 
-  let findOrg = await findOrgByLogin(login);
+  const findOrg = await findOrgByLogin(login);
   if (findOrg) {
     Object.assign(findOrg, newOrgInfo);
     await findOrg.save();

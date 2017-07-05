@@ -1,8 +1,7 @@
 import GitHubCommits from './schema';
 
-const clearUserCommits = async login => await GitHubCommits.remove({
-  login
-});
+const clearUserCommits = async login =>
+  await GitHubCommits.remove({ login });
 
 const setCommits = async (login, datas) => {
   await clearUserCommits(login);
