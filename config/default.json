@@ -3,7 +3,6 @@
   "port": "5002",
   "appKey": "",
   "appName": "",
-  "redis": "",
   "database": {
     "url": ""
   },

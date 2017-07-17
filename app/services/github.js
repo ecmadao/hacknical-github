@@ -154,8 +154,8 @@ const getReposContributors = async (fullname, verify) => {
         weeks: weeklyCommits
       };
     });
-  } catch (err) {
-    logger.error(err);
+  } catch (e) {
+    logger.error(e);
     results = [];
   }
   return results;
@@ -165,11 +165,17 @@ const fetchByPromiseList = promiseList =>
   Promise.all(promiseList).then((datas) => {
     let results = [];
     datas.forEach(data => (results = [...results, ...data]));
-    return Promise.resolve(results);
-  }).catch(() => Promise.resolve([]));
+    return results;
+  }).catch((e) => {
+    logger.error(e);
+    return [];
+  });
 
 const fetchDatas = (func, options = {}) =>
-  func(options).catch(() => Promise.resolve([]));
+  func(options).catch((e) => {
+    logger.error(e);
+    return [];
+  });
 
 const fetchMultiDatas = async (pages, func,  options = {}) => {
   let page = 0;
@@ -189,7 +195,8 @@ const fetchMultiDatas = async (pages, func,  options = {}) => {
     const datas = await fetchByPromiseList(promiseList);
     results.push(...datas);
   }
-  return Promise.resolve(results);
+
+  return results;
 };
 
 const mapReposToGet = async ({ repositories, params }, func) => {
@@ -200,11 +207,14 @@ const mapReposToGet = async ({ repositories, params }, func) => {
     const promiseList = repository.map(
       item => func(item.fullname || item.full_name, params));
     const datas =
-      await Promise.all(promiseList).catch(() => Promise.resolve([]));
+      await Promise.all(promiseList).catch((e) => {
+        logger.error(e);
+        return [];
+      });
     results.push(...datas);
   }
 
-  return Promise.resolve(results);
+  return results;
 };
 
 /* =========================== github api =========================== */

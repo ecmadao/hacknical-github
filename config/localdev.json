@@ -3,7 +3,6 @@
   "port": "5002",
   "appKey": "hacknical-api-local",
   "appName": "hacknical-api-local",
-  "redis": "redis://localhost:6379/3",
   "database": {
     "url": "mongodb://localhost:27017/hacknical-api"
   },

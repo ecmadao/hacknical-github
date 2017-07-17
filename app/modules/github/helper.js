@@ -163,8 +163,12 @@ const fetchOrgDetail = async (orgLogin, verify) => {
   try {
     const reposContributors =
       await GitHub.getAllReposContributors(repos, verify);
-    repos.forEach((repository, index) =>
-      (repository.contributors = reposContributors[index]));
+    repos.forEach((repository, index) => {
+      const contributors = reposContributors[index];
+      if (contributors && contributors.length) {
+        repository.contributors = contributors;
+      }
+    });
   } catch (err) {
     logger.error(err);
   }

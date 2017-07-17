@@ -142,5 +142,5 @@ export default {
   setRepository,
   setRepos,
   getRepos,
-  resetRepos
+  resetRepos,
 };

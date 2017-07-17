@@ -46,7 +46,9 @@ app.on('error', (err) => {
 });
 
 app.listen(port, () => {
-  logger.info(`[SERVER START][${config.get('appName')}][Running at port ${port}]`);
+  logger.info(
+    `[SERVER START][${config.get('appName')}][Running at port ${port}]`
+  );
 });
 
 export default app;

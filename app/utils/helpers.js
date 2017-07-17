@@ -21,8 +21,11 @@ export const splitArray = (array, max = SPLIT_NUM) => {
     return [array];
   }
   const loop = Math.floor(arrayLength / max) + 1;
-  return new Array(loop).fill(0).map(
-    (i, index) => array.slice(index * max, (index + 1) * max));
+  return new Array(loop)
+    .fill(0)
+    .map(
+      (i, index) => array.slice(index * max, (index + 1) * max)
+    );
 };
 
 /**

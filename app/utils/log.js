@@ -17,7 +17,7 @@ if (!config.logFile) {
   });
 }
 
-const logger = log4js.getLogger(`[${appName}]`);
+const logger = log4js.getLogger(`[${appName.toUpperCase()}]`);
 logger.setLevel('INFO');
 
 export default logger;
