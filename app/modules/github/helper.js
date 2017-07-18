@@ -160,21 +160,23 @@ const fetchOrgDetail = async (orgLogin, verify) => {
   // } catch (err) {}
 
   // set repos contributors
-  try {
-    const reposContributors =
-      await GitHub.getAllReposContributors(repos, verify);
-    repos.forEach((repository, index) => {
-      const contributors = reposContributors[index];
-      if (contributors && contributors.length) {
-        repository.contributors = contributors;
-      }
-    });
-  } catch (err) {
-    logger.error(err);
+  if (repos && repos.length) {
+    try {
+      const reposContributors =
+        await GitHub.getAllReposContributors(repos, verify);
+      repos.forEach((repository, index) => {
+        const contributors = reposContributors[index];
+        if (contributors && contributors.length) {
+          repository.contributors = contributors;
+        }
+      });
+    } catch (err) {
+      logger.error(err);
+    }
   }
 
   org.repos = repos;
-  await OrgsModel.create(org);
+  await OrgsModel.update(org);
   return org;
 };
 

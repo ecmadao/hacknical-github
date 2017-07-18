@@ -21,8 +21,8 @@ const getZen = async (ctx) => {
   const { verify } = ctx.request.query;
   const result = await GitHub.getZen(verify);
   ctx.body = {
+    result,
     success: true,
-    result
   };
 };
 
@@ -30,8 +30,8 @@ const getOctocat = async (ctx) => {
   const { verify } = ctx.request.query;
   const result = await GitHub.getOctocat(verify);
   ctx.body = {
+    result,
     success: true,
-    result
   };
 };
 
@@ -48,7 +48,7 @@ const getToken = async (ctx) => {
   const token = result.access_token;
   ctx.body = {
     success: true,
-    result: token
+    result: token,
   };
 };
 
@@ -79,7 +79,7 @@ const getUser = async (ctx) => {
   const user = await Helper.getUser(login, verify);
   ctx.body = {
     success: true,
-    result: user
+    result: user,
   };
 };
 
@@ -90,7 +90,7 @@ const getUserRepos = async (ctx) => {
   ctx.body = {
     success: true,
     result: {
-      repos
+      repos,
     }
   };
 };
@@ -103,15 +103,15 @@ const getUserStarred = async (ctx) => {
     perPage = 30,
   } = ctx.request.query;
   const repos = await Helper.getUserStarred({
+    page,
     login,
     verify,
-    page,
-    perPage
+    perPage,
   });
 
   ctx.body = {
     success: true,
-    result: repos
+    result: repos,
   };
 };
 
@@ -120,7 +120,7 @@ const getUserStarredCount = async (ctx) => {
   const count = await starredCount(login, verify);
   ctx.body = {
     success: true,
-    result: count
+    result: count,
   };
 };
 
@@ -140,7 +140,7 @@ const getUserOrgs = async (ctx) => {
   const orgs = await Helper.getOrgs(login, verify);
   ctx.body = {
     success: true,
-    result: orgs
+    result: orgs,
   };
 };
 
@@ -248,8 +248,8 @@ const starRepository = async (ctx) => {
   const result = await GitHub.starRepository(fullname, verify);
 
   ctx.body = {
+    result,
     success: true,
-    result
   };
 };
 
@@ -259,8 +259,8 @@ const unstarRepository = async (ctx) => {
   const result = await GitHub.unstarRepository(fullname, verify);
 
   ctx.body = {
+    result,
     success: true,
-    result
   };
 };
 

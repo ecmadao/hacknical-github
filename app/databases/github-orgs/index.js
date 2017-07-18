@@ -45,6 +45,26 @@ const getReposInfo = repos => ({
   watchers: repos.watchers
 });
 
+const updateOrgReposInfo = (newRepos, oldRepos = []) => {
+  const results = [];
+  newRepos.forEach((repository) => {
+    const { full_name, contributors } = repository;
+    const oldRepository = oldRepos.find(item => item.full_name === full_name);
+    if (
+      (!contributors || !contributors.length)
+      && oldRepository.contributors
+      && oldRepository.contributors.length
+    ) {
+      results.push(getReposInfo(Object.assign({}, repository, {
+        contributors: oldRepository.contributors
+      })));
+    } else {
+      results.push(getReposInfo(repository));
+    }
+  });
+  return results;
+};
+
 /* === API === */
 
 const findOrgByLogin = async login => await GitHubOrgs.findOne({ login });
@@ -55,9 +75,6 @@ const findOrgsByLogin = async logins => await GitHubOrgs.find({
   }
 });
 
-const updateOrg = async (login) => {
-};
-
 const updateOrgRepos = async (login, repos) => {
   const findOrg = await findOrgByLogin(login);
   if (!findOrg) {
@@ -65,8 +82,8 @@ const updateOrgRepos = async (login, repos) => {
       success: false
     });
   }
-  const newRepos = repos.map(repository => getReposInfo(repository));
-  findOrg.repos = [...newRepos];
+  const oldRepos = findOrg.repos;
+  findOrg.repos = updateOrgReposInfo(repos, oldRepos);
   await findOrg.save();
   return Promise.resolve({
     success: true,
@@ -74,13 +91,14 @@ const updateOrgRepos = async (login, repos) => {
   });
 };
 
-const createOrg = async (orgInfo) => {
+const updateOrg = async (orgInfo) => {
   const newOrgInfo = getOrgInfo(orgInfo);
   const { login, repos } = newOrgInfo;
-  const newRepos = repos.map(repository => getReposInfo(repository));
-  newOrgInfo.repos = newRepos;
-
   const findOrg = await findOrgByLogin(login);
+
+  const oldRepos = findOrg ? findOrg.repos : [];
+  newOrgInfo.repos = updateOrgReposInfo(repos, oldRepos);
+
   if (findOrg) {
     Object.assign(findOrg, newOrgInfo);
     await findOrg.save();
@@ -92,14 +110,13 @@ const createOrg = async (orgInfo) => {
   const newOrg = await GitHubOrgs.create(newOrgInfo);
   return Promise.resolve({
     success: true,
-    result: newOrg
+    result: newOrg,
   });
 };
 
 export default {
   find: findOrgByLogin,
   findMany: findOrgsByLogin,
-  create: createOrg,
   update: updateOrg,
-  updateRepos: updateOrgRepos
+  updateRepos: updateOrgRepos,
 };
