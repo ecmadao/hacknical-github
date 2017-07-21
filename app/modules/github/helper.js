@@ -4,7 +4,7 @@ import ReposModel from '../../databases/github-repos';
 import CommitsModel from '../../databases/github-commits';
 import UsersModel from '../../databases/github-users';
 
-import GitHub from '../../services/github';
+import GitHub from '../../services/github-v3';
 import {
   PER_PAGE,
   sortByCommits,

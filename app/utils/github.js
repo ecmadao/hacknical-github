@@ -45,5 +45,6 @@ export const GITHUB = {
   API_REPOS: `${BASE_URL}/repos`,
   OCTOCAT: `${BASE_URL}/octocat`,
   ZEN: `${BASE_URL}/zen`,
+  API_GRAPHQL: 'https://api.github.com/graphql',
   API_TOKEN: 'https://github.com/login/oauth/access_token'
 };

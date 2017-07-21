@@ -13,7 +13,7 @@ const {
   API_GET_USER,
   API_USERS,
   API_ORGS,
-  API_REPOS
+  API_REPOS,
 } = GITHUB;
 
 /* ===================== repository =====================*/

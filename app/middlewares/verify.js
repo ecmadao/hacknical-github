@@ -10,9 +10,10 @@ const verifyMiddlwware = () => async (ctx, next) => {
   const token = ctx.request.query.token || ctx.request.body.token;
   const headers = { 'User-Agent': appName };
 
-  let verify = {};
+  let verify = null;
   if (token && String(token) !== 'undefined' && String(token) !== 'null') {
-    verify = { access_token: token };
+    // verify = { access_token: token };
+    headers.Authorization = `Bearer ${token}`;
   } else {
     const clientId = app[appName].clientId;
     const clientSecret = app[appName].clientSecret;

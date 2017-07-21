@@ -1,6 +1,7 @@
 import config from 'config';
 import UsersModel from '../../databases/github-users';
-import GitHub from '../../services/github';
+import GitHub from '../../services/github-v3';
+import GitHubV4 from '../../services/github-v4';
 import dateHelper from '../../utils/date';
 import Helper from './helper';
 import {
@@ -54,7 +55,7 @@ const getToken = async (ctx) => {
 
 const getLogin = async (ctx) => {
   const { verify } = ctx.request.query;
-  const userInfo = await GitHub.getUserByToken(verify);
+  const userInfo = await GitHubV4.getUserByToken(verify);
 
   const user = await UsersModel.findUser(userInfo.login);
   if (!user) {
