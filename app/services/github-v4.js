@@ -1,6 +1,6 @@
 /* eslint no-loop-func: "off" */
 
-import fetch from '../utils/fetch';
+import axios from '../utils/axios';
 import logger from '../utils/log';
 import {
   splitArray,
@@ -15,11 +15,10 @@ const {
 
 const baseFetch = (query, verify) => {
   const { headers } = verify;
-  return fetch.post({
+  return axios.post({
     headers,
     url: API_GRAPHQL,
-    form: { query },
-    json: true,
+    data: { query },
   });
 };
 
@@ -55,7 +54,7 @@ const getUserByToken = async (verify) => {
     }
   }`;
   const result = await baseFetch(query, verify);
-  logger.debug(result);
+  logger.info(result);
   return convert.user(result.data.viewer);
 };
 
@@ -91,7 +90,7 @@ const getUser = async (login, verify) => {
     }
   }`;
   const result = await baseFetch(query, verify);
-  logger.debug(result);
+  logger.info(result);
   return convert.user(result.data.user);
 };
 
