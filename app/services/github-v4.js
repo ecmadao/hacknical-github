@@ -7,7 +7,7 @@ import {
   flattenObject
 } from '../utils/helpers';
 import { GITHUB } from '../utils/github';
-import convert from './v4-to-v3';
+import adapter from './v4-to-v3';
 
 const {
   API_GRAPHQL,
@@ -22,76 +22,109 @@ const baseFetch = (query, verify) => {
   });
 };
 
+const USER_QUERY = `{
+  id
+  name
+  bio
+  login
+  email
+  websiteUrl
+  location
+  company
+  createdAt
+  updatedAt
+  avatarUrl
+  followers {
+    totalCount
+  }
+  following {
+    totalCount
+  }
+  starredRepositories {
+    totalCount
+  }
+  repositories {
+    totalCount
+  }
+  gists {
+    totalCount
+  }
+}`;
+
 const getUserByToken = async (verify) => {
   const query = `{
-    viewer {
-      id
-      name
-      bio
-      login
-      email
-      websiteUrl
-      location
-      company
-      createdAt
-      updatedAt
-      avatarUrl
-      followers {
-        totalCount
-      }
-      following {
-        totalCount
-      }
-      starredRepositories {
-        totalCount
-      }
-      repositories {
-        totalCount
-      }
-      gists {
-        totalCount
-      }
-    }
+    viewer ${USER_QUERY}
   }`;
   const result = await baseFetch(query, verify);
   logger.info(result);
-  return convert.user(result.data.viewer);
+  return adapter.user(result.data.viewer);
 };
 
 const getUser = async (login, verify) => {
   const query = `{
-    user(login: "${login}") {
-      id
+    user(login: "${login}") ${USER_QUERY}
+  }`;
+  const result = await baseFetch(query, verify);
+  logger.info(result);
+  return adapter.user(result.data.user);
+};
+
+const getRepository = async (fullname, verify) => {
+  const [owner, ...names] = fullname.split('/');
+  const query = `{
+    repository(owner: "${owner}", name: "${names.join('/')}") {
+      url
       name
-      bio
-      login
-      email
-      websiteUrl
-      location
-      company
-      createdAt
+      isFork
+      pushedAt
       updatedAt
-      avatarUrl
-      followers {
+      createdAt
+      isPrivate
+      diskUsage
+      databaseId
+      description
+      homepageUrl
+      nameWithOwner
+      primaryLanguage {
+        name
+      }
+      languages(first: 100) {
+        edges {
+          size
+          node {
+            name
+            color
+          }
+        }
+      }
+      stargazers {
         totalCount
       }
-      following {
+      forks {
         totalCount
       }
-      starredRepositories {
+      watchers {
         totalCount
       }
-      repositories {
-        totalCount
+      owner {
+        url
+        login
+        avatarUrl
       }
-      gists {
-        totalCount
+      repositoryTopics(first: 100) {
+        edges {
+          node {
+            topic {
+              name
+            }
+          }
+        }
       }
     }
   }`;
   const result = await baseFetch(query, verify);
   logger.info(result);
-  return convert.user(result.data.user);
+  return adapter.repository(result.data.repository);
 };
 
 const getUserReposTotalCount = (user, verify) => {
@@ -100,5 +133,6 @@ const getUserReposTotalCount = (user, verify) => {
 
 export default {
   getUser,
-  getUserByToken
+  getUserByToken,
+  getRepository,
 };

@@ -1,6 +1,6 @@
 import config from 'config';
 import UsersModel from '../../databases/github-users';
-import GitHub from '../../services/github-v3';
+import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
 import dateHelper from '../../utils/date';
 import Helper from './helper';
@@ -20,7 +20,7 @@ const app = config.get('app');
 
 const getZen = async (ctx) => {
   const { verify } = ctx.request.query;
-  const result = await GitHub.getZen(verify);
+  const result = await GitHubV3.getZen(verify);
   ctx.body = {
     result,
     success: true,
@@ -29,7 +29,7 @@ const getZen = async (ctx) => {
 
 const getOctocat = async (ctx) => {
   const { verify } = ctx.request.query;
-  const result = await GitHub.getOctocat(verify);
+  const result = await GitHubV3.getOctocat(verify);
   ctx.body = {
     result,
     success: true,
@@ -45,7 +45,7 @@ const getVerify = async (ctx) => {
 
 const getToken = async (ctx) => {
   const { code, verify } = ctx.request.query;
-  const result = await GitHub.getToken(code, verify);
+  const result = await GitHubV3.getToken(code, verify);
   const token = result.access_token;
   ctx.body = {
     success: true,
@@ -160,7 +160,7 @@ const refreshUserRepos = async (ctx) => {
   }
 
   try {
-    const githubUser = await GitHub.getUserByToken(verify);
+    const githubUser = await GitHubV3.getUserByToken(verify);
     const { public_repos } = githubUser;
     const pages = Math.ceil(parseInt(public_repos, 10) / PER_PAGE.REPOS);
     await Helper.fetchRepos({
@@ -246,7 +246,7 @@ const getRepository = async (ctx) => {
 const starRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
-  const result = await GitHub.starRepository(fullname, verify);
+  const result = await GitHubV3.starRepository(fullname, verify);
 
   ctx.body = {
     result,
@@ -257,7 +257,7 @@ const starRepository = async (ctx) => {
 const unstarRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
-  const result = await GitHub.unstarRepository(fullname, verify);
+  const result = await GitHubV3.unstarRepository(fullname, verify);
 
   ctx.body = {
     result,

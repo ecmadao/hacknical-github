@@ -1,4 +1,4 @@
-const convertUserInfo = (v4UserInfo) => {
+const convertUser = (v4UserInfo) => {
   const {
     id,
     bio,
@@ -36,6 +36,68 @@ const convertUserInfo = (v4UserInfo) => {
   };
 };
 
+const convertRepository = (v4Repository) => {
+  const {
+    url,
+    name,
+    isFork,
+    owner,
+    forks,
+    watchers,
+    diskUsage,
+    languages,
+    stargazers,
+    pushedAt,
+    updatedAt,
+    createdAt,
+    databaseId,
+    homepageUrl,
+    description,
+    nameWithOwner,
+    primaryLanguage,
+    repositoryTopics,
+  } = v4Repository;
+
+  const languagesPercentage = {};
+  const totalSize = languages.edges.reduce((current, next, index) => {
+    if (index === 0) return current.size;
+    return current + next.size;
+  }, 0);
+  languages.edges.forEach((language) => {
+    const { size, node } = language;
+    languagesPercentage[node.name] = size / totalSize;
+  });
+
+  return {
+    name,
+    description,
+    full_name: nameWithOwner,
+    reposId: databaseId,
+    html_url: url,
+    fork: isFork,
+    created_at: createdAt,
+    updated_at: updatedAt,
+    pushed_at: pushedAt,
+    homepage: homepageUrl,
+    size: diskUsage,
+    stargazers_count: stargazers.totalCount,
+    watchers_count: watchers.totalCount,
+    language: primaryLanguage.name,
+    forks_count: forks.totalCount,
+    forks: forks.totalCount,
+    watchers: watchers.totalCount,
+    subscribers_count: watchers.totalCount,
+    owner: {
+      login: owner.login,
+      avatar_url: owner.avatarUrl,
+      html_url: owner.url,
+    },
+    languages: languagesPercentage,
+    topics: repositoryTopics.edges.map(edge => edge.node.topic.name),
+  };
+};
+
 export default {
-  user: convertUserInfo
+  user: convertUser,
+  repository: convertRepository
 };
