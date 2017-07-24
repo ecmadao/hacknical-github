@@ -30,10 +30,10 @@ const convertUser = (v4UserInfo) => {
     created_at: createdAt,
     updated_at: updatedAt,
     avatar_url: avatarUrl,
+    public_gists: gists.totalCount,
     followers: followers.totalCount,
     following: following.totalCount,
     public_repos: repositories.totalCount,
-    public_gists: gists.totalCount,
   };
 };
 
@@ -60,9 +60,9 @@ const convertRepository = (v4Repository) => {
   } = v4Repository;
 
   const languagesPercentage = {};
-  const totalSize = languages.edges.reduce((current, next, index) => {
+  const totalSize = languages.edges.reduce((prev, current, index) => {
     if (index === 0) return current.size;
-    return current + next.size;
+    return prev + current.size;
   }, 0);
   languages.edges.forEach((language) => {
     const { size, node } = language;
@@ -90,8 +90,8 @@ const convertRepository = (v4Repository) => {
     subscribers_count: watchers.totalCount,
     owner: {
       login: owner.login,
-      avatar_url: owner.avatarUrl,
       html_url: owner.url,
+      avatar_url: owner.avatarUrl,
     },
     languages: languagesPercentage,
     topics: repositoryTopics.edges.map(edge => edge.node.topic.name),
@@ -109,10 +109,10 @@ const convertOrganization = (v4Organization) => {
 
   return {
     url,
-    login,
     name,
-    avatar_url: avatarUrl,
+    login,
     html_url: url,
+    avatar_url: avatarUrl,
     email: organizationBillingEmail,
   };
 };

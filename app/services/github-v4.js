@@ -206,7 +206,6 @@ const getUserByToken = async (verify) => {
     viewer ${USER_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  logger.info(result);
   return adapter.user(result.data.viewer);
 };
 
@@ -215,7 +214,6 @@ const getUser = async (login, verify) => {
     user(login: "${login}") ${USER_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  logger.info(result);
   return adapter.user(result.data.user);
 };
 
@@ -225,7 +223,6 @@ const getRepository = async (fullname, verify) => {
     repository(owner: "${owner}", name: "${names.join('/')}") ${REPOSITORY_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  logger.info(result);
   return adapter.repository(result.data.repository);
 };
 
@@ -234,7 +231,6 @@ const getOrg = async (login, verify) => {
     organization(login: "${login}") ${ORG_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  logger.info(result);
   return adapter.organization(result.data.organization);
 };
 

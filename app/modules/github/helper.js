@@ -17,11 +17,10 @@ const fetchRepository = async (fullname, verify, repos = {}) => {
 
   const getReposResult = await GitHubV4.getRepository(fullname, verify);
   const repository = Object.assign({}, repos, getReposResult);
-
   const login = repository.owner.login;
-  const setResult = await ReposModel.setRepository(login, repository);
-  delete setResult._id;
-  return setResult;
+
+  ReposModel.setRepository(login, repository);
+  return repository;
 };
 
 /**
@@ -37,8 +36,8 @@ const fetchRepos = async (options = {}) => {
   const multiRepos =
     await GitHubV4.getPersonalPubRepos(login, verify, perPage);
 
-  const setResults = await ReposModel.setRepos(login, multiRepos);
-  return setResults;
+  ReposModel.setRepos(login, multiRepos);
+  return multiRepos;
 };
 
 const fetchContributedRepos = async (options) => {
@@ -51,10 +50,10 @@ const fetchContributedRepos = async (options) => {
   const multiRepos =
     await GitHubV4.getPersonalContributedRepos(login, verify, perPage);
 
-  const setResults = await ReposModel.setRepos(login, multiRepos);
-  const contributions = setResults.map(repository => repository.full_name);
-  await UsersModel.updateUserContributions(login, contributions);
-  return setResults;
+  const contributions = multiRepos.map(repository => repository.full_name);
+  ReposModel.setRepos(login, multiRepos);
+  UsersModel.updateUserContributions(login, contributions);
+  return multiRepos;
 };
 
 const getRepository = async (fullname, verify, required = []) => {
@@ -112,20 +111,14 @@ const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED
   });
   const {
     results,
-    endCursor,
-    hasNextPage,
   } = result;
 
   for (let i = 0; i < results.length; i += 1) {
     const repository = results[i];
     const { owner } = repository;
-    await ReposModel.setRepository(owner.login, repository);
+    ReposModel.setRepository(owner.login, repository);
   }
-  return {
-    endCursor,
-    hasNextPage,
-    repos: results,
-  };
+  return result;
 };
 
 /**
@@ -134,7 +127,8 @@ const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED
 const fetchCommits = async (repos, login, verify) => {
   const reposList = validateReposList(repos);
   try {
-    const fetchedCommits = await GitHubV3.getAllReposYearlyCommits(reposList, verify);
+    const fetchedCommits =
+      await GitHubV3.getAllReposYearlyCommits(reposList, verify);
     const results = fetchedCommits.map((commits, index) => {
       const repository = reposList[index];
       const { reposId, name, created_at, pushed_at } = repository;
@@ -199,7 +193,8 @@ const fetchOrgDetail = async (orgLogin, verify) => {
 };
 
 const fetchUserOrgs = async (login, verify) => {
-  const pubOrgs = await GitHubV3.getPersonalPubOrgs(login, verify, PER_PAGE.ORGS);
+  const pubOrgs =
+    await GitHubV3.getPersonalPubOrgs(login, verify, PER_PAGE.ORGS);
   await UsersModel.updateUserOrgs(login, pubOrgs);
   return pubOrgs;
 };
