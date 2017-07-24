@@ -28,7 +28,7 @@ const GitHubReposSchema = new Schema({
     avatar_url: String,
     html_url: String
   },
-  topics: Array
+  topics: Array,
 });
 
 export default mongoose.model('GithubRepos', GitHubReposSchema);

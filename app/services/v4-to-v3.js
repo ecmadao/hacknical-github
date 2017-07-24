@@ -1,4 +1,3 @@
-import { GITHUB } from '../utils/github';
 
 const convertUser = (v4UserInfo) => {
   const {
@@ -101,6 +100,7 @@ const convertRepository = (v4Repository) => {
 
 const convertOrganization = (v4Organization) => {
   const {
+    url,
     name,
     login,
     avatarUrl,
@@ -108,10 +108,11 @@ const convertOrganization = (v4Organization) => {
   } = v4Organization;
 
   return {
+    url,
     login,
     name,
     avatar_url: avatarUrl,
-    html_url: `${GITHUB.BASE}/${name}`,
+    html_url: url,
     email: organizationBillingEmail,
   };
 };

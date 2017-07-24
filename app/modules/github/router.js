@@ -62,6 +62,11 @@ router.get(
   GitHub.getUserRepos
 );
 router.get(
+  '/user/contributed',
+  params.checkQuery(['login', 'verify']),
+  GitHub.getUserContributed
+);
+router.get(
   '/user/starred',
   params.checkQuery(['login', 'verify']),
   GitHub.getUserStarred

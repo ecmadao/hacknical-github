@@ -98,23 +98,35 @@ const getUserRepos = async (ctx) => {
   };
 };
 
+const getUserContributed = async (ctx) => {
+  const { login, verify } = ctx.request.query;
+  const repos = await Helper.getUserContributedRepos(login, verify);
+
+  ctx.body = {
+    success: true,
+    result: {
+      repos,
+    }
+  };
+};
+
 const getUserStarred = async (ctx) => {
   const {
     login,
     verify,
-    page = 1,
     perPage = 30,
+    after = null,
   } = ctx.request.query;
-  const repos = await Helper.getUserStarred({
-    page,
+  const result = await Helper.getUserStarred({
+    after,
     login,
     verify,
     perPage,
   });
 
   ctx.body = {
+    result,
     success: true,
-    result: repos,
   };
 };
 
@@ -279,6 +291,7 @@ export default {
   unstarRepository,
   /* ====== */
   getUserRepos,
+  getUserContributed,
   getUserStarred,
   getUserStarredCount,
   getUserCommits,

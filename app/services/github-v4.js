@@ -194,6 +194,7 @@ const REPOSITORY_QUERY = `{
 }`;
 
 const ORG_QUERY = `{
+  url
   name
   login
   avatarUrl

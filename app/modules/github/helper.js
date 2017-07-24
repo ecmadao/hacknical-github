@@ -41,6 +41,22 @@ const fetchRepos = async (options = {}) => {
   return setResults;
 };
 
+const fetchContributedRepos = async (options) => {
+  const {
+    login,
+    verify,
+    perPage,
+  } = options;
+
+  const multiRepos =
+    await GitHubV4.getPersonalContributedRepos(login, verify, perPage);
+
+  const setResults = await ReposModel.setRepos(login, multiRepos);
+  const contributions = setResults.map(repository => repository.full_name);
+  await UsersModel.updateUserContributions(login, contributions);
+  return setResults;
+};
+
 const getRepository = async (fullname, verify, required = []) => {
   const findResult = await ReposModel.getRepository(fullname);
   if (!findResult || required.some(key => !findResult[key] || !findResult[key].length)) {
@@ -49,48 +65,67 @@ const getRepository = async (fullname, verify, required = []) => {
   return findResult;
 };
 
-const getRepos = async (login, verify, options) => {
+const getRepos = async (login, verify) => {
   const findResult = await ReposModel.getRepos(login);
   if (findResult.length) {
     return findResult;
   }
 
-  const { publicRepos } = options;
-  const pages = Math.ceil(publicRepos / PER_PAGE.REPOS);
   return await fetchRepos({
     login,
     verify,
-    pages,
     perPage: PER_PAGE.REPOS
   });
 };
 
-const getUserPublicRepos = async (login, verify) => {
+const getUserContributed = async (login, verify) => {
   const user = await getUser(login, verify);
-  const { public_repos } = user;
-  const repos = await getRepos(login, verify, {
-    publicRepos: public_repos
-  });
+  const { contributions } = user;
+  if (!contributions || !contributions.length) {
+    return await fetchContributedRepos({
+      login,
+      verify,
+      perPage: PER_PAGE.REPOS
+    });
+  }
+  const repos = [];
+  for (let i = 0; i < contributions.length; i += 1) {
+    const fullname = contributions[i];
+    const repository = await getRepository(fullname, verify);
+    repos.push(repository);
+  }
   return repos;
 };
 
+const getUserPublicRepos = async (login, verify) =>
+  await getRepos(login, verify);
+
+const getUserContributedRepos = async (login, verify) =>
+  await getUserContributed(login, verify);
+
 const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED }) => {
-  const repos = await GitHubV4.getUserStarred({
+  const result = await GitHubV4.getUserStarred({
     after,
     login,
     verify,
     first: perPage
   });
+  const {
+    results,
+    endCursor,
+    hasNextPage,
+  } = result;
 
-  const results = [];
-  for (let i = 0; i < repos.length; i += 1) {
-    const repository = repos[i];
+  for (let i = 0; i < results.length; i += 1) {
+    const repository = results[i];
     const { owner } = repository;
-
-    const result = await ReposModel.setRepository(owner.login, repository);
-    results.push(result);
+    await ReposModel.setRepository(owner.login, repository);
   }
-  return results;
+  return {
+    endCursor,
+    hasNextPage,
+    repos: results,
+  };
 };
 
 /**
@@ -228,6 +263,7 @@ export default {
   getRepository,
   getUserStarred,
   getUserPublicRepos,
+  getUserContributedRepos,
   // commits
   fetchCommits,
   getCommits,
