@@ -17,9 +17,7 @@ const fetchRepository = async (fullname, verify, repos = {}) => {
 
   const getReposResult = await GitHubV4.getRepository(fullname, verify);
   const repository = Object.assign({}, repos, getReposResult);
-  // if (!repository.languages) {
-  //   repository.languages = await GitHubV3.getReposLanguages(fullname, verify);
-  // }
+
   const login = repository.owner.login;
   const setResult = await ReposModel.setRepository(login, repository);
   delete setResult._id;
@@ -34,20 +32,11 @@ const fetchRepos = async (options = {}) => {
     login,
     verify,
     perPage,
-    pages = 2
   } = options;
 
   const multiRepos =
-    await GitHubV3.getPersonalPubRepos(login, verify, perPage, pages);
+    await GitHubV4.getPersonalPubRepos(login, verify, perPage);
 
-  try {
-    const reposLanguages =
-      await GitHubV3.getAllReposLanguages(multiRepos, verify);
-    multiRepos.forEach(
-      (repository, index) => (repository.languages = reposLanguages[index]));
-  } catch (err) {
-    logger.error(err);
-  }
   const setResults = await ReposModel.setRepos(login, multiRepos);
   return setResults;
 };
@@ -85,16 +74,15 @@ const getUserPublicRepos = async (login, verify) => {
   return repos;
 };
 
-const getUserStarred = async ({ login, verify, perPage = PER_PAGE.STARRED, page = 1 }) => {
-  const repos = await GitHubV3.getUserStarred({
-    page,
+const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED }) => {
+  const repos = await GitHubV4.getUserStarred({
+    after,
     login,
     verify,
-    perPage
+    first: perPage
   });
 
   const results = [];
-  // TODO save repos to user-starred schema
   for (let i = 0; i < repos.length; i += 1) {
     const repository = repos[i];
     const { owner } = repository;
@@ -152,13 +140,7 @@ const fetchOrgDetail = async (orgLogin, verify) => {
     return {};
   }
 
-  const repos = await GitHubV3.getOrgPubRepos(orgLogin, verify, PER_PAGE.REPOS);
-
-  // set repos languages
-  // try {
-  //   const reposLanguages = await GitHubV3.getAllReposLanguages(repos, verify);
-  //   repos.forEach((repository, index) => repository.languages = reposLanguages[index]);
-  // } catch (err) {}
+  const repos = await GitHubV4.getOrgPubRepos(orgLogin, verify, PER_PAGE.REPOS);
 
   // set repos contributors
   if (repos && repos.length) {
@@ -228,7 +210,7 @@ const getOrgs = async (login, verify) => {
  * =============== user ===============
  */
 const fetchUser = async (login, verify) => {
-  const userInfo = await GitHubV3.getUser(login, verify);
+  const userInfo = await GitHubV4.getUser(login, verify);
   const addResut = await UsersModel.createGitHubUser(userInfo);
   return addResut.result;
 };
@@ -252,5 +234,5 @@ export default {
   // orgs
   getOrgs,
   updateOrgs,
-  getUser
+  getUser,
 };

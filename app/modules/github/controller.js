@@ -21,6 +21,7 @@ const app = config.get('app');
 const getZen = async (ctx) => {
   const { verify } = ctx.request.query;
   const result = await GitHubV3.getZen(verify);
+
   ctx.body = {
     result,
     success: true,
@@ -30,6 +31,7 @@ const getZen = async (ctx) => {
 const getOctocat = async (ctx) => {
   const { verify } = ctx.request.query;
   const result = await GitHubV3.getOctocat(verify);
+
   ctx.body = {
     result,
     success: true,
@@ -160,13 +162,10 @@ const refreshUserRepos = async (ctx) => {
   }
 
   try {
-    const githubUser = await GitHubV3.getUserByToken(verify);
-    const { public_repos } = githubUser;
-    const pages = Math.ceil(parseInt(public_repos, 10) / PER_PAGE.REPOS);
+    const githubUser = await GitHubV4.getUserByToken(verify);
     await Helper.fetchRepos({
       login,
       verify,
-      pages,
       perPage: PER_PAGE.REPOS
     });
     const updateUserResult = await UsersModel.updateUser(githubUser);

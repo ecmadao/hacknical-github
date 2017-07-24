@@ -1,3 +1,5 @@
+import { GITHUB } from '../utils/github';
+
 const convertUser = (v4UserInfo) => {
   const {
     id,
@@ -54,8 +56,8 @@ const convertRepository = (v4Repository) => {
     homepageUrl,
     description,
     nameWithOwner,
-    primaryLanguage,
     repositoryTopics,
+    primaryLanguage = {},
   } = v4Repository;
 
   const languagesPercentage = {};
@@ -82,7 +84,7 @@ const convertRepository = (v4Repository) => {
     size: diskUsage,
     stargazers_count: stargazers.totalCount,
     watchers_count: watchers.totalCount,
-    language: primaryLanguage.name,
+    language: (primaryLanguage && primaryLanguage.name) || '',
     forks_count: forks.totalCount,
     forks: forks.totalCount,
     watchers: watchers.totalCount,
@@ -97,7 +99,25 @@ const convertRepository = (v4Repository) => {
   };
 };
 
+const convertOrganization = (v4Organization) => {
+  const {
+    name,
+    login,
+    avatarUrl,
+    organizationBillingEmail,
+  } = v4Organization;
+
+  return {
+    login,
+    name,
+    avatar_url: avatarUrl,
+    html_url: `${GITHUB.BASE}/${name}`,
+    email: organizationBillingEmail,
+  };
+};
+
 export default {
   user: convertUser,
-  repository: convertRepository
+  repository: convertRepository,
+  organization: convertOrganization
 };

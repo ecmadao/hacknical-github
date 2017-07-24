@@ -39,6 +39,7 @@ export const PER_PAGE = {
 export const BASE_URL = 'https://api.github.com';
 
 export const GITHUB = {
+  BASE: 'https://github.com',
   API_GET_USER: `${BASE_URL}/user`,
   API_USERS: `${BASE_URL}/users`,
   API_ORGS: `${BASE_URL}/orgs`,
