@@ -20,7 +20,7 @@ const getOrgInfo = orgInfo => ({
   followers: orgInfo.followers,
   following: orgInfo.following,
   html_url: orgInfo.html_url,
-  type: orgInfo.type,
+  type: orgInfo.type || 'Organization',
   repos: orgInfo.repos || []
 });
 

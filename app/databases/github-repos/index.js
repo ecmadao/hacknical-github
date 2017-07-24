@@ -4,7 +4,7 @@ import { isEmptyObject } from '../../utils/helpers';
 
 const getReposData = (repository, login) => {
   const {
-    id,
+    reposId,
     full_name,
     name,
     html_url,
@@ -29,7 +29,7 @@ const getReposData = (repository, login) => {
 
   const data = {
     login,
-    reposId: id,
+    reposId,
     full_name,
     name,
     html_url,
@@ -48,8 +48,8 @@ const getReposData = (repository, login) => {
     watchers,
     subscribers_count,
     languages,
+    topics,
     owner: {},
-    topics
   };
 
   if (!isEmptyObject(owner)) {

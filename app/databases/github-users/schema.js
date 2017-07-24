@@ -24,7 +24,11 @@ const GitHubUsersSchema = new Schema({
     login: String,
     avatar_url: String,
     description: String
-  }]
+  }],
+  contributions: {
+    type: Array,
+    default: [],
+  },
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });

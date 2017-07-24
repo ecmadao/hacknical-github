@@ -39,11 +39,13 @@ export const PER_PAGE = {
 export const BASE_URL = 'https://api.github.com';
 
 export const GITHUB = {
+  BASE: 'https://github.com',
   API_GET_USER: `${BASE_URL}/user`,
   API_USERS: `${BASE_URL}/users`,
   API_ORGS: `${BASE_URL}/orgs`,
   API_REPOS: `${BASE_URL}/repos`,
   OCTOCAT: `${BASE_URL}/octocat`,
   ZEN: `${BASE_URL}/zen`,
+  API_GRAPHQL: 'https://api.github.com/graphql',
   API_TOKEN: 'https://github.com/login/oauth/access_token'
 };

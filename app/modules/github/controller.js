@@ -1,6 +1,7 @@
 import config from 'config';
 import UsersModel from '../../databases/github-users';
-import GitHub from '../../services/github';
+import GitHubV3 from '../../services/github-v3';
+import GitHubV4 from '../../services/github-v4';
 import dateHelper from '../../utils/date';
 import Helper from './helper';
 import {
@@ -19,7 +20,8 @@ const app = config.get('app');
 
 const getZen = async (ctx) => {
   const { verify } = ctx.request.query;
-  const result = await GitHub.getZen(verify);
+  const result = await GitHubV3.getZen(verify);
+
   ctx.body = {
     result,
     success: true,
@@ -28,7 +30,8 @@ const getZen = async (ctx) => {
 
 const getOctocat = async (ctx) => {
   const { verify } = ctx.request.query;
-  const result = await GitHub.getOctocat(verify);
+  const result = await GitHubV3.getOctocat(verify);
+
   ctx.body = {
     result,
     success: true,
@@ -44,7 +47,7 @@ const getVerify = async (ctx) => {
 
 const getToken = async (ctx) => {
   const { code, verify } = ctx.request.query;
-  const result = await GitHub.getToken(code, verify);
+  const result = await GitHubV3.getToken(code, verify);
   const token = result.access_token;
   ctx.body = {
     success: true,
@@ -54,7 +57,7 @@ const getToken = async (ctx) => {
 
 const getLogin = async (ctx) => {
   const { verify } = ctx.request.query;
-  const userInfo = await GitHub.getUserByToken(verify);
+  const userInfo = await GitHubV4.getUserByToken(verify);
 
   const user = await UsersModel.findUser(userInfo.login);
   if (!user) {
@@ -95,23 +98,35 @@ const getUserRepos = async (ctx) => {
   };
 };
 
+const getUserContributed = async (ctx) => {
+  const { login, verify } = ctx.request.query;
+  const repos = await Helper.getUserContributedRepos(login, verify);
+
+  ctx.body = {
+    success: true,
+    result: {
+      repos,
+    }
+  };
+};
+
 const getUserStarred = async (ctx) => {
   const {
     login,
     verify,
-    page = 1,
     perPage = 30,
+    after = null,
   } = ctx.request.query;
-  const repos = await Helper.getUserStarred({
-    page,
+  const result = await Helper.getUserStarred({
+    after,
     login,
     verify,
     perPage,
   });
 
   ctx.body = {
+    result,
     success: true,
-    result: repos,
   };
 };
 
@@ -159,13 +174,10 @@ const refreshUserRepos = async (ctx) => {
   }
 
   try {
-    const githubUser = await GitHub.getUserByToken(verify);
-    const { public_repos } = githubUser;
-    const pages = Math.ceil(parseInt(public_repos, 10) / PER_PAGE.REPOS);
+    const githubUser = await GitHubV4.getUserByToken(verify);
     await Helper.fetchRepos({
       login,
       verify,
-      pages,
       perPage: PER_PAGE.REPOS
     });
     const updateUserResult = await UsersModel.updateUser(githubUser);
@@ -245,7 +257,7 @@ const getRepository = async (ctx) => {
 const starRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
-  const result = await GitHub.starRepository(fullname, verify);
+  const result = await GitHubV3.starRepository(fullname, verify);
 
   ctx.body = {
     result,
@@ -256,7 +268,7 @@ const starRepository = async (ctx) => {
 const unstarRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
-  const result = await GitHub.unstarRepository(fullname, verify);
+  const result = await GitHubV3.unstarRepository(fullname, verify);
 
   ctx.body = {
     result,
@@ -279,6 +291,7 @@ export default {
   unstarRepository,
   /* ====== */
   getUserRepos,
+  getUserContributed,
   getUserStarred,
   getUserStarredCount,
   getUserCommits,
