@@ -164,7 +164,9 @@ const refreshUserRepos = async (ctx) => {
   if (timeInterval <= REFRESH_LIMIT) {
     ctx.body = {
       success: false,
-      result: parseInt((REFRESH_LIMIT - timeInterval) / 60, 10)
+      result: {
+        result: parseInt((REFRESH_LIMIT - timeInterval) / 60, 10)
+      }
     };
     return;
   }
@@ -186,7 +188,9 @@ const refreshUserRepos = async (ctx) => {
     logger.error(err);
     ctx.body = {
       success: false,
-      error: 'Ops! Something broken..'
+      result: {
+        error: 'Ops! Something broken..'
+      }
     };
   }
 };
@@ -205,7 +209,9 @@ const refreshUserCommits = async (ctx) => {
     logger.error(err);
     ctx.body = {
       success: false,
-      error: 'Ops! Something broken..'
+      result: {
+        error: 'Ops! Something broken..'
+      }
     };
   }
 };
@@ -222,7 +228,9 @@ const refreshUserOrgs = async (ctx) => {
     logger.error(err);
     ctx.body = {
       success: false,
-      error: 'Ops! Something broken..'
+      result: {
+        error: 'Ops! Something broken..'
+      }
     };
   }
 };
