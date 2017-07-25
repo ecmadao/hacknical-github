@@ -6,11 +6,12 @@
   "scripts": {
     "build-app": "babel app -d dist --copy-files",
     "start-dev": "bnr local:app:start",
-    "deploy": "git checkout master && git pull origin master && npm i && npm run build-app && npm run pm2:restart",
+    "deploy": "git checkout master && git pull origin master && npm i && npm run build-app && npm run pm2:restart && npm run notify-opbeat",
     "pm2": "bnr pro:app:start",
     "pm2:restart": "NODE_ENV=production pm2 restart \"hacknical-api\"",
     "pm2:stop": "NODE_ENV=production pm2 stop \"hacknical-api\"",
-    "pm2:logs": "NODE_ENV=production pm2 logs \"hacknical-api\""
+    "pm2:logs": "NODE_ENV=production pm2 logs \"hacknical-api\"",
+    "notify-opbeat": "sh ./scripts/opbeat.sh"
   },
   "betterScripts": {
     "pro:app:start": {
@@ -72,6 +73,7 @@
     "log4js": "^1.1.1",
     "moment": "^2.17.0",
     "mongoose": "^4.7.2",
+    "opbeat": "^4.14.2",
     "parse-link-header": "^1.0.1",
     "request": "^2.75.0"
   }
