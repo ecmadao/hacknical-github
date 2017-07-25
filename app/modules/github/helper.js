@@ -19,7 +19,7 @@ const fetchRepository = async (fullname, verify, repos = {}) => {
   const repository = Object.assign({}, repos, getReposResult);
   const login = repository.owner.login;
 
-  ReposModel.setRepository(login, repository);
+  await ReposModel.setRepository(login, repository);
   return repository;
 };
 
@@ -36,7 +36,7 @@ const fetchRepos = async (options = {}) => {
   const multiRepos =
     await GitHubV4.getPersonalPubRepos(login, verify, perPage);
 
-  ReposModel.setRepos(login, multiRepos);
+  await ReposModel.setRepos(login, multiRepos);
   return multiRepos;
 };
 
@@ -55,9 +55,9 @@ const fetchContributedRepos = async (options) => {
   for (let i = 0; i < multiRepos.length; i += 1) {
     const repository = multiRepos[i];
     const owner = repository.owner.login || repository.full_name.split('/')[0];
-    ReposModel.setRepository(owner, repository);
+    await ReposModel.setRepository(owner, repository);
   }
-  UsersModel.updateUserContributions(login, contributions);
+  await UsersModel.updateUserContributions(login, contributions);
   return multiRepos;
 };
 
@@ -121,7 +121,7 @@ const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED
   for (let i = 0; i < results.length; i += 1) {
     const repository = results[i];
     const { owner } = repository;
-    ReposModel.setRepository(owner.login, repository);
+    await ReposModel.setRepository(owner.login, repository);
   }
   return result;
 };
@@ -150,7 +150,7 @@ const fetchCommits = async (login, verify) => {
       };
     });
     const sortResult = sortByCommits(results);
-    CommitsModel.setCommits(login, sortResult);
+    await CommitsModel.setCommits(login, sortResult);
     return sortResult;
   } catch (err) {
     return [];
@@ -193,7 +193,7 @@ const fetchOrgDetail = async (orgLogin, verify) => {
   }
 
   org.repos = repos;
-  OrgsModel.update(org);
+  await OrgsModel.update(org);
   return org;
 };
 
