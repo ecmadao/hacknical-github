@@ -22,10 +22,10 @@ const wrapFetch = async (func, options) => {
 
 const fetchMultiDatas = async (options = {}) => {
   const {
+    func,
+    first,
     login,
     verify,
-    first,
-    func,
   } = options;
 
   const results = [];
@@ -38,9 +38,10 @@ const fetchMultiDatas = async (options = {}) => {
       first,
       after: endCursor
     });
-    if (!result) break;
-    endCursor = result.endCursor;
-    results.push(...result.results);
+    if (result && result.results) {
+      endCursor = result.endCursor;
+      results.push(...result.results);
+    }
     if (!result.hasNextPage) break;
   }
 

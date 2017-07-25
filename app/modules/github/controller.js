@@ -185,7 +185,8 @@ const refreshUserRepos = async (ctx) => {
   } catch (err) {
     logger.error(err);
     ctx.body = {
-      success: false
+      success: false,
+      error: 'Ops! Something broken..'
     };
   }
 };
@@ -203,7 +204,8 @@ const refreshUserCommits = async (ctx) => {
   } catch (err) {
     logger.error(err);
     ctx.body = {
-      success: false
+      success: false,
+      error: 'Ops! Something broken..'
     };
   }
 };
@@ -219,7 +221,8 @@ const refreshUserOrgs = async (ctx) => {
   } catch (err) {
     logger.error(err);
     ctx.body = {
-      success: false
+      success: false,
+      error: 'Ops! Something broken..'
     };
   }
 };
