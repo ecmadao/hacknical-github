@@ -6,7 +6,6 @@ import dateHelper from '../../utils/date';
 import Helper from './helper';
 import {
   PER_PAGE,
-  sortByCommits
 } from '../../utils/github';
 import {
   starredCount
@@ -92,9 +91,7 @@ const getUserRepos = async (ctx) => {
 
   ctx.body = {
     success: true,
-    result: {
-      repos,
-    }
+    result: repos
   };
 };
 
@@ -104,9 +101,7 @@ const getUserContributed = async (ctx) => {
 
   ctx.body = {
     success: true,
-    result: {
-      repos,
-    }
+    result: repos
   };
 };
 
@@ -142,11 +137,10 @@ const getUserStarredCount = async (ctx) => {
 const getUserCommits = async (ctx) => {
   const { login, verify } = ctx.request.query;
   const commits = await Helper.getCommits(login, verify);
+
   ctx.body = {
     success: true,
-    result: {
-      commits: sortByCommits(commits)
-    }
+    result: commits
   };
 };
 
@@ -197,8 +191,7 @@ const refreshUserCommits = async (ctx) => {
   const { login, verify } = ctx.request.query;
 
   try {
-    const repos = await Helper.getUserPublicRepos(login, verify);
-    await Helper.fetchCommits(repos, login, verify);
+    await Helper.fetchCommits(login, verify);
 
     ctx.body = {
       success: true,
