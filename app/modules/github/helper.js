@@ -51,7 +51,12 @@ const fetchContributedRepos = async (options) => {
     await GitHubV4.getPersonalContributedRepos(login, verify, perPage);
 
   const contributions = multiRepos.map(repository => repository.full_name);
-  ReposModel.setRepos(login, multiRepos);
+
+  for (let i = 0; i < multiRepos.length; i += 1) {
+    const repository = multiRepos[i];
+    const owner = repository.owner.login || repository.full_name.split('/')[0];
+    ReposModel.setRepository(owner, repository);
+  }
   UsersModel.updateUserContributions(login, contributions);
   return multiRepos;
 };
@@ -124,7 +129,8 @@ const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED
 /**
  * =============== commits ===============
  */
-const fetchCommits = async (repos, login, verify) => {
+const fetchCommits = async (login, verify) => {
+  const repos = await getUserPublicRepos(login, verify);
   const reposList = validateReposList(repos);
   try {
     const fetchedCommits =
@@ -154,10 +160,9 @@ const fetchCommits = async (repos, login, verify) => {
 const getCommits = async (login, verify) => {
   const findCommits = await CommitsModel.getCommits(login);
   if (findCommits.length) {
-    return sortByCommits(findCommits);
+    return findCommits;
   }
-  const findRepos = await ReposModel.getRepos(login);
-  return await fetchCommits(findRepos, login, verify);
+  return await fetchCommits(login, verify);
 };
 
 /**
