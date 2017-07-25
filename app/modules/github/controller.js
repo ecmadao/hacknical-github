@@ -4,6 +4,7 @@ import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
 import dateHelper from '../../utils/date';
 import Helper from './helper';
+import logger from '../../utils/log';
 import {
   PER_PAGE,
 } from '../../utils/github';
@@ -182,6 +183,7 @@ const refreshUserRepos = async (ctx) => {
       result: updateUserResult.result
     };
   } catch (err) {
+    logger.error(err);
     ctx.body = {
       success: false
     };
@@ -199,6 +201,7 @@ const refreshUserCommits = async (ctx) => {
       result: new Date()
     };
   } catch (err) {
+    logger.error(err);
     ctx.body = {
       success: false
     };
@@ -214,6 +217,7 @@ const refreshUserOrgs = async (ctx) => {
       result: new Date()
     };
   } catch (err) {
+    logger.error(err);
     ctx.body = {
       success: false
     };
@@ -236,7 +240,7 @@ const getRepository = async (ctx) => {
   const {
     verify,
     fullname,
-    required = ''
+    required = '',
   } = ctx.request.query;
 
   const repository = await Helper.getRepository(
@@ -244,7 +248,7 @@ const getRepository = async (ctx) => {
   );
   ctx.body = {
     success: true,
-    result: repository
+    result: repository,
   };
 };
 

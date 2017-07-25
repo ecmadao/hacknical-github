@@ -138,21 +138,25 @@ const fetchCommits = async (login, verify) => {
     const results = fetchedCommits.map((commits, index) => {
       const repository = reposList[index];
       const { reposId, name, created_at, pushed_at } = repository;
-      let totalCommits = 0;
-      commits.forEach(commit => (totalCommits += commit.total));
+      const totalCommits = commits.reduce(
+        (pre, next) => (index === 0 ? 0 : pre) + next.total, 0
+      );
       return {
-        commits,
-        totalCommits,
-        reposId,
         name,
+        commits,
+        reposId,
+        pushed_at,
         created_at,
-        pushed_at
+        totalCommits,
       };
     });
     const sortResult = sortByCommits(results);
-    await CommitsModel.setCommits(login, sortResult);
+    if (sortResult && sortResult.length) {
+      await CommitsModel.setCommits(login, sortResult);
+    }
     return sortResult;
   } catch (err) {
+    logger.error(err);
     return [];
   }
 };

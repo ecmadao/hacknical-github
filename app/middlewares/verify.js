@@ -5,7 +5,7 @@ const app = config.get('app');
 
 const verifyMiddlwware = () => async (ctx, next) => {
   const { appName } = ctx.state;
-  logger.info(`[VERIFY APPLICATION][${appName}]`);
+  logger.info(`[VERIFY APPLICATION][${appName}][${ctx.request.url}]`);
 
   const token = ctx.request.query.token || ctx.request.body.token || app[appName].token;
   const headers = { 'User-Agent': appName };
