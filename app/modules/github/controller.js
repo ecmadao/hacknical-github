@@ -11,7 +11,7 @@ import {
   starredCount
 } from '../../utils/starred-count';
 
-const HALF_AN_HOUR = 30 * 60;
+const REFRESH_LIMIT = 5 * 60;
 const app = config.get('app');
 
 
@@ -158,11 +158,12 @@ const refreshUserRepos = async (ctx) => {
   const user = await UsersModel.findUser(login);
   const lastUpdateTime = user.lastUpdateTime || user.created_at;
 
-  const timeInterval = dateHelper.getSeconds(new Date()) - dateHelper.getSeconds(lastUpdateTime);
-  if (timeInterval <= HALF_AN_HOUR) {
+  const timeInterval =
+    dateHelper.getSeconds(new Date()) - dateHelper.getSeconds(lastUpdateTime);
+  if (timeInterval <= REFRESH_LIMIT) {
     ctx.body = {
       success: false,
-      result: parseInt((HALF_AN_HOUR - timeInterval) / 60, 10)
+      result: parseInt((REFRESH_LIMIT - timeInterval) / 60, 10)
     };
     return;
   }
@@ -293,5 +294,5 @@ export default {
   refreshUserRepos,
   refreshUserCommits,
   refreshUserOrgs,
-  getUserUpdateTime
+  getUserUpdateTime,
 };
