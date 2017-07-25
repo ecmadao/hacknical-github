@@ -33,7 +33,7 @@ export const sortByCommits = repos => repos.sort(sortCommits);
 export const PER_PAGE = {
   REPOS: 50,
   ORGS: 20,
-  STARRED: 50
+  STARRED: 70
 };
 
 export const BASE_URL = 'https://api.github.com';

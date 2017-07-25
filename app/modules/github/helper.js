@@ -150,7 +150,7 @@ const fetchCommits = async (login, verify) => {
       };
     });
     const sortResult = sortByCommits(results);
-    await CommitsModel.setCommits(login, sortResult);
+    CommitsModel.setCommits(login, sortResult);
     return sortResult;
   } catch (err) {
     return [];
@@ -193,7 +193,7 @@ const fetchOrgDetail = async (orgLogin, verify) => {
   }
 
   org.repos = repos;
-  await OrgsModel.update(org);
+  OrgsModel.update(org);
   return org;
 };
 
