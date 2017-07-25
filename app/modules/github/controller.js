@@ -161,11 +161,11 @@ const refreshUserRepos = async (ctx) => {
 
   const timeInterval =
     dateHelper.getSeconds(new Date()) - dateHelper.getSeconds(lastUpdateTime);
-  if (timeInterval <= REFRESH_LIMIT) {
+  if (timeInterval < REFRESH_LIMIT) {
     ctx.body = {
       success: false,
       result: {
-        result: parseInt((REFRESH_LIMIT - timeInterval) / 60, 10)
+        result: Math.ceil((REFRESH_LIMIT - timeInterval) / 60)
       }
     };
     return;
@@ -189,6 +189,7 @@ const refreshUserRepos = async (ctx) => {
     ctx.body = {
       success: false,
       result: {
+        success: false,
         error: 'Ops! Something broken..'
       }
     };
@@ -210,6 +211,7 @@ const refreshUserCommits = async (ctx) => {
     ctx.body = {
       success: false,
       result: {
+        success: false,
         error: 'Ops! Something broken..'
       }
     };
@@ -229,6 +231,7 @@ const refreshUserOrgs = async (ctx) => {
     ctx.body = {
       success: false,
       result: {
+        success: false,
         error: 'Ops! Something broken..'
       }
     };
