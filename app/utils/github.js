@@ -18,7 +18,7 @@ export const validateReposList = (repos) => {
         reposId,
         pushed_at,
         created_at,
-        fullname: full_name,
+        full_name,
       };
     });
   return reposList;

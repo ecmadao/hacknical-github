@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 
 const GitHubReposSchema = new Schema({
   login: String,
-  reposId: String,
   full_name: String,
   name: String,
   html_url: String,

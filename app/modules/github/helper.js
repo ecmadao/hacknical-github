@@ -133,21 +133,24 @@ const fetchCommits = async (login, verify) => {
   const repos = await getUserPublicRepos(login, verify);
   const reposList = validateReposList(repos);
   try {
-    const fetchedCommits =
+    const fetchedResults =
       await GitHubV3.getAllReposYearlyCommits(reposList, verify);
-    const results = fetchedCommits.map((commits, index) => {
-      const repository = reposList[index];
-      const { reposId, name, created_at, pushed_at } = repository;
-      const totalCommits = commits.reduce(
-        (pre, next) => (index === 0 ? 0 : pre) + next.total, 0
+    const results = fetchedResults.map((fetchedResult) => {
+      const { full_name, data } = fetchedResult;
+      const repository = reposList.find(
+        item => item.full_name === full_name
+      );
+      if (!repository) return {};
+      const { name, created_at, pushed_at } = repository;
+      const totalCommits = data.reduce(
+        (pre, next, i) => (i === 0 ? 0 : pre) + next.total, 0
       );
       return {
         name,
-        commits,
-        reposId,
         pushed_at,
         created_at,
         totalCommits,
+        commits: data,
       };
     });
     const sortResult = sortByCommits(results);
@@ -178,17 +181,20 @@ const fetchOrgDetail = async (orgLogin, verify) => {
     return {};
   }
 
-  const repos = await GitHubV4.getOrgPubRepos(orgLogin, verify, PER_PAGE.REPOS);
+  const repos =
+    await GitHubV4.getOrgPubRepos(orgLogin, verify, PER_PAGE.REPOS);
 
   // set repos contributors
   if (repos && repos.length) {
     try {
-      const reposContributors =
+      const fetchedResults =
         await GitHubV3.getAllReposContributors(repos, verify);
-      repos.forEach((repository, index) => {
-        const contributors = reposContributors[index];
-        if (contributors && contributors.length) {
-          repository.contributors = contributors;
+
+      fetchedResults.forEach((fetchedResult) => {
+        const { full_name, data } = fetchedResult;
+        const repository = repos.find(item => item.full_name === full_name);
+        if (repository) {
+          repository.contributors = data;
         }
       });
     } catch (err) {

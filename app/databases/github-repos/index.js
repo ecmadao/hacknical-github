@@ -4,7 +4,6 @@ import { isEmptyObject } from '../../utils/helpers';
 
 const getReposData = (repository, login) => {
   const {
-    reposId,
     full_name,
     name,
     html_url,
@@ -29,7 +28,6 @@ const getReposData = (repository, login) => {
 
   const data = {
     login,
-    reposId,
     full_name,
     name,
     html_url,
@@ -65,23 +63,23 @@ const getReposData = (repository, login) => {
   return data;
 };
 
-const findRepository = async (login, reposId) =>
+const findRepository = async (login, name) =>
   await GitHubRepos.findOne({
     login,
-    reposId
+    name
   });
 
 // const findRepos = async login => await GitHubRepos.find({ login });
 
 const clearRepos = async login => await GitHubRepos.remove({ login });
 
-const removeRepos = async (login, reposId = null) => {
-  if (reposId === null) {
+const removeRepos = async (login, name = null) => {
+  if (name === null) {
     await clearRepos(login);
   } else {
     await GitHubRepos.remove({
+      name,
       login,
-      reposId
     });
   }
 };
@@ -94,7 +92,7 @@ const createRepos = async (login, repository) => {
 };
 
 const setRepository = async (login, repository) => {
-  const findResult = await findRepository(login, repository.id);
+  const findResult = await findRepository(login, repository.name);
   if (findResult) {
     const data = getReposData(repository, login);
     Object.assign(findResult, data);
@@ -105,7 +103,6 @@ const setRepository = async (login, repository) => {
 
 const setRepos = async (login, repos) => {
   const setResults = [];
-  await removeRepos(login);
   for (let i = 0; i < repos.length; i += 1) {
     const repository = repos[i];
     try {

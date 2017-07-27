@@ -200,18 +200,21 @@ const fetchMultiDatas = async (pages, func,  options = {}) => {
 };
 
 const mapReposToGet = async ({ repositories, params }, func) => {
-  const repos = splitArray(repositories);
+  const reposArrays = splitArray(repositories);
   const results = [];
-  for (let i = 0; i < repos.length; i += 1) {
-    const repository = repos[i];
-    const promiseList = repository.map(
-      item => func(item.fullname || item.full_name, params));
+  for (let i = 0; i < reposArrays.length; i += 1) {
+    const reposArray = reposArrays[i];
+    const promiseList = reposArray.map(
+      item => func(item.full_name, params));
     const datas =
       await Promise.all(promiseList).catch((e) => {
         logger.error(e);
         return [];
       });
-    results.push(...datas);
+    results.push(...datas.map((data, index) => ({
+      data,
+      full_name: reposArray[index].full_name
+    })));
   }
 
   return results;

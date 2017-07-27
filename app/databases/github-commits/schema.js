@@ -4,7 +4,6 @@ const Schema = mongoose.Schema;
 
 const GitHubCommitsSchema = new Schema({
   login: String,
-  reposId: String,
   name: String,
   commits: [{
     days: Array,
