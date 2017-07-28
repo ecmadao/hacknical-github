@@ -140,7 +140,7 @@ const fetchCommits = async (login, verify) => {
       const repository = reposList.find(
         item => item.full_name === full_name
       );
-      if (!repository) return {};
+      if (!repository || !data.length) return {};
       const { name, created_at, pushed_at } = repository;
       const totalCommits = data.reduce(
         (pre, next, i) => (i === 0 ? 0 : pre) + next.total, 0
@@ -193,7 +193,7 @@ const fetchOrgDetail = async (orgLogin, verify) => {
       fetchedResults.forEach((fetchedResult) => {
         const { full_name, data } = fetchedResult;
         const repository = repos.find(item => item.full_name === full_name);
-        if (repository) {
+        if (repository && data.length) {
           repository.contributors = data;
         }
       });
@@ -217,7 +217,7 @@ const fetchUserOrgs = async (login, verify) => {
 const getUserOrgs = async (login, verify) => {
   const findUser = await UsersModel.findUser(login);
   const pubOrgs = findUser.orgs;
-  if (pubOrgs && pubOrgs.length) { return pubOrgs; }
+  if (pubOrgs && pubOrgs.length) return pubOrgs;
   return await fetchUserOrgs(login, verify);
 };
 

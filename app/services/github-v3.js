@@ -93,24 +93,17 @@ const getUserPubOrgs = ({ login, verify, page = 1, perPage = 100 }) => {
   });
 };
 
-const getReposYearlyCommits = async (fullname, verify) => {
-  let result = [];
+const getReposYearlyCommits = ({ fullname, verify }) => {
   const { qs, headers } = verify;
-  try {
-    result = await fetch.get({
-      qs,
-      headers,
-      url: `${API_REPOS}/${fullname}/stats/commit_activity`
-    });
-  } catch (err) {
-    logger.error(err);
-    result = [];
-  }
-  return result;
+  return fetch.get({
+    qs,
+    headers,
+    url: `${API_REPOS}/${fullname}/stats/commit_activity`
+  });
 };
 
-const getReposLanguages = async (fullname, verify) => {
-  let result = {};
+const getReposLanguages = async ({ fullname, verify }) => {
+  const result = {};
   const { qs, headers } = verify;
   try {
     const languages = await fetch.get({
@@ -121,43 +114,36 @@ const getReposLanguages = async (fullname, verify) => {
     let total = 0;
     Object.keys(languages).forEach(key => (total += languages[key]));
     Object.keys(languages).forEach(key => (result[key] = languages[key] / total));
-  } catch (err) {
-    logger.error(err);
-    result = {};
+  } catch (e) {
+    logger.error(e);
   }
   return result;
 };
 
-const getReposContributors = async (fullname, verify) => {
-  let results = [];
+const getReposContributors = async ({ fullname, verify }) => {
   const { qs, headers } = verify;
-  try {
-    const contributors = await fetch.get({
-      qs,
-      headers,
-      url: `${API_REPOS}/${fullname}/stats/contributors`
-    });
-    results = contributors.map((contributor) => {
-      const { total, weeks, author } = contributor;
-      const weeklyCommits = weeks.map((week) => {
-        const { w, a, d, c } = week;
-        return {
-          week: w,
-          data: parseInt((a + d + c), 10)
-        };
-      });
-      const { avatar_url, login } = author;
+  const contributors = await fetch.get({
+    qs,
+    headers,
+    url: `${API_REPOS}/${fullname}/stats/contributors`
+  });
+  const results = contributors.map((contributor) => {
+    const { total, weeks, author } = contributor;
+    const weeklyCommits = weeks.map((week) => {
+      const { w, a, d, c } = week;
       return {
-        total,
-        login,
-        avatar_url,
-        weeks: weeklyCommits
+        week: w,
+        data: parseInt((a + d + c), 10)
       };
     });
-  } catch (e) {
-    logger.error(e);
-    results = [];
-  }
+    const { avatar_url, login } = author;
+    return {
+      total,
+      login,
+      avatar_url,
+      weeks: weeklyCommits
+    };
+  });
   return results;
 };
 
@@ -166,9 +152,6 @@ const fetchByPromiseList = promiseList =>
     let results = [];
     datas.forEach(data => (results = [...results, ...data]));
     return results;
-  }).catch((e) => {
-    logger.error(e);
-    return [];
   });
 
 const fetchDatas = (func, options = {}) =>
@@ -205,12 +188,12 @@ const mapReposToGet = async ({ repositories, params }, func) => {
   for (let i = 0; i < reposArrays.length; i += 1) {
     const reposArray = reposArrays[i];
     const promiseList = reposArray.map(
-      item => func(item.full_name, params));
-    const datas =
-      await Promise.all(promiseList).catch((e) => {
-        logger.error(e);
-        return [];
-      });
+      item => fetchDatas(func, {
+        verify: params,
+        fullname: item.full_name
+      }));
+
+    const datas = await Promise.all(promiseList);
     results.push(...datas.map((data, index) => ({
       data,
       full_name: reposArray[index].full_name
