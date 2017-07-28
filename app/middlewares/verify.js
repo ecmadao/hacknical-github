@@ -13,14 +13,14 @@ const verifyMiddlwware = () => async (ctx, next) => {
   const clientSecret = app[appName].clientSecret;
   const verify = {
     client_id: clientId,
-    client_secret: clientSecret
+    client_secret: clientSecret,
   };
   if (token && String(token) !== 'undefined' && String(token) !== 'null') {
     headers.Authorization = `Bearer ${token}`;
   }
   ctx.request.query.verify = {
+    headers,
     qs: verify,
-    headers
   };
   await next();
 };

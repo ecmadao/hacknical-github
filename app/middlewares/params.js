@@ -1,28 +1,41 @@
 import verifyApp from '../utils/verify';
 
-const checkQuery = (params = []) => async (ctx, next) => {
+const baseCheck = (options = {}) => {
+  const {
+    msg,
+    params,
+    object,
+  } = options;
   params.forEach((param) => {
-    if (!ctx.request.query[param]) {
-      throw new Error(`query: ${param} missed!`);
+    if (!object[param]) {
+      throw new Error(msg.replace(/%s/, param));
     }
+  });
+};
+
+const checkQuery = (params = []) => async (ctx, next) => {
+  baseCheck({
+    params,
+    object: ctx.request.query,
+    msg: 'Required query: %s missed!'
   });
   await next();
 };
 
 const checkBody = (params = []) => async (ctx, next) => {
-  params.forEach((param) => {
-    if (!ctx.request.body[param]) {
-      throw new Error(`body: ${param} missed!`);
-    }
+  baseCheck({
+    params,
+    object: ctx.request.body,
+    msg: 'Required body: %s missed!'
   });
   await next();
 };
 
 const checkHeaders = (params = []) => async (ctx, next) => {
-  params.forEach((param) => {
-    if (!ctx.headers[param]) {
-      throw new Error(`header: ${param} missed!`);
-    }
+  baseCheck({
+    params,
+    object: ctx.headers,
+    msg: 'Required header: %s missed!'
   });
   await next();
 };
@@ -37,5 +50,5 @@ export default {
   checkQuery,
   checkBody,
   checkHeaders,
-  checkApp
+  checkApp,
 };

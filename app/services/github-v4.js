@@ -321,14 +321,14 @@ const getPersonalContributedRepos = async (login, verify, perPage) =>
   });
 
 export default {
-  getUser,
   getOrg,
-  getOrgPubRepos,
-  getUserByToken,
+  getUser,
   getRepository,
   getUserStarred,
+  getOrgPubRepos,
+  getUserByToken,
   getPersonalStarred,
-  getPersonalPubRepos,
   getPersonalPubOrgs,
+  getPersonalPubRepos,
   getPersonalContributedRepos,
 };
