@@ -1,13 +1,11 @@
 /* eslint no-loop-func: "off", no-constant-condition: "off" */
 
-import axios from '../utils/axios';
 import logger from '../utils/log';
-import { GITHUB } from '../utils/github';
 import adapter from './v4-to-v3';
-
-const {
-  API_GRAPHQL,
-} = GITHUB;
+import {
+  fetch,
+  getClient,
+} from '../utils/graphql-request';
 
 /* =================== PRIVATE =================== */
 
@@ -50,11 +48,8 @@ const fetchMultiDatas = async (options = {}) => {
 
 const baseFetch = (query, verify) => {
   const { headers } = verify;
-  return axios.post({
-    headers,
-    url: API_GRAPHQL,
-    data: { query },
-  });
+  const client = getClient(headers);
+  return fetch(client, query);
 };
 
 const baseGetOrgs = async ({ login, verify, after = null, first = 100 }) => {
@@ -76,7 +71,7 @@ const baseGetOrgs = async ({ login, verify, after = null, first = 100 }) => {
     }
   }`;
   const fetchResults = await baseFetch(query, verify);
-  const { pageInfo, edges } = fetchResults.data.user.organizations;
+  const { pageInfo, edges } = fetchResults.user.organizations;
   const results = edges.map(edge => adapter.organization(edge.node));
   return {
     results,
@@ -104,7 +99,7 @@ const baseGetRepos = async ({ login, verify, after = null, first = 100, what = '
     }
   }`;
   const fetchResults = await baseFetch(query, verify);
-  const { pageInfo, edges } = fetchResults.data[who][what];
+  const { pageInfo, edges } = fetchResults[who][what];
   const results = edges.map(edge => adapter.repository(edge.node));
   return {
     results,
@@ -207,7 +202,7 @@ const getUserByToken = async (verify) => {
     viewer ${USER_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  return adapter.user(result.data.viewer);
+  return adapter.user(result.viewer);
 };
 
 const getUser = async (login, verify) => {
@@ -215,7 +210,7 @@ const getUser = async (login, verify) => {
     user(login: "${login}") ${USER_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  return adapter.user(result.data.user);
+  return adapter.user(result.user);
 };
 
 const getRepository = async (fullname, verify) => {
@@ -224,7 +219,7 @@ const getRepository = async (fullname, verify) => {
     repository(owner: "${owner}", name: "${names.join('/')}") ${REPOSITORY_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  return adapter.repository(result.data.repository);
+  return adapter.repository(result.repository);
 };
 
 const getOrg = async (login, verify) => {
@@ -232,7 +227,7 @@ const getOrg = async (login, verify) => {
     organization(login: "${login}") ${ORG_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  return adapter.organization(result.data.organization);
+  return adapter.organization(result.organization);
 };
 
 const getOrgRepos = async ({ login, verify, after = null, first = 30 }) =>
