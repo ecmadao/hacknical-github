@@ -29,8 +29,8 @@
     }
   },
   "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ecmadao/hacknical-api.git"
+    "url": "git+https://github.com/ecmadao/hacknical-api.git",
+    "type": "git"
   },
   "author": "ecmadao",
   "license": "Apache License",
@@ -47,10 +47,10 @@
     "babel-register": "^6.14.0",
     "babel-runtime": "^6.11.6",
     "better-npm-run": "0.0.13",
-    "nodemon": "^1.10.2",
     "eslint": "^3.9.1",
     "eslint-config-airbnb-base": "^10.0.1",
-    "eslint-plugin-import": "^2.2.0"
+    "eslint-plugin-import": "^2.2.0",
+    "nodemon": "^1.10.2"
   },
   "dependencies": {
     "babel-core": "^6.14.0",

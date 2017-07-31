@@ -3,7 +3,7 @@ import UsersModel from '../../databases/github-users';
 import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
 import dateHelper from '../../utils/date';
-import Helper from './helper';
+import Helper from '../shared/helper';
 import logger from '../../utils/log';
 import {
   PER_PAGE,

@@ -9,7 +9,7 @@ import {
 
 /* =================== PRIVATE =================== */
 
-const wrapFetch = async (func, options) => {
+const wrapFetch = async (func, options = {}) => {
   try {
     return await func(options);
   } catch (e) {
@@ -52,7 +52,14 @@ const baseFetch = (query, verify) => {
   return fetch(client, query);
 };
 
-const baseGetOrgs = async ({ login, verify, after = null, first = 100 }) => {
+const baseGetOrgs = async (options = {}) => {
+  const {
+    login,
+    verify,
+    after = null,
+    first = 100
+  } = options;
+
   let limit = `first: ${first}`;
   if (after) {
     limit = `${limit}, after: "${after}"`;
@@ -80,7 +87,16 @@ const baseGetOrgs = async ({ login, verify, after = null, first = 100 }) => {
   };
 };
 
-const baseGetRepos = async ({ login, verify, after = null, first = 100, what = 'repositories', who = 'user' }) => {
+const baseGetRepos = async (options = {}) => {
+  const {
+    login,
+    verify,
+    after = null,
+    first = 100,
+    who = 'user',
+    what = 'repositories',
+  } = options;
+
   let limit = `first: ${first}`;
   if (after) {
     limit = `${limit}, after: "${after}"`;
@@ -160,7 +176,6 @@ const REPOSITORY_QUERY = `{
       size
       node {
         name
-        color
       }
     }
   }
