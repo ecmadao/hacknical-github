@@ -1,8 +1,8 @@
 {
   "production": false,
   "port": "5002",
-  "appKey": "hacknical-api-local",
-  "appName": "hacknical-api-local",
+  "appKey": "hacknical-github-local",
+  "appName": "hacknical-github-local",
   "database": {
     "url": "mongodb://localhost:27017/hacknical-api"
   },
