@@ -6,16 +6,20 @@
   "scripts": {
     "build-app": "babel app -d dist --copy-files",
     "start-dev": "bnr local:app:start",
-    "deploy": "git checkout master && git pull origin master && npm i && npm run build-app && npm run pm2:restart && npm run notify-opbeat",
-    "pm2": "bnr pro:app:start",
-    "pm2:restart": "NODE_ENV=production pm2 restart \"hacknical-github\"",
-    "pm2:stop": "NODE_ENV=production pm2 stop \"hacknical-github\"",
-    "pm2:logs": "NODE_ENV=production pm2 logs \"hacknical-github\"",
+    "deploy": "git checkout master && git pull origin master && npm i && npm run build-app && npm run restart && npm run notify-opbeat",
+    "start": "bnr pro:app:start",
+    "restart": "bnr pro:app:restart",
     "notify-opbeat": "sh ./scripts/opbeat.sh"
   },
   "betterScripts": {
+    "pro:app:restart": {
+      "command": "forever restart dist/bin/index.js",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
     "pro:app:start": {
-      "command": "pm2 start dist/bin/server.js -i 3 --name \"hacknical-github\" --max-memory-restart 300M --merge-logs --log-date-format=\"YYYY-MM-DD HH:mm Z\" --output=\"log/production.log\"",
+      "command": "forever start dist/bin/index.js",
       "env": {
         "NODE_ENV": "production"
       }
@@ -71,7 +75,6 @@
     "moment": "^2.17.0",
     "mongoose": "4.7.2",
     "opbeat": "^4.14.2",
-    "parse-link-header": "^1.0.1",
     "request": "^2.75.0"
   }
 }

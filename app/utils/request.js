@@ -6,11 +6,11 @@ const retryTimes = config.get('timeouts');
 
 const handleBody = (httpResponse, body) => {
   if (body) {
-    let result = null;
+    let result = body;
     try {
       result = JSON.parse(body);
     } catch (e) {
-      result = body;
+      logger.error(e);
     }
     return result;
   }
@@ -63,5 +63,5 @@ export default {
   delete: (options, timeout) => {
     options.method = 'DELETE';
     return baseFetch(options, timeout);
-  }
+  },
 };

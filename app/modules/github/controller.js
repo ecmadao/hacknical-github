@@ -8,9 +8,6 @@ import logger from '../../utils/logger';
 import {
   PER_PAGE,
 } from '../../utils/github';
-import {
-  starredCount
-} from '../../utils/starred-count';
 
 const REFRESH_LIMIT = 5 * 60;
 const app = config.get('app');
@@ -128,7 +125,7 @@ const getUserStarred = async (ctx) => {
 
 const getUserStarredCount = async (ctx) => {
   const { login, verify } = ctx.request.query;
-  const count = await starredCount(login, verify);
+  const count = await GitHubV4.getUserStarredCount(login, verify);
   ctx.body = {
     success: true,
     result: count,

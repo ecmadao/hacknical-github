@@ -245,6 +245,23 @@ const getOrg = async (login, verify) => {
   return adapter.organization(result.organization);
 };
 
+const getUserStarredCount = async (login, verify) => {
+  const query = `{
+    user(login: "${login}") {
+      starredRepositories(first: 1) {
+        totalCount
+      }
+    }
+  }`;
+  const result = await baseFetch(query, verify);
+  try {
+    return result.user.starredRepositories.totalCount;
+  } catch (e) {
+    logger.error(e);
+  }
+  return 0;
+};
+
 const getOrgRepos = async ({ login, verify, after = null, first = 30 }) =>
   await baseGetRepos({
     login,
@@ -337,6 +354,7 @@ export default {
   getUserStarred,
   getOrgPubRepos,
   getUserByToken,
+  getUserStarredCount,
   getPersonalStarred,
   getPersonalPubOrgs,
   getPersonalPubRepos,
