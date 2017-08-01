@@ -1,7 +1,7 @@
 /* eslint no-loop-func: "off" */
 
-import fetch from '../utils/fetch';
-import logger from '../utils/log';
+import fetch from '../utils/request';
+import logger from '../utils/logger';
 import {
   splitArray,
   flattenObject

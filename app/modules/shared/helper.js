@@ -1,4 +1,4 @@
-import logger from '../../utils/log';
+import logger from '../../utils/logger';
 import OrgsModel from '../../databases/github-orgs';
 import ReposModel from '../../databases/github-repos';
 import CommitsModel from '../../databases/github-commits';
@@ -57,11 +57,11 @@ const fetchContributedRepos = async (options) => {
     repository => repository.full_name
   );
 
-  for (let i = 0; i < userContributeds.length; i += 1) {
-    const repository = userContributeds[i];
+  await Promise.all(userContributeds.map(async (repository) => {
     const owner = repository.owner.login || repository.full_name.split('/')[0];
     await ReposModel.setRepository(owner, repository);
-  }
+  }));
+
   await UsersModel.updateUserContributions(login, contributions);
   return userContributeds;
 };
@@ -98,11 +98,12 @@ const getUserContributed = async (login, verify) => {
     });
   }
   const repos = [];
-  for (let i = 0; i < contributions.length; i += 1) {
-    const fullname = contributions[i];
+
+  await Promise.all(contributions.map(async (contribution) => {
+    const fullname = contribution;
     const repository = await getRepository(fullname, verify);
     repos.push(repository);
-  }
+  }));
   return repos;
 };
 
@@ -123,11 +124,10 @@ const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED
     results,
   } = result;
 
-  for (let i = 0; i < results.length; i += 1) {
-    const repository = results[i];
+  await Promise.all(results.map(async (repository) => {
     const { owner } = repository;
     await ReposModel.setRepository(owner.login, repository);
-  }
+  }));
   return result;
 };
 
@@ -242,14 +242,15 @@ const getUserOrgs = async (login, verify) => {
 const updateOrgs = async (login, verify) => {
   try {
     const userOrgs = await fetchUserOrgs(login, verify);
-    for (let i = 0; i < userOrgs.length; i += 1) {
-      const orgLogin = userOrgs[i].login;
+
+    await Promise.all(userOrgs.map(async (userOrg) => {
+      const orgLogin = userOrg.login;
       await fetchOrgDetail({
         login,
         verify,
         orgLogin,
       });
-    }
+    }));
   } catch (err) {
     logger.error(err);
   }
@@ -257,8 +258,9 @@ const updateOrgs = async (login, verify) => {
 
 const getDetailOrgs = async (pubOrgs, verify, login) => {
   const orgs = [];
-  for (let i = 0; i < pubOrgs.length; i += 1) {
-    const orgLogin = pubOrgs[i].login;
+
+  await Promise.all(pubOrgs.map(async (pubOrg) => {
+    const orgLogin = pubOrg.login;
     let org = await OrgsModel.find(orgLogin);
     if (!org) {
       org = await fetchOrgDetail({
@@ -268,7 +270,7 @@ const getDetailOrgs = async (pubOrgs, verify, login) => {
       });
     }
     orgs.push(org);
-  }
+  }));
   return orgs;
 };
 

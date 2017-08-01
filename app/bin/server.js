@@ -7,7 +7,7 @@ import json from 'koa-json';
 import cors from 'kcors';
 import config from 'config';
 import router from '../modules';
-import logger from '../utils/log';
+import logger from '../utils/logger';
 import params from '../middlewares/params';
 import authMiddleware from '../middlewares/auth';
 import verifyMiddleware from '../middlewares/verify';

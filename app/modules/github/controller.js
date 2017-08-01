@@ -4,7 +4,7 @@ import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
 import dateHelper from '../../utils/date';
 import Helper from '../shared/helper';
-import logger from '../../utils/log';
+import logger from '../../utils/logger';
 import {
   PER_PAGE,
 } from '../../utils/github';

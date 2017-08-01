@@ -1,5 +1,5 @@
 import GitHubRepos from './schema';
-import logger from '../../utils/log';
+import logger from '../../utils/logger';
 import { isEmptyObject } from '../../utils/helpers';
 
 const getReposData = (repository, login) => {
@@ -103,15 +103,15 @@ const setRepository = async (login, repository) => {
 
 const setRepos = async (login, repos) => {
   const setResults = [];
-  for (let i = 0; i < repos.length; i += 1) {
-    const repository = repos[i];
+
+  await Promise.all(repos.map(async (repository) => {
     try {
       const result = await setRepository(login, repository);
       setResults.push(result);
     } catch (e) {
       logger.error(e);
     }
-  }
+  }));
   return setResults;
 };
 
@@ -122,22 +122,10 @@ const getRepository = async fullname =>
     full_name: fullname
   });
 
-const resetRepos = async (login, repos) => {
-  const setResults = [];
-  await removeRepos(login);
-  for (let i = 0; i < repos.length; i += 1) {
-    const repository = repos[i];
-    const result = await createRepos(login, repository);
-    setResults.push(result);
-  }
-  return setResults;
-};
-
 export default {
   removeRepos,
   getRepository,
   setRepository,
   setRepos,
   getRepos,
-  resetRepos,
 };

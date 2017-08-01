@@ -1,8 +1,8 @@
 import parse from 'parse-link-header';
 import config from 'config';
-import logger from './log';
+import logger from './logger';
 import { PER_PAGE, GITHUB } from './github';
-import { baseFetch } from './fetch';
+import { baseFetch } from './request';
 
 const retryTimes = config.get('timeouts');
 

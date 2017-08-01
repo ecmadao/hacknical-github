@@ -1,5 +1,5 @@
 import config from 'config';
-import logger from '../utils/log';
+import logger from '../utils/logger';
 
 const app = config.get('app');
 

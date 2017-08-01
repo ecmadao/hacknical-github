@@ -1,6 +1,6 @@
 import request from 'request';
 import config from 'config';
-import logger from './log';
+import logger from './logger';
 
 const retryTimes = config.get('timeouts');
 

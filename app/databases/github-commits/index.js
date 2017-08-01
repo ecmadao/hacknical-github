@@ -38,10 +38,9 @@ const setRepositoryCommits = async (login, data) => {
 };
 
 const setCommits = async (login, datas) => {
-  for (let i = 0; i < datas.length; i += 1) {
-    const data = datas[i];
+  await Promise.all(datas.map(async (data) => {
     await setRepositoryCommits(login, data);
-  }
+  }));
   return Promise.resolve({
     success: true
   });

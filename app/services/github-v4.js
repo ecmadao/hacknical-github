@@ -1,6 +1,6 @@
 /* eslint no-loop-func: "off", no-constant-condition: "off" */
 
-import logger from '../utils/log';
+import logger from '../utils/logger';
 import adapter from './v4-to-v3';
 import {
   fetch,

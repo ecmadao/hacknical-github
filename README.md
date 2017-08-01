@@ -1,4 +1,4 @@
-# hacknical-api
+# hacknical-github
 
 > Core server for [hacknical](http://hacknical.com)
 
