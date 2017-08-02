@@ -6,20 +6,20 @@
   "scripts": {
     "build-app": "babel app -d dist --copy-files",
     "start-dev": "bnr local:app:start",
-    "deploy": "git checkout master && git pull origin master && npm i && npm run build-app && npm run restart && npm run notify-opbeat",
+    "deploy": "git checkout master && git pull origin master && npm i && npm run stop && npm run build-app && npm run start && npm run notify-opbeat",
     "start": "bnr pro:app:start",
-    "restart": "bnr pro:app:restart",
+    "stop": "bnr pro:app:stop",
     "notify-opbeat": "sh ./scripts/opbeat.sh"
   },
   "betterScripts": {
-    "pro:app:restart": {
-      "command": "forever restart dist/bin/server.js",
+    "pro:app:start": {
+      "command": "forever start --killSignal=SIGTERM -a -l /home/ecmadao/log/hacknical-github/forever_log -e /home/ecmadao/log/hacknical-github/error_log dist/bin/server.js",
       "env": {
         "NODE_ENV": "production"
       }
     },
-    "pro:app:start": {
-      "command": "forever start dist/bin/server.js",
+    "bnr pro:app:stop": {
+      "command": "forever stop dist/bin/server.js",
       "env": {
         "NODE_ENV": "production"
       }
