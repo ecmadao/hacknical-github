@@ -5,7 +5,7 @@ import adapter from './v4-to-v3';
 import {
   fetch,
   getClient,
-} from '../utils/graphql-request';
+} from '../utils/request-graphql';
 
 /* =================== PRIVATE =================== */
 

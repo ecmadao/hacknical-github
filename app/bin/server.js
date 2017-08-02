@@ -1,16 +1,14 @@
 import Koa from 'koa';
-import log from 'koa-logger';
+import koaLogger from 'koa-logger';
 import convert from 'koa-convert';
 import bodyParser from 'koa-bodyparser';
-import onerror from 'koa-onerror';
-import json from 'koa-json';
 import cors from 'kcors';
 import config from 'config';
 import router from '../modules';
 import logger from '../utils/logger';
 import params from '../middlewares/params';
-import authMiddleware from '../middlewares/auth';
-import verifyMiddleware from '../middlewares/verify';
+import auth from '../middlewares/auth';
+import verify from '../middlewares/verify';
 
 const appKey = config.get('appKey');
 const port = config.get('port');
@@ -19,24 +17,20 @@ app.keys = [appKey];
 
 app.use(convert(cors()));
 
-// error handle
-onerror(app);
 // bodyparser
 app.use(bodyParser());
-// json parse
-app.use(convert(json()));
 // koa-logger
-app.use(convert(log()));
+app.use(convert(koaLogger()));
 // check if validate app
 app.use(params.checkApp('x-app-name'));
 // auth
-app.use(authMiddleware({
+app.use(auth({
   whiteList: [
     /^\/api\/github\/(zen)|(octocat)|(verify)/
   ]
 }));
 // verify token params
-app.use(verifyMiddleware());
+app.use(verify());
 
 // router
 app.use(router.routes(), router.allowedMethods());
