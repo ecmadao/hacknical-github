@@ -18,7 +18,7 @@
         "NODE_ENV": "production"
       }
     },
-    "bnr pro:app:stop": {
+    "pro:app:stop": {
       "command": "forever stop dist/bin/server.js",
       "env": {
         "NODE_ENV": "production"
