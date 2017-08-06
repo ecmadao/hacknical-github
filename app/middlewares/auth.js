@@ -33,12 +33,14 @@ class HmacStrategy extends passport.Strategy {
 
   authenticate(request) {
     const authString = request.headers.authorization;
-    if (!authString) return this.fail(new Error('Authorization header not present'));
+    if (!authString) {
+      throw new Error('Authorization header not present');
+    }
 
     const matches = authString.match(/^([^ ]+) ([^:]+):((?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)$/);
 
     if (!matches) {
-      this.fail(new Error('Bad authorization header'));
+      throw new Error('Bad authorization header');
     }
 
     const publicKey = matches[2];
@@ -50,15 +52,14 @@ class HmacStrategy extends passport.Strategy {
         const secretKey = getAuth.secretKey;
 
         if (getSignString(request, secretKey) !== signature) {
-          this.fail(new Error('Bad signature'));
+          throw new Error('Bad signature');
         }
         return this.success(getAuth, {});
       }
-      this.fail(new Error('Bad credentials'));
+      throw new Error('Bad credentials');
     } catch (e) {
-      return this.error(e);
+      throw e;
     }
-    return null;
   }
 }
 

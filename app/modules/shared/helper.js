@@ -31,10 +31,11 @@ const fetchRepos = async (options = {}) => {
     login,
     verify,
     perPage,
+    fetch = GitHubV4.getPersonalPubRepos,
   } = options;
 
   const multiRepos =
-    await GitHubV4.getPersonalPubRepos(login, verify, perPage);
+    await fetch(login, verify, perPage);
 
   await ReposModel.setRepos(login, multiRepos);
   return multiRepos;
@@ -74,7 +75,7 @@ const getRepository = async (fullname, verify, required = []) => {
   return findResult;
 };
 
-const getRepos = async (login, verify) => {
+const getRepos = async (login, verify, fetch) => {
   const findResult = await ReposModel.getRepos(login);
   if (findResult.length) {
     return findResult;
@@ -83,7 +84,8 @@ const getRepos = async (login, verify) => {
   return await fetchRepos({
     login,
     verify,
-    perPage: PER_PAGE.REPOS
+    fetch,
+    perPage: PER_PAGE.REPOS,
   });
 };
 
@@ -180,49 +182,76 @@ const getCommits = async (login, verify) => {
 /**
  * =============== orgs ===============
  */
-const fetchOrgDetail = async (options = {}) => {
+const getReposContributors = async (options = {}) => {
   const {
-    orgLogin,
+    login,
+    repos,
     verify,
-    login = '',
   } = options;
-  const org = await GitHubV3.getOrg(orgLogin, verify);
-  if (!org.login) {
-    return {};
+
+  const fetchedResults =
+    await GitHubV3.getAllReposContributors(repos, verify);
+
+  fetchedResults.forEach((fetchedResult) => {
+    const { full_name, data } = fetchedResult;
+    const repository = repos.find(item => item.full_name === full_name);
+    if (repository && data.length) {
+      repository.contributors = data;
+    } else {
+      repository.contributors = [];
+    }
+  });
+
+  await ReposModel.setRepos(login, repos);
+  return repos;
+};
+
+const getOrgRepositories = async (options = {}) => {
+  const {
+    org,
+    login,
+    verify,
+  } = options;
+
+  const results = [];
+  let repos = [];
+  try {
+    repos = await getRepos(org.login, verify, GitHubV4.getOrgPubRepos);
+  } catch (e) {
+    repos = [];
+    logger.error(e);
   }
 
-  const repos =
-    await GitHubV4.getOrgPubRepos(orgLogin, verify, PER_PAGE.REPOS);
-
-  // set repos contributors
   if (repos && repos.length) {
     try {
       // avoid tooo many repos in a organization
       const contributeds = await getUserContributedRepos(login, verify);
+      const contributedsInOrg = [];
 
-      const contributedsInOrg = repos.filter(
-        repository => contributeds.find(item => item.full_name === repository.full_name)
-      );
-      const fetchedResults =
-        await GitHubV3.getAllReposContributors(contributedsInOrg, verify);
-
-      fetchedResults.forEach((fetchedResult) => {
-        const { full_name, data } = fetchedResult;
-        const repository = repos.find(item => item.full_name === full_name);
-        if (repository && data.length) {
-          repository.contributors = data;
+      repos.forEach((repository) => {
+        if (
+          (!repository.contributors || !repository.contributors.length)
+          && contributeds.find(item => item.full_name === repository.full_name)
+        ) {
+          contributedsInOrg.push(repository);
         } else {
-          repository.contributors = [];
+          results.push(repository);
         }
       });
+
+      if (contributedsInOrg.length) {
+        const reposWithContributors = await getReposContributors({
+          verify,
+          login: org.login,
+          repos: contributedsInOrg,
+        });
+        results.push(...reposWithContributors);
+      }
     } catch (err) {
       logger.error(err);
     }
   }
-
-  org.repos = repos;
-  await OrgsModel.update(org);
-  return org;
+  return results;
 };
 
 const fetchUserOrgs = async (login, verify) => {
@@ -239,35 +268,15 @@ const getUserOrgs = async (login, verify) => {
   return await fetchUserOrgs(login, verify);
 };
 
-const updateOrgs = async (login, verify) => {
-  try {
-    const userOrgs = await fetchUserOrgs(login, verify);
-
-    await Promise.all(userOrgs.map(async (userOrg) => {
-      const orgLogin = userOrg.login;
-      await fetchOrgDetail({
-        login,
-        verify,
-        orgLogin,
-      });
-    }));
-  } catch (err) {
-    logger.error(err);
-  }
-};
-
-const getDetailOrgs = async (pubOrgs, verify, login) => {
+const getOrgsInfo = async (pubOrgs, verify) => {
   const orgs = [];
 
   await Promise.all(pubOrgs.map(async (pubOrg) => {
     const orgLogin = pubOrg.login;
     let org = await OrgsModel.find(orgLogin);
     if (!org) {
-      org = await fetchOrgDetail({
-        login,
-        verify,
-        orgLogin,
-      });
+      org = await GitHubV3.getOrg(orgLogin, verify);
+      await OrgsModel.update(org);
     }
     orgs.push(org);
   }));
@@ -276,7 +285,55 @@ const getDetailOrgs = async (pubOrgs, verify, login) => {
 
 const getOrgs = async (login, verify) => {
   const userOrgs = await getUserOrgs(login, verify);
-  return await getDetailOrgs(userOrgs, verify, login);
+  const orgs = await getOrgsInfo(userOrgs, verify, login);
+  // get orgs repositories
+  const results = await Promise.all(orgs.map(async (org) => {
+    const {
+      name,
+      blog,
+      html_url,
+      created_at,
+      avatar_url,
+      description,
+      public_repos,
+    } = org;
+    const repositories = await getOrgRepositories({
+      org,
+      login,
+      verify,
+    });
+    return {
+      name,
+      blog,
+      html_url,
+      avatar_url,
+      created_at,
+      description,
+      public_repos,
+      login: org.login,
+      repos: repositories
+    };
+  }));
+  return results;
+};
+
+const updateOrgs = async (login, verify) => {
+  try {
+    const userOrgs = await fetchUserOrgs(login, verify);
+
+    await Promise.all(userOrgs.map(async (userOrg) => {
+      const orgLogin = userOrg.login;
+      const org = await GitHubV3.getOrg(orgLogin, verify);
+      await OrgsModel.update(org);
+      await getOrgRepositories({
+        org,
+        login,
+        verify,
+      });
+    }));
+  } catch (err) {
+    logger.error(err);
+  }
 };
 
 /*
@@ -308,5 +365,6 @@ export default {
   // orgs
   getOrgs,
   updateOrgs,
+  // user
   getUser,
 };

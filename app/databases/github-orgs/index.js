@@ -21,49 +21,7 @@ const getOrgInfo = orgInfo => ({
   following: orgInfo.following,
   html_url: orgInfo.html_url,
   type: orgInfo.type || 'Organization',
-  repos: orgInfo.repos || []
 });
-
-const getReposInfo = repos => ({
-  full_name: repos.full_name,
-  name: repos.name,
-  html_url: repos.html_url,
-  description: repos.description,
-  fork: repos.fork,
-  created_at: repos.created_at,
-  updated_at: repos.updated_at,
-  pushed_at: repos.pushed_at,
-  homepage: repos.homepage,
-  size: repos.size,
-  stargazers_count: repos.stargazers_count,
-  watchers_count: repos.watchers_count,
-  language: repos.language,
-  languages: repos.languages,
-  contributors: repos.contributors,
-  forks_count: repos.forks_count,
-  forks: repos.forks,
-  watchers: repos.watchers
-});
-
-const updateOrgReposInfo = (newRepos, oldRepos = []) => {
-  const results = [];
-  newRepos.forEach((repository) => {
-    const { full_name, contributors } = repository;
-    const oldRepository = oldRepos.find(item => item.full_name === full_name);
-    if (
-      (!contributors || !contributors.length)
-      && oldRepository.contributors
-      && oldRepository.contributors.length
-    ) {
-      results.push(getReposInfo(Object.assign({}, repository, {
-        contributors: oldRepository.contributors
-      })));
-    } else {
-      results.push(getReposInfo(repository));
-    }
-  });
-  return results;
-};
 
 /* === API === */
 
@@ -75,15 +33,13 @@ const findOrgsByLogin = async logins => await GitHubOrgs.find({
   }
 });
 
-const updateOrgRepos = async (login, repos) => {
+const updateOrgRepos = async (login) => {
   const findOrg = await findOrgByLogin(login);
   if (!findOrg) {
     return Promise.resolve({
       success: false
     });
   }
-  const oldRepos = findOrg.repos;
-  findOrg.repos = updateOrgReposInfo(repos, oldRepos);
   await findOrg.save();
   return Promise.resolve({
     success: true,
@@ -93,11 +49,8 @@ const updateOrgRepos = async (login, repos) => {
 
 const updateOrg = async (orgInfo) => {
   const newOrgInfo = getOrgInfo(orgInfo);
-  const { login, repos } = newOrgInfo;
+  const { login } = newOrgInfo;
   const findOrg = await findOrgByLogin(login);
-
-  const oldRepos = findOrg ? findOrg.repos : [];
-  newOrgInfo.repos = updateOrgReposInfo(repos, oldRepos);
 
   if (findOrg) {
     Object.assign(findOrg, newOrgInfo);

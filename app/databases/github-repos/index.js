@@ -24,6 +24,7 @@ const getReposData = (repository, login) => {
     owner = {},
     topics = null,
     languages = {},
+    contributors = [],
   } = repository;
 
   const data = {
@@ -48,6 +49,7 @@ const getReposData = (repository, login) => {
     languages,
     topics,
     owner: {},
+    contributors,
   };
 
   if (!isEmptyObject(owner)) {
@@ -61,6 +63,20 @@ const getReposData = (repository, login) => {
     data.topics = topics;
   }
   return data;
+};
+
+const updateRepositoryInfo = ({ newRepository, oldRepository }) => {
+  const newContributors = newRepository.contributors || [];
+  const oldContributors = oldRepository.contributors || [];
+
+  const contributors = (!newContributors || !newContributors.length)
+    ? oldContributors
+    : newContributors;
+
+  Object.assign(oldRepository, newRepository, {
+    contributors
+  });
+  oldRepository.markModified('contributors');
 };
 
 const findRepository = async (login, name) =>
@@ -84,21 +100,22 @@ const removeRepos = async (login, name = null) => {
   }
 };
 
-const createRepos = async (login, repository) => {
-  const data = getReposData(repository, login);
-  return await GitHubRepos.create({
-    ...data
+const createRepos = async (login, repository) =>
+  await GitHubRepos.create({
+    ...repository
   });
-};
 
 const setRepository = async (login, repository) => {
   const findResult = await findRepository(login, repository.name);
+  const newRepository = getReposData(repository, login);
   if (findResult) {
-    const data = getReposData(repository, login);
-    Object.assign(findResult, data);
+    updateRepositoryInfo({
+      newRepository,
+      oldRepository: findResult
+    });
     return await findResult.save();
   }
-  return await createRepos(login, repository);
+  return await createRepos(login, newRepository);
 };
 
 const setRepos = async (login, repos) => {

@@ -28,6 +28,7 @@ const GitHubReposSchema = new Schema({
     html_url: String
   },
   topics: Array,
+  contributors: { type: Array, default: [] }
 });
 
 export default mongoose.model('GithubRepos', GitHubReposSchema);

@@ -10,7 +10,7 @@ const handleBody = (httpResponse, body) => {
     try {
       result = JSON.parse(body);
     } catch (e) {
-      logger.error(e);
+      result = body;
     }
     return result;
   }

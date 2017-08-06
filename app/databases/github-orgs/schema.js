@@ -19,26 +19,6 @@ const GitHubOrgsSchema = new Schema({
   followers: String,
   following: String,
   html_url: String,
-  repos: [{
-    full_name: String,
-    name: String,
-    html_url: String,
-    description: String,
-    fork: Boolean,
-    created_at: String,
-    updated_at: String,
-    pushed_at: String,
-    homepage: String,
-    size: Number,
-    stargazers_count: Number,
-    watchers_count: Number,
-    language: String,
-    languages: { type: Object, default: {} },
-    forks_count: Number,
-    forks: Number,
-    watchers: Number,
-    contributors: { type: Array, default: [] }
-  }]
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
