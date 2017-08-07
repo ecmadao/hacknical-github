@@ -15,9 +15,6 @@ const GitHubOrgsSchema = new Schema({
   updated_at: String,
   type: String,
   public_repos: String,
-  public_gists: String,
-  followers: String,
-  following: String,
   html_url: String,
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }

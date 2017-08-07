@@ -127,7 +127,6 @@ const baseGetRepos = async (options = {}) => {
 /* ==================== PUBLIC FUNCS ==================== */
 
 const USER_QUERY = `{
-  id
   name
   bio
   login
@@ -163,8 +162,6 @@ const REPOSITORY_QUERY = `{
   updatedAt
   createdAt
   isPrivate
-  diskUsage
-  databaseId
   description
   homepageUrl
   nameWithOwner

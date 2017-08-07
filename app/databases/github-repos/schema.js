@@ -13,7 +13,6 @@ const GitHubReposSchema = new Schema({
   updated_at: String,
   pushed_at: String,
   homepage: String,
-  size: Number,
   stargazers_count: Number,
   watchers_count: Number,
   language: String,

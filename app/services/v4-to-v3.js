@@ -1,7 +1,6 @@
 
 const convertUser = (v4UserInfo) => {
   const {
-    id,
     bio,
     name,
     login,
@@ -19,7 +18,6 @@ const convertUser = (v4UserInfo) => {
   } = v4UserInfo;
 
   return {
-    id,
     bio,
     name,
     login,
@@ -48,10 +46,8 @@ const convertRepository = (v4Repository) => {
     pushedAt,
     updatedAt,
     createdAt,
-    diskUsage,
     languages,
     stargazers,
-    databaseId,
     homepageUrl,
     description,
     nameWithOwner,
@@ -74,8 +70,6 @@ const convertRepository = (v4Repository) => {
     description,
     fork: isFork,
     html_url: url,
-    size: diskUsage,
-    reposId: databaseId,
     pushed_at: pushedAt,
     created_at: createdAt,
     updated_at: updatedAt,

@@ -12,10 +12,9 @@ export const validateReposList = (repos) => {
   const reposList = repos
     .filter(repository => !repository.fork)
     .map((repository) => {
-      const { name, full_name, reposId, created_at, pushed_at } = repository;
+      const { name, full_name, created_at, pushed_at } = repository;
       return {
         name,
-        reposId,
         pushed_at,
         created_at,
         full_name,

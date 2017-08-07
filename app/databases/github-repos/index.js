@@ -4,52 +4,50 @@ import { isEmptyObject } from '../../utils/helpers';
 
 const getReposData = (repository, login) => {
   const {
-    full_name,
     name,
-    html_url,
-    description,
     fork,
+    forks,
+    html_url,
+    homepage,
+    language,
+    watchers,
+    full_name,
+    pushed_at,
     created_at,
     updated_at,
-    pushed_at,
-    homepage,
-    size,
-    stargazers_count,
-    watchers_count,
-    language,
     forks_count,
-    forks,
-    watchers,
+    description,
+    watchers_count,
+    stargazers_count,
     subscribers_count,
     owner = {},
-    topics = null,
+    topics = [],
     languages = {},
     contributors = [],
   } = repository;
 
   const data = {
-    login,
-    full_name,
     name,
-    html_url,
-    description,
     fork,
+    login,
+    forks,
+    topics,
+    html_url,
+    homepage,
+    language,
+    watchers,
+    languages,
+    full_name,
+    pushed_at,
     created_at,
     updated_at,
-    pushed_at,
-    homepage,
-    size,
-    stargazers_count,
-    watchers_count,
-    language,
-    forks_count,
-    forks,
-    watchers,
-    subscribers_count,
-    languages,
-    topics,
-    owner: {},
     contributors,
+    forks_count,
+    description,
+    watchers_count,
+    stargazers_count,
+    subscribers_count,
+    owner: {},
   };
 
   if (!isEmptyObject(owner)) {
@@ -58,9 +56,7 @@ const getReposData = (repository, login) => {
       avatar_url: owner.avatar_url,
       html_url: owner.html_url
     };
-  }
-  if (topics) {
-    data.topics = topics;
+    data.login = owner.login;
   }
   return data;
 };
@@ -79,15 +75,11 @@ const updateRepositoryInfo = ({ newRepository, oldRepository }) => {
   oldRepository.markModified('contributors');
 };
 
-const findRepository = async (login, name) =>
-  await GitHubRepos.findOne({
-    login,
-    name
-  });
+const findRepository = async full_name =>
+  await GitHubRepos.findOne({ full_name });
 
-// const findRepos = async login => await GitHubRepos.find({ login });
-
-const clearRepos = async login => await GitHubRepos.remove({ login });
+const clearRepos = async login =>
+  await GitHubRepos.remove({ login });
 
 const removeRepos = async (login, name = null) => {
   if (name === null) {
@@ -100,13 +92,13 @@ const removeRepos = async (login, name = null) => {
   }
 };
 
-const createRepos = async (login, repository) =>
+const createRepos = async repository =>
   await GitHubRepos.create({
     ...repository
   });
 
 const setRepository = async (login, repository) => {
-  const findResult = await findRepository(login, repository.name);
+  const findResult = await findRepository(repository.full_name);
   const newRepository = getReposData(repository, login);
   if (findResult) {
     updateRepositoryInfo({
@@ -115,7 +107,7 @@ const setRepository = async (login, repository) => {
     });
     return await findResult.save();
   }
-  return await createRepos(login, newRepository);
+  return await createRepos(newRepository);
 };
 
 const setRepos = async (login, repos) => {
@@ -132,7 +124,8 @@ const setRepos = async (login, repos) => {
   return setResults;
 };
 
-const getRepos = async login => await GitHubRepos.find({ login });
+const getRepos = async login =>
+  await GitHubRepos.find({ login });
 
 const getRepository = async fullname =>
   await GitHubRepos.findOne({

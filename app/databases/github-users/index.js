@@ -4,7 +4,6 @@ import GitHubUsers from './schema';
  * private
  */
 const getGitHubInfo = userInfo => ({
-  id: userInfo.id,
   login: userInfo.login,
   name: userInfo.name,
   avatar_url: userInfo.avatar_url,
@@ -23,8 +22,6 @@ const getGitHubInfo = userInfo => ({
 });
 
 const findUser = async login => await GitHubUsers.findOne({ login });
-
-const findUserByGitHubId = async id => await GitHubUsers.findOne({ id });
 
 const updateUser = async (userInfo) => {
   const newGitHubInfo = getGitHubInfo(userInfo);
@@ -81,7 +78,6 @@ const createGitHubUser = async (userInfo) => {
 
 export default {
   findUser,
-  findUserByGitHubId,
   updateUser,
   updateUserOrgs,
   createGitHubUser,

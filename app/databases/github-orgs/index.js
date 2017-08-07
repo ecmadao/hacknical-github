@@ -16,9 +16,6 @@ const getOrgInfo = orgInfo => ({
   created_at: orgInfo.created_at,
   updated_at: orgInfo.updated_at,
   public_repos: orgInfo.public_repos,
-  public_gists: orgInfo.public_gists,
-  followers: orgInfo.followers,
-  following: orgInfo.following,
   html_url: orgInfo.html_url,
   type: orgInfo.type || 'Organization',
 });
