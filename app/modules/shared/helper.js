@@ -41,11 +41,11 @@ const fetchRepos = async (options = {}) => {
   return multiRepos;
 };
 
-const fetchContributedRepos = async (options) => {
+const updateContributed = async (options) => {
   const {
     login,
     verify,
-    perPage,
+    perPage = PER_PAGE.REPOS,
   } = options;
 
   const multiRepos =
@@ -93,7 +93,7 @@ const getUserContributed = async (login, verify) => {
   const user = await getUser(login, verify);
   const { contributions } = user;
   if (!contributions || !contributions.length) {
-    return await fetchContributedRepos({
+    return await updateContributed({
       login,
       verify,
       perPage: PER_PAGE.REPOS
@@ -136,7 +136,7 @@ const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED
 /**
  * =============== commits ===============
  */
-const fetchCommits = async (login, verify) => {
+const updateCommits = async ({ login, verify }) => {
   const repos = await getUserPublicRepos(login, verify);
   const reposList = validateReposList(repos);
   try {
@@ -176,7 +176,7 @@ const getCommits = async (login, verify) => {
   if (findCommits.length) {
     return findCommits;
   }
-  return await fetchCommits(login, verify);
+  return await updateCommits({ login, verify });
 };
 
 /**
@@ -224,18 +224,14 @@ const getOrgRepositories = async (options = {}) => {
 
   if (repos && repos.length) {
     try {
-      // avoid tooo many repos in a organization
       const contributeds = await getUserContributedRepos(login, verify);
       const contributedsInOrg = [];
 
       repos.forEach((repository) => {
-        if (
-          (!repository.contributors || !repository.contributors.length)
-          && contributeds.find(item => item.full_name === repository.full_name)
-        ) {
-          contributedsInOrg.push(repository);
-        } else {
+        if (repository.contributors && repository.contributors.length) {
           results.push(repository);
+        } else if (contributeds.find(item => item.full_name === repository.full_name)) {
+          contributedsInOrg.push(repository);
         }
       });
 
@@ -317,7 +313,7 @@ const getOrgs = async (login, verify) => {
   return results;
 };
 
-const updateOrgs = async (login, verify) => {
+const updateOrgs = async ({ login, verify }) => {
   try {
     const userOrgs = await fetchUserOrgs(login, verify);
 
@@ -358,9 +354,10 @@ export default {
   getRepository,
   getUserStarred,
   getUserPublicRepos,
-  getUserContributedRepos,
+  getUserContributed,
+  updateContributed,
   // commits
-  fetchCommits,
+  updateCommits,
   getCommits,
   // orgs
   getOrgs,

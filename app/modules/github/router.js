@@ -102,6 +102,11 @@ router.get(
   GitHub.refreshUserOrgs
 );
 router.get(
+  '/user/contributed/refresh',
+  params.checkQuery(['login', 'verify']),
+  GitHub.refreshUserContributed
+);
+router.get(
   '/user/updateTime',
   params.checkQuery(['login']),
   GitHub.getUserUpdateTime

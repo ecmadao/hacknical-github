@@ -95,7 +95,7 @@ const getUserRepos = async (ctx) => {
 
 const getUserContributed = async (ctx) => {
   const { login, verify } = ctx.request.query;
-  const repos = await Helper.getUserContributedRepos(login, verify);
+  const repos = await Helper.getUserContributed(login, verify);
 
   ctx.body = {
     success: true,
@@ -151,6 +151,33 @@ const getUserOrgs = async (ctx) => {
   };
 };
 
+
+const refreshData = async (options = {}) => {
+  const {
+    func,
+    params,
+  } = options;
+
+  try {
+    await func({
+      ...params
+    });
+    return {
+      success: true,
+      result: new Date()
+    };
+  } catch (e) {
+    logger.error(e);
+  }
+  return {
+    success: false,
+    result: {
+      success: false,
+      error: 'Ops! Something broken..'
+    }
+  };
+};
+
 const refreshUserRepos = async (ctx) => {
   const { login, verify } = ctx.request.query;
   const user = await UsersModel.findUser(login);
@@ -168,71 +195,58 @@ const refreshUserRepos = async (ctx) => {
     return;
   }
 
-  try {
-    const githubUser = await GitHubV4.getUserByToken(verify);
-    await Helper.fetchRepos({
+  const githubUser = await GitHubV4.getUserByToken(verify);
+  await UsersModel.updateUser(githubUser);
+
+  const result = await refreshData({
+    func: Helper.fetchRepos,
+    params: {
       login,
       verify,
       perPage: PER_PAGE.REPOS
-    });
-    const updateUserResult = await UsersModel.updateUser(githubUser);
-
-    ctx.body = {
-      success: true,
-      result: updateUserResult.result
-    };
-  } catch (err) {
-    logger.error(err);
-    ctx.body = {
-      success: false,
-      result: {
-        success: false,
-        error: 'Ops! Something broken..'
-      }
-    };
-  }
+    }
+  });
+  ctx.body = result;
 };
 
 const refreshUserCommits = async (ctx) => {
   const { login, verify } = ctx.request.query;
 
-  try {
-    await Helper.fetchCommits(login, verify);
+  const result = await refreshData({
+    func: Helper.updateCommits,
+    params: {
+      login,
+      verify
+    }
+  });
 
-    ctx.body = {
-      success: true,
-      result: new Date()
-    };
-  } catch (err) {
-    logger.error(err);
-    ctx.body = {
-      success: false,
-      result: {
-        success: false,
-        error: 'Ops! Something broken..'
-      }
-    };
-  }
+  ctx.body = result;
 };
 
 const refreshUserOrgs = async (ctx) => {
   const { login, verify } = ctx.request.query;
-  try {
-    await Helper.updateOrgs(login, verify);
-    ctx.body = {
-      success: true,
-      result: new Date()
-    };
-  } catch (err) {
-    logger.error(err);
-    ctx.body = {
-      success: false,
-      result: {
-        success: false,
-        error: 'Ops! Something broken..'
-      }
-    };
-  }
+
+  const result = await refreshData({
+    func: Helper.updateOrgs,
+    params: {
+      login,
+      verify
+    }
+  });
+  ctx.body = result;
+};
+
+const refreshUserContributed = async (ctx) => {
+  const { login, verify } = ctx.request.query;
+
+  const result = await refreshData({
+    func: Helper.updateContributed,
+    params: {
+      login,
+      verify
+    }
+  });
+  ctx.body = result;
 };
 
 const getUserUpdateTime = async (ctx) => {
@@ -309,5 +323,6 @@ export default {
   refreshUserRepos,
   refreshUserCommits,
   refreshUserOrgs,
+  refreshUserContributed,
   getUserUpdateTime,
 };
