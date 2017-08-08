@@ -30,20 +30,6 @@ const findOrgsByLogin = async logins => await GitHubOrgs.find({
   }
 });
 
-const updateOrgRepos = async (login) => {
-  const findOrg = await findOrgByLogin(login);
-  if (!findOrg) {
-    return Promise.resolve({
-      success: false
-    });
-  }
-  await findOrg.save();
-  return Promise.resolve({
-    success: true,
-    result: findOrg
-  });
-};
-
 const updateOrg = async (orgInfo) => {
   const newOrgInfo = getOrgInfo(orgInfo);
   const { login } = newOrgInfo;
@@ -68,5 +54,4 @@ export default {
   find: findOrgByLogin,
   findMany: findOrgsByLogin,
   update: updateOrg,
-  updateRepos: updateOrgRepos,
 };

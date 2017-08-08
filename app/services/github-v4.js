@@ -222,7 +222,10 @@ const getUser = async (login, verify) => {
     user(login: "${login}") ${USER_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  return adapter.user(result.user);
+  const user = (result && result.user)
+    ? adapter.user(result.user)
+    : null;
+  return user;
 };
 
 const getRepository = async (fullname, verify) => {

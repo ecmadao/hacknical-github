@@ -123,7 +123,7 @@ const getUserStarred = async ({ login, verify, after, perPage = PER_PAGE.STARRED
     first: perPage
   });
   const {
-    results,
+    results = [],
   } = result;
 
   await Promise.all(results.map(async (repository) => {
@@ -337,6 +337,8 @@ const updateOrgs = async ({ login, verify }) => {
  */
 const fetchUser = async (login, verify) => {
   const userInfo = await GitHubV4.getUser(login, verify);
+  if (!userInfo) return null;
+
   const addResut = await UsersModel.createGitHubUser(userInfo);
   return addResut.result;
 };

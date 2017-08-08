@@ -13,6 +13,12 @@
       "appName": "hacknical-local",
       "token": ""
     },
+    "hacknical-scientific-local": {
+      "clientId": "f6df08c498e7117dcda2",
+      "clientSecret": "d42ad1f125ee7911c3b290463d0a64d41b506d20",
+      "appName": "hacknical-scientific-local",
+      "token": ""
+    },
     "jarvim-web-local": {
       "clientId": "8b91eabebd11756e79b3",
       "clientSecret": "80071b1c1d14aca980a6caa79b7311200a4779a8",
@@ -29,6 +35,11 @@
   "auth": [
     {
       "name": "hacknical-local",
+      "publicKey": "07a9c1c",
+      "secretKey": "6cf75c66dcc02caa7e0eef7170a9"
+    },
+    {
+      "name": "hacknical-scientific-local",
       "publicKey": "07a9c1c",
       "secretKey": "6cf75c66dcc02caa7e0eef7170a9"
     },
