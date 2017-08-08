@@ -75,7 +75,8 @@ const getLogin = async (ctx) => {
 };
 
 const getUser = async (ctx) => {
-  const { verify, login } = ctx.request.query;
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
   const user = await Helper.getUser(login, verify);
   ctx.body = {
     success: true,
@@ -83,8 +84,9 @@ const getUser = async (ctx) => {
   };
 };
 
-const getUserRepos = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+const getUserRepositories = async (ctx) => {
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
   const repos = await Helper.getUserPublicRepos(login, verify);
 
   ctx.body = {
@@ -94,7 +96,8 @@ const getUserRepos = async (ctx) => {
 };
 
 const getUserContributed = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
   const repos = await Helper.getUserContributed(login, verify);
 
   ctx.body = {
@@ -104,8 +107,8 @@ const getUserContributed = async (ctx) => {
 };
 
 const getUserStarred = async (ctx) => {
+  const { login } = ctx.params;
   const {
-    login,
     verify,
     perPage = 30,
     after = null,
@@ -124,7 +127,8 @@ const getUserStarred = async (ctx) => {
 };
 
 const getUserStarredCount = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
   const count = await GitHubV4.getUserStarredCount(login, verify);
   ctx.body = {
     success: true,
@@ -133,7 +137,8 @@ const getUserStarredCount = async (ctx) => {
 };
 
 const getUserCommits = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
   const commits = await Helper.getCommits(login, verify);
 
   ctx.body = {
@@ -142,8 +147,9 @@ const getUserCommits = async (ctx) => {
   };
 };
 
-const getUserOrgs = async (ctx) => {
-  const { login, verify } = ctx.query;
+const getUserOrganizations = async (ctx) => {
+  const { login } = ctx.params;
+  const { verify } = ctx.query;
   const orgs = await Helper.getOrgs(login, verify);
   ctx.body = {
     success: true,
@@ -178,8 +184,9 @@ const refreshData = async (options = {}) => {
   };
 };
 
-const refreshUserRepos = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+const refreshUserRepositories = async (ctx) => {
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
   const user = await UsersModel.findUser(login);
   const lastUpdateTime = user.lastUpdateTime || user.created_at;
 
@@ -210,7 +217,8 @@ const refreshUserRepos = async (ctx) => {
 };
 
 const refreshUserCommits = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
 
   const result = await refreshData({
     func: Helper.updateCommits,
@@ -223,8 +231,9 @@ const refreshUserCommits = async (ctx) => {
   ctx.body = result;
 };
 
-const refreshUserOrgs = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+const refreshUserOrganizations = async (ctx) => {
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
 
   const result = await refreshData({
     func: Helper.updateOrgs,
@@ -237,7 +246,8 @@ const refreshUserOrgs = async (ctx) => {
 };
 
 const refreshUserContributed = async (ctx) => {
-  const { login, verify } = ctx.request.query;
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
 
   const result = await refreshData({
     func: Helper.updateContributed,
@@ -250,7 +260,7 @@ const refreshUserContributed = async (ctx) => {
 };
 
 const getUserUpdateTime = async (ctx) => {
-  const { login } = ctx.request.query;
+  const { login } = ctx.params;
   const findResult = await UsersModel.findUser(login);
   if (!findResult) {
     throw new Error('can not find target user');
@@ -274,6 +284,20 @@ const getRepository = async (ctx) => {
   ctx.body = {
     success: true,
     result: repository,
+  };
+};
+
+const getRepositoryReadme = async (ctx) => {
+  const {
+    verify,
+    fullname,
+  } = ctx.request.query;
+
+  const data = await Helper.getRepositoryReadme(fullname, verify);
+
+  ctx.body = {
+    success: true,
+    result: data.readme,
   };
 };
 
@@ -310,19 +334,20 @@ export default {
   getLogin,
   getUser,
   getRepository,
+  getRepositoryReadme,
   starRepository,
   unstarRepository,
   /* ====== */
-  getUserRepos,
+  getUserRepositories,
   getUserContributed,
   getUserStarred,
   getUserStarredCount,
   getUserCommits,
-  getUserOrgs,
+  getUserOrganizations,
   /* ====== */
-  refreshUserRepos,
+  refreshUserRepositories,
   refreshUserCommits,
-  refreshUserOrgs,
+  refreshUserOrganizations,
   refreshUserContributed,
   getUserUpdateTime,
 };

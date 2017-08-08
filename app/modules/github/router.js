@@ -32,8 +32,8 @@ router.get(
   GitHub.getLogin
 );
 router.get(
-  '/user',
-  params.checkQuery(['login', 'verify']),
+  '/:login',
+  params.checkQuery(['verify']),
   GitHub.getUser
 );
 
@@ -41,6 +41,11 @@ router.get(
   '/repository',
   params.checkQuery(['verify', 'fullname']),
   GitHub.getRepository
+);
+router.get(
+  '/repository/readme',
+  params.checkQuery(['verify', 'fullname']),
+  GitHub.getRepositoryReadme
 );
 router.put(
   '/repository/star',
@@ -57,58 +62,57 @@ router.delete(
 
 
 router.get(
-  '/user/repos',
-  params.checkQuery(['login', 'verify']),
-  GitHub.getUserRepos
+  '/:login/repositories',
+  params.checkQuery(['verify']),
+  GitHub.getUserRepositories
 );
 router.get(
-  '/user/contributed',
-  params.checkQuery(['login', 'verify']),
+  '/:login/contributed',
+  params.checkQuery(['verify']),
   GitHub.getUserContributed
 );
 router.get(
-  '/user/starred',
-  params.checkQuery(['login', 'verify']),
+  '/:login/starred',
+  params.checkQuery(['verify']),
   GitHub.getUserStarred
 );
 router.get(
-  '/user/starred/count',
-  params.checkQuery(['login', 'verify']),
+  '/:login/starred/count',
+  params.checkQuery(['verify']),
   GitHub.getUserStarredCount
 );
 router.get(
-  '/user/repos/refresh',
-  params.checkQuery(['login', 'verify']),
-  GitHub.refreshUserRepos
+  '/:login/repositories/refresh',
+  params.checkQuery(['verify']),
+  GitHub.refreshUserRepositories
 );
 router.get(
-  '/user/commits',
-  params.checkQuery(['login', 'verify']),
+  '/:login/commits',
+  params.checkQuery(['verify']),
   GitHub.getUserCommits
 );
 router.get(
-  '/user/commits/refresh',
-  params.checkQuery(['login', 'verify']),
+  '/:login/commits/refresh',
+  params.checkQuery(['verify']),
   GitHub.refreshUserCommits
 );
 router.get(
-  '/user/orgs',
-  params.checkQuery(['login', 'verify']),
-  GitHub.getUserOrgs
+  '/:login/organizations',
+  params.checkQuery(['verify']),
+  GitHub.getUserOrganizations
 );
 router.get(
-  '/user/orgs/refresh',
-  params.checkQuery(['login', 'verify']),
-  GitHub.refreshUserOrgs
+  '/:login/organizations/refresh',
+  params.checkQuery(['verify']),
+  GitHub.refreshUserOrganizations
 );
 router.get(
-  '/user/contributed/refresh',
-  params.checkQuery(['login', 'verify']),
+  '/:login/contributed/refresh',
+  params.checkQuery(['verify']),
   GitHub.refreshUserContributed
 );
 router.get(
-  '/user/updateTime',
-  params.checkQuery(['login']),
+  '/:login/updateTime',
   GitHub.getUserUpdateTime
 );
 

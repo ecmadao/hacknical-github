@@ -27,6 +27,16 @@ const getRepository = (fullname, verify) => {
   });
 };
 
+const getRepositoryReadme = (fullname, verify) => {
+  const { qs, headers } = verify;
+  headers.Accept = 'application/vnd.github.v3.raw';
+  return fetch.get({
+    qs,
+    headers,
+    url: `${API_REPOS}/${fullname}/readme`
+  });
+};
+
 const starRepository = (fullname, verify) => {
   const { qs, headers } = verify;
   return fetch.put({
@@ -304,6 +314,7 @@ export default {
   getRepository,
   starRepository,
   unstarRepository,
+  getRepositoryReadme,
   // user
   getUser,
   getUserByToken,

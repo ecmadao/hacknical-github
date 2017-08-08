@@ -1,6 +1,7 @@
 import logger from '../../utils/logger';
 import OrgsModel from '../../databases/github-orgs';
 import ReposModel from '../../databases/github-repos';
+import ReposReadmeModel from '../../databases/github-repos-readme';
 import CommitsModel from '../../databases/github-commits';
 import UsersModel from '../../databases/github-users';
 import GitHubV3 from '../../services/github-v3';
@@ -12,15 +13,15 @@ import {
 } from '../../utils/github';
 
 /* ================== private helper ================== */
-const fetchRepository = async (fullname, verify, repos = {}) => {
-  delete repos._id;
+const fetchRepository = async (fullname, verify, repository = {}) => {
+  delete repository._id;
 
   const getReposResult = await GitHubV4.getRepository(fullname, verify);
-  const repository = Object.assign({}, repos, getReposResult);
-  const login = repository.owner.login;
+  const data = Object.assign({}, repository, getReposResult);
+  const login = data.owner.login;
 
-  await ReposModel.setRepository(login, repository);
-  return repository;
+  await ReposModel.setRepository(login, data);
+  return data;
 };
 
 /**
@@ -73,6 +74,19 @@ const getRepository = async (fullname, verify, required = []) => {
     return await fetchRepository(fullname, verify, findResult || {});
   }
   return findResult;
+};
+
+const getRepositoryReadme = async (fullname, verify) => {
+  let result = await ReposReadmeModel.findOne(fullname);
+  if (!result) {
+    const readme = await GitHubV3.getRepositoryReadme(fullname, verify);
+    result = {
+      readme,
+      full_name: fullname
+    };
+    await ReposReadmeModel.update(result);
+  }
+  return result;
 };
 
 const getRepos = async (login, verify, fetch) => {
@@ -358,6 +372,7 @@ export default {
   getUserPublicRepos,
   getUserContributed,
   updateContributed,
+  getRepositoryReadme,
   // commits
   updateCommits,
   getCommits,
