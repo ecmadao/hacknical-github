@@ -18,7 +18,6 @@ const getGitHubInfo = userInfo => ({
   public_gists: userInfo.public_gists,
   followers: userInfo.followers,
   following: userInfo.following,
-  contributions: [],
 });
 
 const findUser = async login => await GitHubUsers.findOne({ login });
@@ -36,36 +35,6 @@ const updateUser = async (userInfo) => {
   });
 };
 
-const updateUserOrgs = async (login, orgs = []) => {
-  const user = await findUser(login);
-  if (!user) {
-    return Promise.resolve({
-      success: false
-    });
-  }
-  user.orgs = [...orgs];
-  await user.save();
-  return Promise.resolve({
-    success: true,
-    result: user
-  });
-};
-
-const updateUserContributions = async (login, contributions = []) => {
-  const user = await findUser(login);
-  if (!user) {
-    return Promise.resolve({
-      success: false
-    });
-  }
-  user.contributions = [...contributions];
-  await user.save();
-  return Promise.resolve({
-    success: true,
-    result: user
-  });
-};
-
 const createGitHubUser = async (userInfo) => {
   const newGitHubInfo = getGitHubInfo(userInfo);
   newGitHubInfo.lastUpdateTime = new Date();
@@ -77,9 +46,7 @@ const createGitHubUser = async (userInfo) => {
 };
 
 export default {
-  findUser,
   updateUser,
-  updateUserOrgs,
   createGitHubUser,
-  updateUserContributions,
+  findOne: findUser,
 };

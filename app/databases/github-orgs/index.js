@@ -4,7 +4,7 @@ import GitHubOrgs from './schema';
 /**
  * private
  */
-const getOrgInfo = orgInfo => ({
+const getOrganizationInfo = orgInfo => ({
   login: orgInfo.login,
   name: orgInfo.name,
   avatar_url: orgInfo.avatar_url,
@@ -22,36 +22,37 @@ const getOrgInfo = orgInfo => ({
 
 /* === API === */
 
-const findOrgByLogin = async login => await GitHubOrgs.findOne({ login });
+const findByLogin = async login => await GitHubOrgs.findOne({ login });
 
-const findOrgsByLogin = async logins => await GitHubOrgs.find({
+const findManyByLogin = async logins => await GitHubOrgs.find({
   login: {
     $in: logins
   }
 });
 
-const updateOrg = async (orgInfo) => {
-  const newOrgInfo = getOrgInfo(orgInfo);
-  const { login } = newOrgInfo;
-  const findOrg = await findOrgByLogin(login);
+const updateOrganization = async (orgInfo) => {
+  const newOrganizationInfo = getOrganizationInfo(orgInfo);
+  const { login } = newOrganizationInfo;
+  const organization = await findByLogin(login);
 
-  if (findOrg) {
-    Object.assign(findOrg, newOrgInfo);
-    await findOrg.save();
+  if (organization) {
+    Object.assign(organization, newOrganizationInfo);
+    await organization.save();
     return Promise.resolve({
       success: true,
-      result: findOrg
+      result: organization
     });
   }
-  const newOrg = await GitHubOrgs.create(newOrgInfo);
+  const newOrganization =
+    await GitHubOrgs.create(newOrganizationInfo);
   return Promise.resolve({
     success: true,
-    result: newOrg,
+    result: newOrganization,
   });
 };
 
 export default {
-  find: findOrgByLogin,
-  findMany: findOrgsByLogin,
-  update: updateOrg,
+  findOne: findByLogin,
+  find: findManyByLogin,
+  update: updateOrganization,
 };

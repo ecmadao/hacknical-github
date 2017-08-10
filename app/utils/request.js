@@ -23,6 +23,7 @@ const fetchData = (options, handler) =>
         reject(err);
       }
       const result = handler(httpResponse, body);
+      if (!result || result.message) reject(result);
       resolve(result);
     });
   });
@@ -34,6 +35,7 @@ export const baseFetch = async (options, timeout = retryTimes, handler = handleB
   for (let i = 0; i < timeout.length; i += 1) {
     try {
       options.timeout = timeout[i];
+      logger.info(`[FETCH:GITHUB:V3][${options.url}]`);
       const result = await fetchData(options, handler);
       err = null;
       return result;

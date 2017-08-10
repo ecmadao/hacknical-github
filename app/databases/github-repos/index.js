@@ -2,7 +2,7 @@ import GitHubRepos from './schema';
 import logger from '../../utils/logger';
 import { isEmptyObject } from '../../utils/helpers';
 
-const getReposData = (repository, login) => {
+const getRepositoryData = (repository, login) => {
   const {
     name,
     fork,
@@ -78,12 +78,12 @@ const updateRepositoryInfo = ({ newRepository, oldRepository }) => {
 const findRepository = async full_name =>
   await GitHubRepos.findOne({ full_name });
 
-const clearRepos = async login =>
+const clearRepositories = async login =>
   await GitHubRepos.remove({ login });
 
-const removeRepos = async (login, name = null) => {
+const removeRepositories = async (login, name = null) => {
   if (name === null) {
-    await clearRepos(login);
+    await clearRepositories(login);
   } else {
     await GitHubRepos.remove({
       name,
@@ -92,14 +92,14 @@ const removeRepos = async (login, name = null) => {
   }
 };
 
-const createRepos = async repository =>
+const createRepository = async repository =>
   await GitHubRepos.create({
     ...repository
   });
 
 const setRepository = async (login, repository) => {
   const findResult = await findRepository(repository.full_name);
-  const newRepository = getReposData(repository, login);
+  const newRepository = getRepositoryData(repository, login);
   if (findResult) {
     updateRepositoryInfo({
       newRepository,
@@ -107,10 +107,10 @@ const setRepository = async (login, repository) => {
     });
     return await findResult.save();
   }
-  return await createRepos(newRepository);
+  return await createRepository(newRepository);
 };
 
-const setRepos = async (login, repos) => {
+const setRepositories = async (login, repos) => {
   const setResults = [];
 
   await Promise.all(repos.map(async (repository) => {
@@ -124,7 +124,7 @@ const setRepos = async (login, repos) => {
   return setResults;
 };
 
-const getRepos = async login =>
+const getRepositories = async login =>
   await GitHubRepos.find({ login });
 
 const getRepository = async fullname =>
@@ -133,9 +133,9 @@ const getRepository = async fullname =>
   });
 
 export default {
-  removeRepos,
   getRepository,
   setRepository,
-  setRepos,
-  getRepos,
+  setRepositories,
+  getRepositories,
+  removeRepositories,
 };

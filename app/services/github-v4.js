@@ -11,6 +11,7 @@ import {
 
 const wrapFetch = async (func, options = {}) => {
   try {
+    logger.info(`[FETCH:GITHUB:V4][${func.name}]`);
     return await func(options);
   } catch (e) {
     logger.error(e);
@@ -52,13 +53,15 @@ const baseFetch = (query, verify) => {
   return fetch(client, query);
 };
 
-const baseGetOrgs = async (options = {}) => {
+const baseGetOrganizations = async (options = {}) => {
   const {
     login,
     verify,
     after = null,
     first = 100
   } = options;
+
+  logger.info(`[FETCH:GITHUB:V4][${login}:baseGetOrganizations]`);
 
   let limit = `first: ${first}`;
   if (after) {
@@ -87,7 +90,7 @@ const baseGetOrgs = async (options = {}) => {
   };
 };
 
-const baseGetRepos = async (options = {}) => {
+const baseGetRepositories = async (options = {}) => {
   const {
     login,
     verify,
@@ -96,6 +99,8 @@ const baseGetRepos = async (options = {}) => {
     who = 'user',
     what = 'repositories',
   } = options;
+
+  logger.info(`[FETCH:GITHUB:V4][${login}:${what}]`);
 
   let limit = `first: ${first}`;
   if (after) {
@@ -117,6 +122,7 @@ const baseGetRepos = async (options = {}) => {
   const fetchResults = await baseFetch(query, verify);
   const { pageInfo, edges } = fetchResults[who][what];
   const results = edges.map(edge => adapter.repository(edge.node));
+
   return {
     results,
     endCursor: pageInfo.endCursor,
@@ -263,7 +269,7 @@ const getUserStarredCount = async (login, verify) => {
 };
 
 const getOrgRepos = async ({ login, verify, after = null, first = 30 }) =>
-  await baseGetRepos({
+  await baseGetRepositories({
     login,
     verify,
     after,
@@ -273,7 +279,7 @@ const getOrgRepos = async ({ login, verify, after = null, first = 30 }) =>
   });
 
 const getUserRepos = async ({ login, verify, after = null, first = 100 }) =>
-  await baseGetRepos({
+  await baseGetRepositories({
     login,
     verify,
     after,
@@ -282,15 +288,15 @@ const getUserRepos = async ({ login, verify, after = null, first = 100 }) =>
   });
 
 const getUserOrgs = async ({ login, verify, after = null, first = 100 }) =>
-  await baseGetOrgs({
+  await baseGetOrganizations({
     login,
     verify,
     after,
     first,
   });
 
-const getUserStarred = async ({ login, verify, after = null, first = 30 }) =>
-  await baseGetRepos({
+const getUserStarred = async ({ login, verify, after = null, first = 100 }) =>
+  await baseGetRepositories({
     login,
     verify,
     after,
@@ -299,7 +305,7 @@ const getUserStarred = async ({ login, verify, after = null, first = 30 }) =>
   });
 
 const getUserContributed = async ({ login, verify, after = null, first = 30 }) =>
-  await baseGetRepos({
+  await baseGetRepositories({
     login,
     verify,
     after,
@@ -331,14 +337,6 @@ const getOrgPubRepos = async (login, verify, perPage) =>
     func: getOrgRepos
   });
 
-const getPersonalStarred = async (login, verify, perPage) =>
-  await fetchMultiDatas({
-    login,
-    verify,
-    first: perPage,
-    func: getUserStarred
-  });
-
 const getPersonalContributedRepos = async (login, verify, perPage) =>
   await fetchMultiDatas({
     login,
@@ -355,7 +353,6 @@ export default {
   getOrgPubRepos,
   getUserByToken,
   getUserStarredCount,
-  getPersonalStarred,
   getPersonalPubOrgs,
   getPersonalPubRepos,
   getPersonalContributedRepos,

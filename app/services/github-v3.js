@@ -4,16 +4,16 @@ import fetch from '../utils/request';
 import logger from '../utils/logger';
 import {
   splitArray,
-  flattenObject
+  flattenObject,
 } from '../utils/helpers';
 import { GITHUB } from '../utils/github';
 
 const {
-  API_TOKEN,
-  API_GET_USER,
-  API_USERS,
   API_ORGS,
+  API_TOKEN,
+  API_USERS,
   API_REPOS,
+  API_GET_USER,
 } = GITHUB;
 
 /* ===================== repository =====================*/
@@ -151,7 +151,7 @@ const getReposContributors = async ({ fullname, verify }) => {
       total,
       login,
       avatar_url,
-      weeks: weeklyCommits
+      weeks: weeklyCommits,
     };
   });
   return results;
@@ -184,7 +184,6 @@ const fetchMultiDatas = async (pages, func,  options = {}) => {
         ...options,
       });
     });
-
     const datas = await fetchByPromiseList(promiseList);
     results.push(...datas);
   }
@@ -329,5 +328,5 @@ export default {
   getAllReposYearlyCommits,
   getAllReposLanguages,
   getReposLanguages,
-  getAllReposContributors
+  getAllReposContributors,
 };

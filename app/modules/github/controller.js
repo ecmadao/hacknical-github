@@ -56,7 +56,7 @@ const getLogin = async (ctx) => {
   const { verify } = ctx.request.query;
   const userInfo = await GitHubV4.getUserByToken(verify);
 
-  const user = await UsersModel.findUser(userInfo.login);
+  const user = await UsersModel.findOne(userInfo.login);
   if (!user) {
     await UsersModel.createGitHubUser(userInfo);
   }
@@ -87,7 +87,7 @@ const getUser = async (ctx) => {
 const getUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
-  const repos = await Helper.getUserPublicRepos(login, verify);
+  const repos = await Helper.getRepositories(login, verify);
 
   ctx.body = {
     success: true,
@@ -110,9 +110,10 @@ const getUserStarred = async (ctx) => {
   const { login } = ctx.params;
   const {
     verify,
-    perPage = 30,
+    perPage,
     after = null,
   } = ctx.request.query;
+
   const result = await Helper.getUserStarred({
     after,
     login,
@@ -150,13 +151,12 @@ const getUserCommits = async (ctx) => {
 const getUserOrganizations = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.query;
-  const orgs = await Helper.getOrgs(login, verify);
+  const organizations = await Helper.getOrganizations(login, verify);
   ctx.body = {
     success: true,
-    result: orgs,
+    result: organizations,
   };
 };
-
 
 const refreshData = async (options = {}) => {
   const {
@@ -187,7 +187,7 @@ const refreshData = async (options = {}) => {
 const refreshUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
-  const user = await UsersModel.findUser(login);
+  const user = await UsersModel.findOne(login);
   const lastUpdateTime = user.lastUpdateTime || user.created_at;
 
   const timeInterval =
@@ -206,7 +206,7 @@ const refreshUserRepositories = async (ctx) => {
   await UsersModel.updateUser(githubUser);
 
   const result = await refreshData({
-    func: Helper.fetchRepos,
+    func: Helper.fetchRepositories,
     params: {
       login,
       verify,
@@ -236,7 +236,7 @@ const refreshUserOrganizations = async (ctx) => {
   const { verify } = ctx.request.query;
 
   const result = await refreshData({
-    func: Helper.updateOrgs,
+    func: Helper.updateOrganizations,
     params: {
       login,
       verify
@@ -261,7 +261,7 @@ const refreshUserContributed = async (ctx) => {
 
 const getUserUpdateTime = async (ctx) => {
   const { login } = ctx.params;
-  const findResult = await UsersModel.findUser(login);
+  const findResult = await UsersModel.findOne(login);
   if (!findResult) {
     throw new Error('can not find target user');
   }
