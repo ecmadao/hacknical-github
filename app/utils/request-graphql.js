@@ -2,6 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import config from 'config';
 import { GITHUB } from './github';
 import logger from './logger';
+import cache from './cache';
 
 const {
   API_GRAPHQL,
@@ -13,13 +14,13 @@ export const getClient = headers =>
     headers,
   });
 
-export const fetch = async (client, query, timeout = retryTimes) => {
+const baseFetch = async (client, query, timeout = retryTimes) => {
   let err = null;
   for (let i = 0; i < timeout.length; i += 1) {
     try {
       const result = await client.request(query);
       if (!result) {
-        err = new Error('[GRAPHQL:ERROR]None return result');
+        err = new Error('[GRAPHQL:ERROR]No return result');
         continue;
       }
       err = null;
@@ -38,3 +39,5 @@ export const fetch = async (client, query, timeout = retryTimes) => {
   }
   return null;
 };
+
+export const fetch = cache.wrapFunc(baseFetch);

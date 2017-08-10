@@ -19,10 +19,6 @@ const GitHubUsersSchema = new Schema({
   following: String,
   html_url: String,
   lastUpdateTime: Date,
-  contributions: Array,
-  orgs: Array,
-  starred: Array,
-  starredFetched: Boolean,
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
