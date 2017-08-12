@@ -1,10 +1,8 @@
 import request from 'request';
 import config from 'config';
 import logger from './logger';
-import cache from './cache';
 
 const retryTimes = config.get('timeouts');
-const requestData = cache.wrapFunc(request);
 
 const handleBody = (httpResponse, body) => {
   if (body) {
@@ -20,7 +18,7 @@ const handleBody = (httpResponse, body) => {
 
 const fetchData = (options, handler) =>
   new Promise((resolve, reject) => {
-    requestData(options, (err, httpResponse, body) => {
+    request(options, (err, httpResponse, body) => {
       if (err) {
         reject(err);
       }

@@ -26,7 +26,7 @@ const getCacheKey = (key, args) => {
 const wrapFn = (fn, options = {}) => {
   const {
     key = '',
-    ttl = 3600, // default 1 hour
+    ttl = 300, // default 5 min
     prefix = appName,
   } = options;
   const finallyOptions = { ttl };
