@@ -9,6 +9,7 @@ import logger from '../utils/logger';
 import params from '../middlewares/params';
 import auth from '../middlewares/auth';
 import verify from '../middlewares/verify';
+import mq from '../middlewares/mq';
 
 const appKey = config.get('appKey');
 const port = config.get('port');
@@ -31,6 +32,9 @@ app.use(auth({
 }));
 // verify token params
 app.use(verify());
+
+// mq
+app.use(mq());
 
 // router
 app.use(router.routes(), router.allowedMethods());

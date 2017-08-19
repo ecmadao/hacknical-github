@@ -6,6 +6,15 @@
   "database": {
     "url": "mongodb://localhost:27017/hacknical-api"
   },
+  "mq": {
+    "config": {
+      "host": "127.0.0.1",
+      "port": 6379,
+      "ns": "geeknical",
+      "options": {}
+    },
+    "qname": "github-scientific-local"
+  },
   "app": {
     "hacknical-local": {
       "clientId": "e7fa43f07a9c1cc07663",

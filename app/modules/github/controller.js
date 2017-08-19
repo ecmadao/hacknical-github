@@ -56,6 +56,9 @@ const getLogin = async (ctx) => {
   const { verify } = ctx.request.query;
   const userInfo = await GitHubV4.getUserByToken(verify);
 
+  ctx.mq.sendMessage({
+    message: userInfo.login
+  });
   const user = await UsersModel.findOne(userInfo.login);
   if (!user) {
     await UsersModel.createGitHubUser(userInfo);
