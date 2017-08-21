@@ -90,7 +90,7 @@ const getUser = async (ctx) => {
 const getUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
-  const repos = await Helper.getRepositories(login, verify);
+  const repos = await Helper.getUserRepositories(login, verify);
 
   ctx.body = {
     success: true,
@@ -326,6 +326,65 @@ const unstarRepository = async (ctx) => {
   };
 };
 
+const userScientificData = (obj, count = 5) => {
+  const result = {};
+  Object.keys(obj)
+    .sort((current, next) => obj[next] - obj[current])
+    .slice(0, count)
+    .map(key => (result[key] = obj[key]));
+  return result;
+};
+
+const getUserScientific = async (ctx) => {
+  const { login } = ctx.params;
+  const usersCol = ctx.db.collection('users');
+
+  const user = await usersCol.findOne({ login });
+  if (!user) {
+    ctx.body = {
+      success: false,
+    };
+    return;
+  }
+  const {
+    starred,
+    created,
+  } = user;
+  ctx.body = {
+    success: true,
+    result: {
+      starred: {
+        keywords: userScientificData(starred.keywords),
+        languages: userScientificData(starred.languages),
+      },
+      created: {
+        keywords: userScientificData(created.keywords),
+        languages: userScientificData(created.languages),
+      }
+    }
+  };
+};
+
+const getUserPredictions = async (ctx) => {
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
+  const predictionsCol = ctx.db.collection('predictions');
+
+  const result = await predictionsCol.findOne({ login });
+  if (!result) {
+    ctx.body = {
+      success: false,
+    };
+    return;
+  }
+  const { predictions } = result;
+  const repositories = await Helper.getRepositories(predictions, verify);
+  ctx.body = {
+    success: true,
+    result: repositories
+  };
+};
+
 export default {
   /* ====== */
   getZen,
@@ -353,4 +412,6 @@ export default {
   refreshUserOrganizations,
   refreshUserContributed,
   getUserUpdateTime,
+  getUserScientific,
+  getUserPredictions,
 };

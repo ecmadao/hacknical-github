@@ -124,7 +124,14 @@ const setRepositories = async (login, repos) => {
   return setResults;
 };
 
-const getRepositories = async login =>
+const getRepositories = async fullnames =>
+  await GitHubRepos.find({
+    full_name: {
+      $in: fullnames
+    }
+  });
+
+const getUserRepositories = async login =>
   await GitHubRepos.find({ login });
 
 const getRepository = async fullname =>
@@ -137,5 +144,6 @@ export default {
   setRepository,
   setRepositories,
   getRepositories,
+  getUserRepositories,
   removeRepositories,
 };

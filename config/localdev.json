@@ -4,7 +4,8 @@
   "appKey": "hacknical-github-local",
   "appName": "hacknical-github-local",
   "database": {
-    "url": "mongodb://localhost:27017/hacknical-api"
+    "github": "mongodb://localhost:27017/hacknical-api",
+    "scientific": "mongodb://localhost:27017/hacknical-scientific"
   },
   "mq": {
     "config": {

@@ -90,8 +90,23 @@ const getRepositoryReadme = async (fullname, verify) => {
   return result;
 };
 
-const getRepositories = async (login, verify, fetch) => {
-  const findResult = await ReposModel.getRepositories(login);
+const getRepositories = async (fullnames, verify) => {
+  const findResult = await ReposModel.getRepositories(fullnames);
+  if (findResult.length) {
+    return findResult;
+  }
+  const results = [];
+  await Promise.all(fullnames.map(
+    async (fullname) => {
+      const result = await getRepository(fullname, verify);
+      results.push(result);
+    }
+  ));
+  return results;
+};
+
+const getUserRepositories = async (login, verify, fetch) => {
+  const findResult = await ReposModel.getUserRepositories(login);
   if (findResult.length) {
     return findResult;
   }
@@ -173,7 +188,7 @@ const getUserStarred = async (options) => {
  * =============== commits ===============
  */
 const updateCommits = async ({ login, verify }) => {
-  const repositories = await getRepositories(login, verify);
+  const repositories = await getUserRepositories(login, verify);
   const reposList = validateReposList(repositories);
   try {
     const fetchedResults =
@@ -253,7 +268,7 @@ const getOrgRepositories = async (options = {}) => {
   let repositories = [];
   try {
     repositories =
-      await getRepositories(org.login, verify, GitHubV4.getOrgPubRepos);
+      await getUserRepositories(org.login, verify, GitHubV4.getOrgPubRepos);
   } catch (e) {
     repositories = [];
     logger.error(e);
@@ -399,8 +414,9 @@ export default {
   updateCommits,
   // repos
   getRepository,
-  getUserStarred,
   getRepositories,
+  getUserStarred,
+  getUserRepositories,
   updateContributed,
   fetchRepositories,
   getUserContributed,

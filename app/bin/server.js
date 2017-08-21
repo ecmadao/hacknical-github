@@ -9,6 +9,7 @@ import logger from '../utils/logger';
 import params from '../middlewares/params';
 import auth from '../middlewares/auth';
 import verify from '../middlewares/verify';
+import mongo from '../middlewares/mongo';
 import mq from '../middlewares/mq';
 
 const appKey = config.get('appKey');
@@ -35,6 +36,8 @@ app.use(verify());
 
 // mq
 app.use(mq());
+// mongo
+app.use(mongo());
 
 // router
 app.use(router.routes(), router.allowedMethods());
