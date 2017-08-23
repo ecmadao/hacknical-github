@@ -6,7 +6,11 @@ const app = config.get('app');
 const verifyMiddlwware = () => async (ctx, next) => {
   const { appName } = ctx.state;
   logger.info(`[VERIFY APPLICATION][${appName}][${ctx.request.url}]`);
-  const token = ctx.request.query.token || ctx.request.body.token || app[appName].token;
+
+  const appToken = /\/api\/github\/login/.test(ctx.request.url)
+    ? app[appName].token
+    : '';
+  const token = ctx.request.query.token || ctx.request.body.token || appToken;
   const headers = { 'User-Agent': appName };
 
   const clientId = app[appName].clientId;

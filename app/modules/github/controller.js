@@ -354,11 +354,11 @@ const getUserScientific = async (ctx) => {
     success: true,
     result: {
       starred: {
-        keywords: userScientificData(starred.keywords),
+        keywords: userScientificData(starred.keywords, 20),
         languages: userScientificData(starred.languages),
       },
       created: {
-        keywords: userScientificData(created.keywords),
+        keywords: userScientificData(created.keywords, 20),
         languages: userScientificData(created.languages),
       }
     }
