@@ -3,6 +3,7 @@
   "port": "5002",
   "appKey": "hacknical-github-local",
   "appName": "hacknical-github-local",
+  "logFile": null,
   "database": {
     "github": "mongodb://localhost:27017/hacknical-api",
     "scientific": "mongodb://localhost:27017/hacknical-scientific"
