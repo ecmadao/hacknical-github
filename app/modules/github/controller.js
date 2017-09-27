@@ -378,7 +378,8 @@ const getUserPredictions = async (ctx) => {
     return;
   }
   const { predictions } = result;
-  const repositories = await Helper.getRepositories(predictions, verify);
+  const fullnames = predictions.map(prediction => prediction.fullName);
+  const repositories = await Helper.getRepositories(fullnames, verify);
   ctx.body = {
     success: true,
     result: repositories
