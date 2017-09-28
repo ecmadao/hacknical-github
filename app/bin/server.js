@@ -28,7 +28,9 @@ app.use(params.checkApp('x-app-name'));
 // auth
 app.use(auth({
   whiteList: [
-    /^\/api\/github\/(zen)|(octocat)|(verify)/
+    /^\/api\/github\/(zen)|(octocat)|(verify)/,
+    /^\/favicon.ico/,
+    /^\/robots.txt/,
   ]
 }));
 // verify token params

@@ -2,6 +2,7 @@ import config from 'config';
 import UsersModel from '../../databases/github-users';
 import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
+import Spider from '../../services/spider';
 import dateHelper from '../../utils/date';
 import Helper from '../shared/helper';
 import logger from '../../utils/logger';
@@ -386,7 +387,19 @@ const getUserPredictions = async (ctx) => {
   };
 };
 
+const getCalendar = async (ctx) => {
+  const { login } = ctx.params;
+  const result = await Spider.calendar(login);
+
+  ctx.body = {
+    result,
+    success: true
+  };
+};
+
 export default {
+  /* ====== */
+  getCalendar,
   /* ====== */
   getZen,
   getOctocat,

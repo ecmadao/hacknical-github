@@ -60,6 +60,11 @@ router.delete(
   GitHub.unstarRepository
 );
 
+// calendar
+router.get(
+  '/:login/calendar',
+  GitHub.getCalendar
+);
 
 router.get(
   '/:login/repositories',

@@ -30,7 +30,9 @@ const fetchData = (options, handler) =>
 
 
 export const baseFetch = async (options, timeout = retryTimes, handler = handleBody) => {
-  options.json = true;
+  if (options.json === undefined) {
+    options.json = true;
+  }
   let err = null;
   for (let i = 0; i < timeout.length; i += 1) {
     try {
