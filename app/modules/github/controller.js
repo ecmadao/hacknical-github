@@ -389,7 +389,8 @@ const getUserPredictions = async (ctx) => {
 
 const getCalendar = async (ctx) => {
   const { login } = ctx.params;
-  const result = await Spider.calendar(login);
+  const { locale } = ctx.request.query;
+  const result = await Spider.calendar(login, locale);
 
   ctx.body = {
     result,
