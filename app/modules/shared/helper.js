@@ -161,7 +161,8 @@ const getUserStarred = async (options) => {
   const userInfo = await UsersInfoModal.findOne(login);
   if (userInfo.starredFetched) {
     logger.info(`[STARRED][get ${login} starred from database]`);
-    return await getStarredRepositories(userInfo.starred, verify);
+    const result = await getStarredRepositories(userInfo.starred, verify);
+    if (result.results.length) return result;
   }
 
   const result = await GitHubV4.getUserStarred({
