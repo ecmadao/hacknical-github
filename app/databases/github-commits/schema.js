@@ -15,4 +15,9 @@ const GitHubCommitsSchema = new Schema({
   pushed_at: String
 });
 
+GitHubCommitsSchema.index({
+  login: 1,
+  name: 1,
+});
+
 export default mongoose.model('GithubCommits', GitHubCommitsSchema);

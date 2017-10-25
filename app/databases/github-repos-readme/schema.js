@@ -10,4 +10,9 @@ const GitHubReposReadmeSchema = new Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
+GitHubReposReadmeSchema.index({
+  login: 1,
+  full_name: 1
+});
+
 export default mongoose.model('GitHubReposReadme', GitHubReposReadmeSchema);

@@ -30,4 +30,14 @@ const GitHubReposSchema = new Schema({
   contributors: { type: Array, default: [] }
 });
 
+GitHubReposSchema.index({
+  full_name: 1,
+  name: 1,
+  login: 1,
+  owner: {
+    login: 1
+  },
+  stargazers_count: 1
+});
+
 export default mongoose.model('GithubRepos', GitHubReposSchema);

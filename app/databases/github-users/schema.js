@@ -23,4 +23,10 @@ const GitHubUsersSchema = new Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
+GitHubUsersSchema.index({
+  name: 1,
+  login: 1,
+  company: 1,
+});
+
 export default mongoose.model('GithubUsers', GitHubUsersSchema);

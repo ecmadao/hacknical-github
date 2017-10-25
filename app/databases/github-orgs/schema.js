@@ -20,4 +20,10 @@ const GitHubOrgsSchema = new Schema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
+GitHubOrgsSchema.index({
+  name: 1,
+  login: 1,
+  company: 1,
+});
+
 export default mongoose.model('GithubOrgs', GitHubOrgsSchema);
