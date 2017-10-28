@@ -327,66 +327,6 @@ const unstarRepository = async (ctx) => {
   };
 };
 
-const userScientificData = (obj, count = 5) => {
-  const result = {};
-  Object.keys(obj)
-    .sort((current, next) => obj[next] - obj[current])
-    .slice(0, count)
-    .map(key => (result[key] = obj[key]));
-  return result;
-};
-
-const getUserScientific = async (ctx) => {
-  const { login } = ctx.params;
-  const usersCol = ctx.db.collection('users');
-
-  const user = await usersCol.findOne({ login });
-  if (!user) {
-    ctx.body = {
-      success: false,
-    };
-    return;
-  }
-  const {
-    starred,
-    created,
-  } = user;
-  ctx.body = {
-    success: true,
-    result: {
-      starred: {
-        keywords: userScientificData(starred.keywords, 20),
-        languages: userScientificData(starred.languages),
-      },
-      created: {
-        keywords: userScientificData(created.keywords, 20),
-        languages: userScientificData(created.languages),
-      }
-    }
-  };
-};
-
-const getUserPredictions = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-  const predictionsCol = ctx.db.collection('predictions');
-
-  const result = await predictionsCol.findOne({ login });
-  if (!result) {
-    ctx.body = {
-      success: false,
-    };
-    return;
-  }
-  const { predictions } = result;
-  const fullnames = predictions.map(prediction => prediction.fullName);
-  const repositories = await Helper.getRepositories(fullnames, verify);
-  ctx.body = {
-    success: true,
-    result: repositories
-  };
-};
-
 const getCalendar = async (ctx) => {
   const { login } = ctx.params;
   const { locale } = ctx.request.query;
@@ -427,6 +367,4 @@ export default {
   refreshUserOrganizations,
   refreshUserContributed,
   getUserUpdateTime,
-  getUserScientific,
-  getUserPredictions,
 };

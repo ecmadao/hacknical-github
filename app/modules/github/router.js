@@ -120,15 +120,5 @@ router.get(
   '/:login/updateTime',
   GitHub.getUserUpdateTime
 );
-router.get(
-  '/:login/scientific',
-  params.checkQuery(['verify']),
-  GitHub.getUserScientific
-);
-router.get(
-  '/:login/predictions',
-  params.checkQuery(['verify']),
-  GitHub.getUserPredictions
-);
 
 module.exports = router;
