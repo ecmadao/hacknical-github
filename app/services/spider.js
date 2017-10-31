@@ -1,8 +1,8 @@
 /* eslint no-nested-ternary: "off" */
-import githubParser from 'github-calendar-parser';
 import cheerio from 'cheerio';
 import fetch from '../utils/request';
 import dateHelper from '../utils/date';
+import githubParser from '../utils/github-calendar-parser';
 
 const BASE_URL = 'https://github.com';
 const DATE_FORMAT = 'YYYY-MM-DD';
