@@ -74,14 +74,14 @@ const setPredictionFeedback = async (ctx) => {
         Object.assign({}, predictions[index], {
           liked: Number(liked)
         }),
-        ...predictions.slice(index)
+        ...predictions.slice(index + 1)
       ]
     });
   }
 
   const {
-    likedRepositories,
-    unlikedRepositories,
+    likedRepositories = [],
+    unlikedRepositories = [],
   } = user;
   let newUserInfo = null;
   if (Number(liked) === 1) {
@@ -113,11 +113,39 @@ const getPredictions = async (ctx) => {
     return;
   }
   const { predictions } = result;
-  const fullnames = predictions.map(prediction => prediction.fullName);
-  const repositories = await Helper.getRepositories(fullnames, verify);
+  const results = [];
+  await Promise.all(predictions.map(async (prediction) => {
+    const {
+      fullName,
+      liked = 0,
+    } = prediction;
+    const repository = await Helper.getRepository(fullName, verify);
+    const {
+      name,
+      owner,
+      html_url,
+      language,
+      full_name,
+      description,
+      forks_count,
+      stargazers_count,
+    } = repository;
+    results.push({
+      name,
+      liked,
+      owner,
+      html_url,
+      language,
+      full_name,
+      description,
+      forks_count,
+      stargazers_count,
+      login: repository.login,
+    });
+  }));
   ctx.body = {
     success: true,
-    result: repositories
+    result: results
   };
 };
 

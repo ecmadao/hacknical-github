@@ -18,7 +18,7 @@ router.get(
   Scientific.getPredictions
 );
 
-router.post(
+router.put(
   '/:login/predictions',
   params.checkQuery(['verify']),
   params.checkBody(['fullName', 'liked']),
