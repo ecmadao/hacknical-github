@@ -15,7 +15,8 @@
       "ns": "geeknical",
       "options": {}
     },
-    "qname": "github-scientific-local"
+    "qname-scientific": "github-scientific-local",
+    "qname-prediction": "github-prediction-local"
   },
   "app": {
     "hacknical-local": {

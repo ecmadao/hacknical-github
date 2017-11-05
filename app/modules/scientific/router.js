@@ -18,6 +18,13 @@ router.get(
   Scientific.getPredictions
 );
 
+router.delete(
+  '/:login/predictions',
+  params.checkQuery(['verify']),
+  params.checkBody(['fullName']),
+  Scientific.reomvePrediction
+);
+
 router.put(
   '/:login/predictions',
   params.checkQuery(['verify']),
