@@ -147,7 +147,7 @@ const getPredictions = async (ctx) => {
   }
   const { predictions } = result;
   const results = [];
-  await Promise.all(predictions.map(async (prediction) => {
+  await Promise.all(predictions.slice(0, 7).map(async (prediction) => {
     const {
       fullName,
       liked = 0,
