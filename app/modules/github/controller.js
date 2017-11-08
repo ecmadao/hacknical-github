@@ -5,6 +5,7 @@ import GitHubV4 from '../../services/github-v4';
 import Spider from '../../services/spider';
 import dateHelper from '../../utils/date';
 import Helper from '../shared/helper';
+import Refresh from '../shared/refresh';
 import logger from '../../utils/logger';
 import {
   PER_PAGE,
@@ -188,6 +189,20 @@ const refreshData = async (options = {}) => {
   };
 };
 
+const refreshUser = async (ctx) => {
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
+
+  const result = await refreshData({
+    func: Refresh.refreshUser,
+    params: {
+      login,
+      verify,
+    }
+  });
+  ctx.body = result;
+};
+
 const refreshUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
@@ -206,11 +221,8 @@ const refreshUserRepositories = async (ctx) => {
     return;
   }
 
-  const githubUser = await GitHubV4.getUserByToken(verify);
-  await UsersModel.updateUser(githubUser);
-
   const result = await refreshData({
-    func: Helper.fetchRepositories,
+    func: Refresh.refreshRepositories,
     params: {
       login,
       verify,
@@ -225,7 +237,7 @@ const refreshUserCommits = async (ctx) => {
   const { verify } = ctx.request.query;
 
   const result = await refreshData({
-    func: Helper.updateCommits,
+    func: Refresh.refreshCommits,
     params: {
       login,
       verify
@@ -235,6 +247,8 @@ const refreshUserCommits = async (ctx) => {
   ctx.body = result;
 };
 
+// WARNING: Can only update user who is the token owner
+// Cause can only use GitHub V4 API
 const refreshUserOrganizations = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
@@ -249,6 +263,8 @@ const refreshUserOrganizations = async (ctx) => {
   ctx.body = result;
 };
 
+// WARNING: Can only update user who is the token owner
+// Cause can only use GitHub V4 API
 const refreshUserContributed = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
@@ -362,6 +378,7 @@ export default {
   getUserCommits,
   getUserOrganizations,
   /* ====== */
+  refreshUser,
   refreshUserRepositories,
   refreshUserCommits,
   refreshUserOrganizations,

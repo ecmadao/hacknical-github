@@ -188,8 +188,7 @@ const getUserStarred = async (options) => {
 /**
  * =============== commits ===============
  */
-const updateCommits = async ({ login, verify }) => {
-  const repositories = await getUserRepositories(login, verify);
+const updateCommits = async ({ login, verify, repositories }) => {
   const reposList = validateReposList(repositories);
   try {
     const fetchedResults =
@@ -228,7 +227,8 @@ const getCommits = async (login, verify) => {
   if (findCommits.length) {
     return findCommits;
   }
-  return await updateCommits({ login, verify });
+  const repositories = await getUserRepositories(login, verify);
+  return await updateCommits({ login, verify, repositories });
 };
 
 /**
@@ -263,13 +263,14 @@ const getOrgRepositories = async (options = {}) => {
     org,
     login,
     verify,
+    fetch = GitHubV4.getOrgPubRepos
   } = options;
 
   const results = [];
   let repositories = [];
   try {
     repositories =
-      await getUserRepositories(org.login, verify, GitHubV4.getOrgPubRepos);
+      await getUserRepositories(org.login, verify, fetch);
   } catch (e) {
     repositories = [];
     logger.error(e);
@@ -419,7 +420,6 @@ export default {
   getUserStarred,
   getUserRepositories,
   updateContributed,
-  fetchRepositories,
   getUserContributed,
   getRepositoryReadme,
 };

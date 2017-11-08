@@ -36,6 +36,10 @@ const updateUser = async (userInfo) => {
 };
 
 const createGitHubUser = async (userInfo) => {
+  const user = await findUser(userInfo.login);
+  if (user) {
+    return await updateUser(userInfo);
+  }
   const newGitHubInfo = getGitHubInfo(userInfo);
   newGitHubInfo.lastUpdateTime = new Date();
   const newUser = await GitHubUsers.create(newGitHubInfo);
