@@ -15,6 +15,7 @@ const convertUser = (v4UserInfo) => {
     following,
     websiteUrl,
     repositories,
+    starredRepositories,
   } = v4UserInfo;
 
   return {
@@ -32,6 +33,7 @@ const convertUser = (v4UserInfo) => {
     followers: followers.totalCount,
     following: following.totalCount,
     public_repos: repositories.totalCount,
+    starred: starredRepositories.totalCount,
   };
 };
 

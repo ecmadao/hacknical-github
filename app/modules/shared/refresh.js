@@ -1,17 +1,12 @@
-import GitHubV3 from '../../services/github-v3';
+import GitHubV4 from '../../services/github-v4';
 import Helper from './helper';
 import UsersModel from '../../databases/github-users';
 import ReposModel from '../../databases/github-repos';
-import UsersInfoModal from '../../databases/github-users-info';
-import {
-  PER_PAGE,
-} from '../../utils/github';
 
 const refreshUser = async (options) => {
   const { login, verify } = options;
-  const userInfo = await GitHubV3.getUser(login, verify);
+  const userInfo = await GitHubV4.getUser(login, verify);
   if (!userInfo) return null;
-
   await UsersModel.updateUser(userInfo);
 };
 
@@ -23,7 +18,7 @@ const refreshRepositories = async (options) => {
   } = options;
 
   const multiRepos =
-    await GitHubV3.getPersonalPubRepos(login, verify, perPage);
+    await GitHubV4.getPersonalPubRepos(login, verify, perPage);
   await ReposModel.setRepositories(login, multiRepos);
 };
 
