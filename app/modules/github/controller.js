@@ -213,20 +213,6 @@ const refreshUser = async (ctx) => {
 const refreshUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
-  const user = await UsersModel.findOne(login);
-  const lastUpdateTime = user.lastUpdateTime || user.created_at;
-
-  const timeInterval =
-    dateHelper.getSeconds(new Date()) - dateHelper.getSeconds(lastUpdateTime);
-  if (timeInterval < REFRESH_LIMIT) {
-    ctx.body = {
-      success: false,
-      result: {
-        result: Math.ceil((REFRESH_LIMIT - timeInterval) / 60)
-      }
-    };
-    return;
-  }
 
   const result = await refreshData({
     func: Refresh.refreshRepositories,

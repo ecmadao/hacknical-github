@@ -1,3 +1,4 @@
+import logger from '../utils/logger';
 
 const convertUser = (v4UserInfo) => {
   const {
@@ -56,6 +57,8 @@ const convertRepository = (v4Repository) => {
     repositoryTopics,
     primaryLanguage = {},
   } = v4Repository;
+
+  logger.debug(`name: ${name}, pushedAt: ${pushedAt}`);
 
   const languagesPercentage = {};
   const totalSize = languages.edges.reduce((prev, current, index) => {
