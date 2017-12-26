@@ -10,6 +10,7 @@ import logger from '../../utils/logger';
 import {
   PER_PAGE,
 } from '../../utils/github';
+import SlackMsg from '../../services/slack';
 
 const REFRESH_LIMIT = 5 * 60;
 const app = config.get('app');
@@ -200,6 +201,12 @@ const refreshUser = async (ctx) => {
       verify,
     }
   });
+
+  new SlackMsg(ctx.mq).send({
+    type: 'refresh',
+    data: `User ${login} refreshing`
+  });
+
   ctx.body = result;
 };
 

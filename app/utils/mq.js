@@ -20,17 +20,6 @@ class MessageQueue {
     logger.info(`[MQ:CONNECT][${initOptions.host}:${initOptions.port}]`);
   }
 
-  wrapMsg({ message, type, url }) {
-    const msg = {
-      data: message,
-      channel: {
-        url,
-        type,
-      },
-    };
-    return JSON.stringify(msg);
-  }
-
   createQueue(qname = defaultMqName) {
     return wrap(this.mq.createQueue, { qname });
   }
@@ -38,7 +27,7 @@ class MessageQueue {
   sendMessage(options = {}) {
     const {
       message = '',
-      qname = defaultMqName
+      qname = defaultMqName,
     } = options;
     if (!message) return;
     logger.info(`[MQ:SEND][${qname}:${message}]`);

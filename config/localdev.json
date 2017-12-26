@@ -16,7 +16,13 @@
       "options": {}
     },
     "qname-scientific": "github-scientific-local",
-    "qname-prediction": "github-prediction-local"
+    "qname-prediction": "github-prediction-local",
+    "qname-messenger": "messenger-local"
+  },
+  "services": {
+    "slack": {
+      "url": ""
+    }
   },
   "app": {
     "hacknical-local": {
