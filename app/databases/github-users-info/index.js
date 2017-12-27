@@ -67,6 +67,8 @@ const updateUserHotmap = async (login, hotmapData) => {
     user.hotmap.end = hotmapData.end;
     user.hotmap.start = hotmapData.start;
     user.hotmap.total = hotmapData.total;
+    user.hotmap.levelRanges = hotmapData.levelRanges;
+    user.hotmap.streak = hotmapData.streak;
   } else {
     user.hotmap = hotmapData;
   }

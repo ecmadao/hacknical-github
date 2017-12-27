@@ -419,7 +419,6 @@ const fetchHotmap = async (login) => {
 const getHotmap = async (login) => {
   const userInfo = await UsersInfoModal.findOne(login);
   let { hotmap } = userInfo;
-  console.log(hotmap);
   if (!hotmap || !hotmap.datas.length || (new Date() - hotmap.updateTime) >= 12 * 60 * 60 * 1000) {
     hotmap = await fetchHotmap(login);
   }
@@ -428,13 +427,16 @@ const getHotmap = async (login) => {
     start,
     total,
     datas,
+    streak,
+    levelRanges,
   } = hotmap;
-  const index = datas.findIndex(item => item.date === start);
   return {
     end,
     start,
     total,
-    datas: datas.slice(index)
+    datas,
+    streak,
+    levelRanges,
   };
 };
 

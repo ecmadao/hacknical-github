@@ -333,7 +333,7 @@ const unstarRepository = async (ctx) => {
   };
 };
 
-const getCalendar = async (ctx) => {
+const getHotmap = async (ctx) => {
   const { login } = ctx.params;
   const hotmap = await Helper.getHotmap(login);
 
@@ -345,7 +345,7 @@ const getCalendar = async (ctx) => {
 
 export default {
   /* ====== */
-  getCalendar,
+  getHotmap,
   /* ====== */
   getZen,
   getOctocat,

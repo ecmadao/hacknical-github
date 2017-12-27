@@ -29,7 +29,7 @@ const TEXTS = {
   },
 };
 
-const getCalendar = async (login, locale = 'en') => {
+const calendar = async (login, locale = 'en') => {
   const LOCAL_TEXTS = TEXTS[locale];
   const url = `${BASE_URL}/${login}`;
   const page = await fetch.get({
@@ -90,31 +90,70 @@ const __parseHotmap = ($) => {
   let total = 0;
   let start = null;
   let end = null;
+  const streak = {
+    longest: {
+      count: 0,
+      start: null,
+      end: null,
+    },
+    current: {
+      count: 0,
+      start: null,
+      end: null,
+    },
+  };
+  const levelRange = {
+    0: 0,
+    1: null,
+    2: null,
+    3: null,
+    4: null,
+  };
 
   const cal = $('.js-contribution-graph');
   const $hotmap = cal.find('.js-calendar-graph-svg');
   $hotmap.find('rect').each((i, ele) => {
-    console.log(`rect index: ${i}`);
     const $rect = $(ele);
     const fill = $rect.attr('fill');
     const data = Number($rect.attr('data-count'));
     const date = $rect.attr('data-date');
+    const level = levelMap[fill] || 0;
+    if (level !== 0) {
+      if (levelRange[level] === null || levelRange[level] > data) {
+        levelRange[level] = data;
+      }
+    }
+    if (data === 0) {
+      if (streak.longest.count < streak.current.count) {
+        streak.longest = Object.assign({}, streak.current);
+      }
+      streak.current.count = 0;
+    } else {
+      streak.current.count += 1;
+      if (!streak.current.start) streak.current.start = date;
+      streak.current.end = date;
+    }
     if (i === 0) start = date;
     end = date;
     datas.push({
       date,
       data,
-      fill,
-      level: levelMap[fill] || 0,
+      level,
     });
     total += data;
   });
+
+  if (!streak.longest.count) {
+    streak.longest = Object.assign({}, streak.current);
+  }
 
   return {
     end,
     start,
     datas,
     total,
+    streak,
+    levelRanges: Object.keys(levelRange).map(l => levelRange[l]),
   };
 };
 
@@ -136,5 +175,5 @@ const hotmap = async (login) => {
 
 export default {
   hotmap,
-  calendar: getCalendar
+  calendar
 };

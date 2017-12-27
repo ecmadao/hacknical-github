@@ -62,8 +62,8 @@ router.delete(
 
 // calendar
 router.get(
-  '/:login/calendar',
-  GitHub.getCalendar
+  '/:login/hotmap',
+  GitHub.getHotmap
 );
 
 router.get(

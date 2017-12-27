@@ -1,4 +1,10 @@
-import githubCalendarLegend from 'github-calendar-legend';
+const githubCalendarLegend = [
+  '#eee',
+  '#d6e685',
+  '#8cc665',
+  '#44a340',
+  '#1e6823'
+];
 
 /**
  * parseGitHubCalendarSvg

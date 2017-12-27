@@ -29,7 +29,20 @@ const GitHubUsersInfoSchema = new Schema({
     start: String,
     end: String,
     total: Number,
-    updateTime: Date
+    updateTime: Date,
+    levelRanges: Array,
+    streak: {
+      longest: {
+        count: Number,
+        start: String,
+        end: String,
+      },
+      current: {
+        count: Number,
+        start: String,
+        end: String,
+      }
+    }
   }
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
