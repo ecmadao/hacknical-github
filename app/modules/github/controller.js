@@ -2,8 +2,6 @@ import config from 'config';
 import UsersModel from '../../databases/github-users';
 import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
-import Spider from '../../services/spider';
-import dateHelper from '../../utils/date';
 import Helper from '../shared/helper';
 import Refresh from '../shared/refresh';
 import logger from '../../utils/logger';
@@ -12,7 +10,6 @@ import {
 } from '../../utils/github';
 import SlackMsg from '../../services/slack';
 
-const REFRESH_LIMIT = 5 * 60;
 const app = config.get('app');
 
 
@@ -338,11 +335,10 @@ const unstarRepository = async (ctx) => {
 
 const getCalendar = async (ctx) => {
   const { login } = ctx.params;
-  const { locale } = ctx.request.query;
-  const result = await Spider.calendar(login, locale);
+  const hotmap = await Helper.getHotmap(login);
 
   ctx.body = {
-    result,
+    result: hotmap,
     success: true
   };
 };

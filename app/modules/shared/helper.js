@@ -7,6 +7,7 @@ import UsersModel from '../../databases/github-users';
 import UsersInfoModal from '../../databases/github-users-info';
 import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
+import Spider from '../../services/spider';
 import {
   PER_PAGE,
   sortByCommits,
@@ -405,9 +406,44 @@ const getUser = async (login, verify) => {
   return await fetchUser(login, verify);
 };
 
+/*
+ * =============== hotmap ===============
+ * */
+
+const fetchHotmap = async (login) => {
+  const hotmap = await Spider.hotmap(login);
+  const update = await UsersInfoModal.updateUserHotmap(login, hotmap);
+  return update.result;
+};
+
+const getHotmap = async (login) => {
+  const userInfo = await UsersInfoModal.findOne(login);
+  let { hotmap } = userInfo;
+  console.log(hotmap);
+  if (!hotmap || !hotmap.datas.length || (new Date() - hotmap.updateTime) >= 12 * 60 * 60 * 1000) {
+    hotmap = await fetchHotmap(login);
+  }
+  const {
+    end,
+    start,
+    total,
+    datas,
+  } = hotmap;
+  const index = datas.findIndex(item => item.date === start);
+  return {
+    end,
+    start,
+    total,
+    datas: datas.slice(index)
+  };
+};
+
+
 export default {
   // user
   getUser,
+  // hotmap
+  getHotmap,
   // orgs
   getOrganizations,
   updateOrganizations,

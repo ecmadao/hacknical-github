@@ -29,10 +29,10 @@ const updateUser = async (userInfo) => {
   const user = await findUser(userInfo.login);
   Object.assign(user, newGitHubInfo);
   await user.save();
-  return Promise.resolve({
+  return {
     success: true,
     result: lastUpdateTime
-  });
+  };
 };
 
 const createGitHubUser = async (userInfo) => {
@@ -43,10 +43,10 @@ const createGitHubUser = async (userInfo) => {
   const newGitHubInfo = getGitHubInfo(userInfo);
   newGitHubInfo.lastUpdateTime = new Date();
   const newUser = await GitHubUsers.create(newGitHubInfo);
-  return Promise.resolve({
+  return {
     success: true,
     result: newUser
-  });
+  };
 };
 
 export default {

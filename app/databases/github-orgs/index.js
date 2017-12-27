@@ -38,17 +38,17 @@ const updateOrganization = async (orgInfo) => {
   if (organization) {
     Object.assign(organization, newOrganizationInfo);
     await organization.save();
-    return Promise.resolve({
+    return {
       success: true,
       result: organization
-    });
+    };
   }
   const newOrganization =
     await GitHubOrgs.create(newOrganizationInfo);
-  return Promise.resolve({
+  return {
     success: true,
     result: newOrganization,
-  });
+  };
 };
 
 export default {

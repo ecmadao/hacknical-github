@@ -21,6 +21,16 @@ const GitHubUsersInfoSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  hotmap: {
+    datas: {
+      type: Array,
+      default: [],
+    },
+    start: String,
+    end: String,
+    total: Number,
+    updateTime: Date
+  }
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });

@@ -77,6 +77,64 @@ const getCalendar = async (login, locale = 'en') => {
   return cal.html();
 };
 
+const levelMap = {
+  '#eee': 0,
+  '#c6e48b': 1,
+  '#7bc96f': 2,
+  '#239a3b': 3,
+  '#196127': 4,
+};
+
+const __parseHotmap = ($) => {
+  const datas = [];
+  let total = 0;
+  let start = null;
+  let end = null;
+
+  const cal = $('.js-contribution-graph');
+  const $hotmap = cal.find('.js-calendar-graph-svg');
+  $hotmap.find('rect').each((i, ele) => {
+    console.log(`rect index: ${i}`);
+    const $rect = $(ele);
+    const fill = $rect.attr('fill');
+    const data = Number($rect.attr('data-count'));
+    const date = $rect.attr('data-date');
+    if (i === 0) start = date;
+    end = date;
+    datas.push({
+      date,
+      data,
+      fill,
+      level: levelMap[fill] || 0,
+    });
+    total += data;
+  });
+
+  return {
+    end,
+    start,
+    datas,
+    total,
+  };
+};
+
+const __getHotmap = async (login) => {
+  const url = `${BASE_URL}/${login}`;
+  const page = await fetch.get({
+    url,
+    json: false
+  });
+  const $ = cheerio.load(page);
+  return $;
+};
+
+const hotmap = async (login) => {
+  const $ = await __getHotmap(login);
+  const result = __parseHotmap($);
+  return result;
+};
+
 export default {
+  hotmap,
   calendar: getCalendar
 };

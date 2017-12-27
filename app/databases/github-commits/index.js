@@ -8,10 +8,10 @@ const getRepositoryCommits = async (login, name) => {
     name,
     login,
   });
-  return Promise.resolve({
+  return {
     success: true,
     result: findResult
-  });
+  };
 };
 
 const setRepositoryCommits = async (login, data) => {
@@ -41,9 +41,7 @@ const setCommits = async (login, datas) => {
   await Promise.all(datas.map(async (data) => {
     await setRepositoryCommits(login, data);
   }));
-  return Promise.resolve({
-    success: true
-  });
+  return { success: true };
 };
 
 const getCommits = async (login) => {

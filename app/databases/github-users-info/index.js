@@ -20,20 +20,20 @@ const updateUserOrganizations = async (login, organizations = []) => {
   const user = await findUserInfo(login);
   user.organizations = [...organizations];
   await user.save();
-  return Promise.resolve({
+  return {
     success: true,
     result: user
-  });
+  };
 };
 
 const updateUserContributions = async (login, contributions = []) => {
   const user = await findUserInfo(login);
   user.contributions = [...contributions];
   await user.save();
-  return Promise.resolve({
+  return {
     success: true,
     result: user
-  });
+  };
 };
 
 const updateUserStarred = async (login, fullnames = [], starredFetched = false) => {
@@ -45,15 +45,43 @@ const updateUserStarred = async (login, fullnames = [], starredFetched = false) 
   ])];
   user.starredFetched = starredFetched;
   await user.save();
-  return Promise.resolve({
+  return {
     success: true,
     result: user
-  });
+  };
+};
+
+const updateUserHotmap = async (login, hotmapData) => {
+  const user = await findUserInfo(login);
+  if (user.hotmap.datas.length) {
+    const { end } = user.hotmap;
+    const { datas } = hotmapData;
+    let index = datas.findIndex(item => item.date === end);
+    if (index !== -1) {
+      user.hotmap.datas[user.hotmap.datas.length - 1] = datas[index];
+      index += 1;
+    } else {
+      index = 0;
+    }
+    user.hotmap.datas.push(...datas.slice(index));
+    user.hotmap.end = hotmapData.end;
+    user.hotmap.start = hotmapData.start;
+    user.hotmap.total = hotmapData.total;
+  } else {
+    user.hotmap = hotmapData;
+  }
+  user.hotmap.updateTime = new Date();
+  await user.save();
+  return {
+    success: true,
+    result: user.hotmap
+  };
 };
 
 export default {
   insert,
   findOne: findUserInfo,
+  updateUserHotmap,
   updateUserStarred,
   updateUserOrganizations,
   updateUserContributions,
