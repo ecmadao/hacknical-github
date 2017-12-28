@@ -1,7 +1,7 @@
 import dateHelper from './date';
 
 export const getReposInYears = (repos, years = 1) => {
-  const oneYearBefore = dateHelper.getDateBeforeYears(years);
+  const oneYearBefore = dateHelper.getDateBeforeYears({ years });
   const seconds = dateHelper.getSeconds(oneYearBefore);
   return repos.filter(
     repository => dateHelper.getSeconds(repository.created_at) >= seconds

@@ -5,10 +5,12 @@ import dateHelper from '../utils/date';
 import githubParser from '../utils/github-calendar-parser';
 
 const BASE_URL = 'https://github.com';
+const BASE_URL_USERS = `${BASE_URL}/users`;
 const DATE_FORMAT = 'YYYY-MM-DD';
 const {
   format,
-  getDateBeforeYears
+  getDateAfterYears,
+  getDateBeforeYears,
 } = dateHelper;
 const TEXTS = {
   en: {
@@ -56,7 +58,7 @@ const calendar = async (login, locale = 'en') => {
     <div class="contrib-column contrib-column-first table-column">
       <span class="text-muted">${LOCAL_TEXTS.TOTAL}</span>\n
       <span class="contrib-number">${LOCAL_TEXTS.TOTAL_COUNT.replace('%s', parsed.last_year)}</span>\n
-      <span class="text-muted">${getDateBeforeYears(1, DATE_FORMAT)} ~ ${format(DATE_FORMAT)}</span>
+      <span class="text-muted">${getDateBeforeYears({ years: 1, format: DATE_FORMAT })} ~ ${format(DATE_FORMAT)}</span>
     </div>
   `);
   cal.append(`
@@ -85,91 +87,64 @@ const levelMap = {
   '#196127': 4,
 };
 
-const __parseHotmap = ($) => {
+const __parseHotmap = ($rects) => {
   const datas = [];
-  let total = 0;
-  let start = null;
-  let end = null;
-  const streak = {
-    longest: {
-      count: 0,
-      start: null,
-      end: null,
-    },
-    current: {
-      count: 0,
-      start: null,
-      end: null,
-    },
-  };
-  const levelRange = {
-    0: 0,
-    1: null,
-    2: null,
-    3: null,
-    4: null,
-  };
+  const cache = new Set();
 
-  const cal = $('.js-contribution-graph');
-  const $hotmap = cal.find('.js-calendar-graph-svg');
-  $hotmap.find('rect').each((i, ele) => {
-    const $rect = $(ele);
+  for (let i = 0; i < $rects.length; i += 1) {
+    const $rect = $rects[i];
     const fill = $rect.attr('fill');
     const data = Number($rect.attr('data-count'));
     const date = $rect.attr('data-date');
+    if (cache.has(date)) continue;
+
     const level = levelMap[fill] || 0;
-    if (level !== 0) {
-      if (levelRange[level] === null || levelRange[level] > data) {
-        levelRange[level] = data;
-      }
-    }
-    if (data === 0) {
-      if (streak.longest.count < streak.current.count) {
-        streak.longest = Object.assign({}, streak.current);
-      }
-      streak.current.count = 0;
-    } else {
-      streak.current.count += 1;
-      if (!streak.current.start) streak.current.start = date;
-      streak.current.end = date;
-    }
-    if (i === 0) start = date;
-    end = date;
     datas.push({
       date,
       data,
       level,
     });
-    total += data;
-  });
-
-  if (!streak.longest.count) {
-    streak.longest = Object.assign({}, streak.current);
+    cache.add(date);
   }
+
+  datas.sort((pre, next) => pre.date > next.date);
+  const start = datas[0].date;
+  const end = datas[datas.length - 1].date;
 
   return {
     end,
     start,
     datas,
-    total,
-    streak,
-    levelRanges: Object.keys(levelRange).map(l => levelRange[l]),
   };
 };
 
-const __getHotmap = async (login) => {
-  const url = `${BASE_URL}/${login}`;
-  const page = await fetch.get({
-    url,
-    json: false
-  });
-  const $ = cheerio.load(page);
-  return $;
+const __getHotmap = async (login, start) => {
+  let end = format(DATE_FORMAT);
+  end = getDateAfterYears({ years: 1, date: end, format: DATE_FORMAT });
+  const rects = [];
+  const baseUrl = `${BASE_URL_USERS}/${login}/contributions?full_graph=1`;
+
+  while (end > start) {
+    const startTmp = getDateBeforeYears({ years: 1, date: end, format: DATE_FORMAT });
+    const url = `${baseUrl}&from=${startTmp}&to=${end}`;
+    const page = await fetch.get({
+      url,
+      json: false
+    });
+    const $ = cheerio.load(page);
+    const $hotmap = $('.js-calendar-graph-svg');
+    $hotmap.find('rect').each((i, ele) => {
+      const $rect = $(ele);
+      rects.push($rect);
+    });
+    end = startTmp;
+  }
+  return rects;
 };
 
-const hotmap = async (login) => {
-  const $ = await __getHotmap(login);
-  const result = __parseHotmap($);
+const hotmap = async (login, start) => {
+  const $rects = await __getHotmap(login, start);
+  const result = __parseHotmap($rects);
   return result;
 };
 

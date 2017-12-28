@@ -410,8 +410,8 @@ const getUser = async (login, verify) => {
  * =============== hotmap ===============
  * */
 
-const fetchHotmap = async (login) => {
-  const hotmap = await Spider.hotmap(login);
+const fetchHotmap = async (login, start) => {
+  const hotmap = await Spider.hotmap(login, start);
   const update = await UsersInfoModal.updateUserHotmap(login, hotmap);
   return update.result;
 };
@@ -419,25 +419,16 @@ const fetchHotmap = async (login) => {
 const getHotmap = async (login) => {
   const userInfo = await UsersInfoModal.findOne(login);
   let { hotmap } = userInfo;
-  if (!hotmap || !hotmap.datas.length || (new Date() - hotmap.updateTime) >= 12 * 60 * 60 * 1000) {
-    hotmap = await fetchHotmap(login);
+  let start;
+  if (!hotmap || !hotmap.datas.length || !hotmap.allFetched) {
+    const user = await UsersModel.findOne(login);
+    start = user.created_at;
+    hotmap = await fetchHotmap(login, start);
+  } else if ((new Date() - hotmap.updateTime) >= 12 * 60 * 60 * 1000) {
+    start = hotmap.end;
+    hotmap = await fetchHotmap(login, start);
   }
-  const {
-    end,
-    start,
-    total,
-    datas,
-    streak,
-    levelRanges,
-  } = hotmap;
-  return {
-    end,
-    start,
-    total,
-    datas,
-    streak,
-    levelRanges,
-  };
+  return hotmap;
 };
 
 
