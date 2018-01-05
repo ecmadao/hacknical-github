@@ -23,7 +23,7 @@ const sendPredictionMq = (mq, login) => {
   });
 };
 
-const userScientificData = (obj, count = 5) => {
+const userScientificData = (obj, count = 10) => {
   const result = {};
   Object.keys(obj)
     .sort((current, next) => obj[next] - obj[current])
