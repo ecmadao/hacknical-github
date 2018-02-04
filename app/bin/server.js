@@ -1,8 +1,7 @@
 import Koa from 'koa';
 import koaLogger from 'koa-logger';
-import convert from 'koa-convert';
 import bodyParser from 'koa-bodyparser';
-import cors from 'kcors';
+import cors from '@koa/cors';
 import config from 'config';
 import router from '../modules';
 import logger from '../utils/logger';
@@ -17,12 +16,17 @@ const port = config.get('port');
 const app = new Koa();
 app.keys = [appKey];
 
-app.use(convert(cors()));
+// koa-logger
+app.use(koaLogger());
+
+app.use(cors());
 
 // bodyparser
-app.use(bodyParser());
-// koa-logger
-app.use(convert(koaLogger()));
+app.use(bodyParser({
+  onerror: (err, ctx) => {
+    ctx.throw('body parse error', 422);
+  }
+}));
 // check if validate app
 app.use(params.checkApp('x-app-name'));
 // auth
