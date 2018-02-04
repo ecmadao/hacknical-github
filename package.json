@@ -37,7 +37,7 @@
     "type": "git"
   },
   "author": "ecmadao",
-  "license": "Apache License",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/ecmadao/hacknical-github/issues"
   },
@@ -46,7 +46,7 @@
     "babel-cli": "^6.18.0",
     "babel-plugin-transform-async-to-generator": "^6.8.0",
     "babel-plugin-transform-runtime": "^6.15.0",
-    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.14.0",
     "babel-runtime": "^6.11.6",
