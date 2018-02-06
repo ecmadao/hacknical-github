@@ -98,7 +98,7 @@ const __parseHotmap = ($rects) => {
     const date = $rect.attr('data-date');
     if (cache.has(date)) continue;
 
-    const level = levelMap[fill] || 0;
+    const level = levelMap[fill.toLowerCase()] || 0;
     datas.push({
       date,
       data,

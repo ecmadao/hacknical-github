@@ -6,7 +6,7 @@
   "scripts": {
     "build-app": "babel app -d dist --copy-files",
     "start-dev": "bnr local:app:start",
-    "deploy": "git checkout master && git pull origin master && npm i && npm run stop && npm run build-app && npm run start && npm run notify-opbeat",
+    "deploy": "git checkout master && git pull origin master && npm i --save-dev && npm run stop && npm run build-app && npm run start && npm run notify-opbeat",
     "start": "bnr pro:app:start",
     "stop": "bnr pro:app:stop",
     "notify-opbeat": "sh ./scripts/opbeat.sh"

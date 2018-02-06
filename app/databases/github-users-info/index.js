@@ -55,15 +55,18 @@ const updateUserHotmap = async (login, hotmapData) => {
   const user = await findUserInfo(login);
   if (user.hotmap.datas.length && user.hotmap.allFetched) {
     const { end } = user.hotmap;
-    const { datas } = hotmapData;
-    let index = datas.findIndex(item => item.date === end);
-    if (index !== -1) {
-      user.hotmap.datas[user.hotmap.datas.length - 1] = datas[index];
-      index += 1;
+    const { datas, start } = hotmapData;
+    const oldIndex = user.hotmap.datas.findIndex(item => item.date === start);
+    if (oldIndex !== -1) {
+      const newIndex = datas.findIndex(item => item.date === start);
+      const oldDatas = user.hotmap.datas.slice(0, oldIndex);
+      user.hotmap.datas = [
+        ...oldDatas,
+        ...datas.slice(newIndex)
+      ];
     } else {
-      index = 0;
+      user.hotmap.datas.push(...datas);
     }
-    user.hotmap.datas.push(...datas.slice(index));
     user.hotmap.end = hotmapData.end;
   } else {
     user.hotmap = hotmapData;
