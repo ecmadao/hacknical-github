@@ -108,6 +108,11 @@ router.get(
   GitHub.refreshUser
 );
 router.get(
+  '/:login/hotmap/refresh',
+  params.checkQuery(['verify']),
+  GitHub.refreshHotmap
+);
+router.get(
   '/:login/repositories/refresh',
   params.checkQuery(['verify']),
   GitHub.refreshUserRepositories

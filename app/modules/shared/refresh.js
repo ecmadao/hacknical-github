@@ -32,8 +32,14 @@ const refreshCommits = async (options) => {
   });
 };
 
+const refreshHotmap = async (options) => {
+  const { login, start } = options;
+  await Helper.fetchHotmap(login, start);
+};
+
 export default {
   refreshUser,
+  refreshHotmap,
   refreshCommits,
   refreshRepositories,
 };

@@ -207,6 +207,20 @@ const refreshUser = async (ctx) => {
   ctx.body = result;
 };
 
+const refreshHotmap = async (ctx) => {
+  const { login } = ctx.params;
+  const user = await UsersModel.findOne(login);
+  const start = user.created_at;
+  const result = await refreshData({
+    func: Refresh.refreshHotmap,
+    params: {
+      login,
+      start,
+    }
+  });
+  ctx.body = result;
+};
+
 const refreshUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
@@ -368,6 +382,7 @@ export default {
   getUserOrganizations,
   /* ====== */
   refreshUser,
+  refreshHotmap,
   refreshUserRepositories,
   refreshUserCommits,
   refreshUserOrganizations,

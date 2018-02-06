@@ -437,6 +437,7 @@ export default {
   getUser,
   // hotmap
   getHotmap,
+  fetchHotmap,
   // orgs
   getOrganizations,
   updateOrganizations,
