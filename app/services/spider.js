@@ -89,14 +89,18 @@ const levelMap = {
 
 const __parseHotmap = ($rects) => {
   const datas = [];
-  const cache = new Set();
+  let start = null;
+  let end = null;
 
   for (let i = 0; i < $rects.length; i += 1) {
     const $rect = $rects[i];
     const fill = $rect.attr('fill');
     const data = Number($rect.attr('data-count'));
     const date = $rect.attr('data-date');
-    if (cache.has(date)) continue;
+
+    const ms = new Date(date).getTime();
+    if (!start || start > ms) start = ms;
+    if (!end || end < ms) end = ms;
 
     const level = levelMap[fill.toLowerCase()] || 0;
     datas.push({
@@ -104,12 +108,7 @@ const __parseHotmap = ($rects) => {
       data,
       level,
     });
-    cache.add(date);
   }
-
-  datas.sort((pre, next) => pre.date > next.date);
-  const start = datas[0].date;
-  const end = datas[datas.length - 1].date;
 
   return {
     end,
@@ -121,8 +120,9 @@ const __parseHotmap = ($rects) => {
 const __getHotmap = async (login, start) => {
   let end = format(DATE_FORMAT);
   end = getDateAfterYears({ years: 1, date: end, format: DATE_FORMAT });
-  const rects = [];
+  let rects = [];
   const baseUrl = `${BASE_URL_USERS}/${login}/contributions?full_graph=1`;
+  const tmp = new Set();
 
   while (end > start) {
     const startTmp = getDateBeforeYears({ years: 1, date: end, format: DATE_FORMAT });
@@ -133,10 +133,16 @@ const __getHotmap = async (login, start) => {
     });
     const $ = cheerio.load(page);
     const $hotmap = $('.js-calendar-graph-svg');
+    const pureRects = [];
     $hotmap.find('rect').each((i, ele) => {
       const $rect = $(ele);
-      rects.push($rect);
+      const date = $rect.attr('data-date');
+      if (!tmp.has(date)) {
+        pureRects.push($rect);
+      }
+      tmp.add(date);
     });
+    rects = pureRects.concat(rects);
     end = startTmp;
   }
   return rects;

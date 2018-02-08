@@ -53,25 +53,12 @@ const updateUserStarred = async (login, fullnames = [], starredFetched = false) 
 
 const updateUserHotmap = async (login, hotmapData) => {
   const user = await findUserInfo(login);
-  if (user.hotmap.datas.length && user.hotmap.allFetched) {
-    const { end } = user.hotmap;
-    const { datas, start } = hotmapData;
-    const oldIndex = user.hotmap.datas.findIndex(item => item.date === start);
-    if (oldIndex !== -1) {
-      const newIndex = datas.findIndex(item => item.date === start);
-      const oldDatas = user.hotmap.datas.slice(0, oldIndex);
-      user.hotmap.datas = [
-        ...oldDatas,
-        ...datas.slice(newIndex)
-      ];
-    } else {
-      user.hotmap.datas.push(...datas);
-    }
-    user.hotmap.end = hotmapData.end;
-  } else {
-    user.hotmap = hotmapData;
-    user.hotmap.allFetched = true;
-  }
+  const { datas, start, end } = hotmapData;
+
+  user.hotmap.datas = [...datas];
+  user.hotmap.end = end;
+  user.hotmap.start = start;
+  user.hotmap.allFetched = true;
   user.hotmap.updateTime = new Date();
   await user.save();
   return {

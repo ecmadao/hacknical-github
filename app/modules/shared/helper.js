@@ -419,13 +419,12 @@ const fetchHotmap = async (login, start) => {
 const getHotmap = async (login) => {
   const userInfo = await UsersInfoModal.findOne(login);
   let { hotmap } = userInfo;
-  let start;
-  if (!hotmap || !hotmap.datas.length || !hotmap.allFetched) {
+  if (!hotmap
+    || !hotmap.datas.length
+    || !hotmap.allFetched
+    || (new Date() - hotmap.updateTime) >= 12 * 60 * 60 * 1000) {
     const user = await UsersModel.findOne(login);
-    start = user.created_at;
-    hotmap = await fetchHotmap(login, start);
-  } else if ((new Date() - hotmap.updateTime) >= 12 * 60 * 60 * 1000) {
-    start = hotmap.end;
+    const start = user.created_at;
     hotmap = await fetchHotmap(login, start);
   }
   return hotmap;
