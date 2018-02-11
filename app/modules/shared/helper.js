@@ -11,7 +11,7 @@ import Spider from '../../services/spider';
 import {
   PER_PAGE,
   sortByCommits,
-  validateReposList,
+  validateReposMap,
 } from '../../utils/github';
 
 /* ================== private helper ================== */
@@ -93,9 +93,7 @@ const getRepositoryReadme = async (fullname, verify) => {
 
 const getRepositories = async (fullnames, verify) => {
   const findResult = await ReposModel.getRepositories(fullnames);
-  if (findResult.length) {
-    return findResult;
-  }
+  if (findResult.length) return findResult;
   const results = [];
   await Promise.all(fullnames.map(
     async (fullname) => {
@@ -108,9 +106,7 @@ const getRepositories = async (fullnames, verify) => {
 
 const getUserRepositories = async (login, verify, fetch) => {
   const findResult = await ReposModel.getUserRepositories(login);
-  if (findResult.length) {
-    return findResult;
-  }
+  if (findResult.length) return findResult;
 
   return await fetchRepositories({
     login,
@@ -190,15 +186,13 @@ const getUserStarred = async (options) => {
  * =============== commits ===============
  */
 const updateCommits = async ({ login, verify, repositories }) => {
-  const reposList = validateReposList(repositories);
+  const reposMap = validateReposMap(repositories);
   try {
     const fetchedResults =
-      await GitHubV3.getAllReposYearlyCommits(reposList, verify);
+      await GitHubV3.getAllReposYearlyCommits(reposMap.values(), verify);
     const results = fetchedResults.map((fetchedResult) => {
       const { full_name, data } = fetchedResult;
-      const repository = reposList.find(
-        item => item.full_name === full_name
-      );
+      const repository = reposMap.get(full_name);
       if (!repository || !data.length) return {};
       const { name, created_at, pushed_at } = repository;
       const totalCommits = data.reduce(
@@ -225,9 +219,7 @@ const updateCommits = async ({ login, verify, repositories }) => {
 
 const getCommits = async (login, verify) => {
   const findCommits = await CommitsModel.getCommits(login);
-  if (findCommits.length) {
-    return findCommits;
-  }
+  if (findCommits.length) return findCommits;
   const repositories = await getUserRepositories(login, verify);
   return await updateCommits({ login, verify, repositories });
 };
@@ -238,21 +230,20 @@ const getCommits = async (login, verify) => {
 const getReposContributors = async (options = {}) => {
   const {
     login,
-    repos,
     verify,
+    repositoriesMap,
   } = options;
 
   const fetchedResults =
-    await GitHubV3.getAllReposContributors(repos, verify);
+    await GitHubV3.getAllReposContributors(
+      repositoriesMap.values(),
+      verify
+    );
 
   fetchedResults.forEach((fetchedResult) => {
     const { full_name, data } = fetchedResult;
-    const repository = repos.find(item => item.full_name === full_name);
-    if (repository && data.length) {
-      repository.contributors = data;
-    } else {
-      repository.contributors = [];
-    }
+    const repository = repositoriesMap.get(full_name);
+    repository.contributors = repository && data.length ? data : [];
   });
 
   await ReposModel.setRepositories(login, repos);
@@ -280,21 +271,23 @@ const getOrgRepositories = async (options = {}) => {
   if (repositories && repositories.length) {
     try {
       const contributeds = await getUserContributed(login, verify);
-      const contributedsInOrg = [];
-
+      const contributedsSet = new Set(
+        contributeds.map(item => item.full_name)
+      );
+      const contributedsInOrgMap = new Map();
       repositories.forEach((repository) => {
         if (repository.contributors && repository.contributors.length) {
           results.push(repository);
-        } else if (contributeds.find(item => item.full_name === repository.full_name)) {
-          contributedsInOrg.push(repository);
+        } else if (contributedsSet.has(repository.full_name)) {
+          contributedsInOrgMap.set(repository.full_name, repository);
         }
       });
 
-      if (contributedsInOrg.length) {
+      if (contributedsInOrgMap.size) {
         const reposWithContributors = await getReposContributors({
           verify,
           login: org.login,
-          repos: contributedsInOrg,
+          repositoriesMap: contributedsInOrgMap,
         });
         results.push(...reposWithContributors);
       }
@@ -402,7 +395,7 @@ const fetchUser = async (login, verify) => {
 
 const getUser = async (login, verify) => {
   const user = await UsersModel.findOne(login);
-  if (user) { return user; }
+  if (user) return user;
   return await fetchUser(login, verify);
 };
 
@@ -422,7 +415,7 @@ const getHotmap = async (login) => {
   if (!hotmap
     || !hotmap.datas.length
     || !hotmap.allFetched
-    || (new Date() - hotmap.updateTime) >= 12 * 60 * 60 * 1000) {
+    || (new Date() - hotmap.updateTime) >= 48 * 60 * 60 * 1000 /* two day */) {
     const user = await UsersModel.findOne(login);
     const start = user.created_at;
     hotmap = await fetchHotmap(login, start);

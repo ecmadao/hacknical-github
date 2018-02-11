@@ -8,19 +8,19 @@ export const getReposInYears = (repos, years = 1) => {
   );
 };
 
-export const validateReposList = (repos) => {
-  const reposList = repos
-    .filter(repository => !repository.fork)
-    .map((repository) => {
-      const { name, full_name, created_at, pushed_at } = repository;
-      return {
-        name,
-        pushed_at,
-        created_at,
-        full_name,
-      };
+export const validateReposMap = (repos) => {
+  const map = new Map();
+  for (let repository of repos) {
+    if (repository.fork || map.has(repository.full_name)) continue;
+    const { name, full_name, created_at, pushed_at } = repository;
+    map.set(full_name, {
+      name,
+      pushed_at,
+      created_at,
+      full_name,
     });
-  return reposList;
+  }
+  return map;
 };
 
 const sortCommits = (thisRepos, nextRepos) =>

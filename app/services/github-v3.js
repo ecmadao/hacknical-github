@@ -3,6 +3,7 @@
 import fetch from '../utils/request';
 import logger from '../utils/logger';
 import {
+  SPLIT_NUM,
   splitArray,
   flattenObject,
 } from '../utils/helpers';
@@ -192,21 +193,28 @@ const fetchMultiDatas = async (pages, func,  options = {}) => {
 };
 
 const mapReposToGet = async ({ repositories, params }, func) => {
-  const reposArrays = splitArray(repositories);
+  let index = 0;
   const results = [];
-  for (let i = 0; i < reposArrays.length; i += 1) {
-    const reposArray = reposArrays[i];
-    const promiseList = reposArray.map(
-      item => fetchDatas(func, {
-        verify: params,
-        fullname: item.full_name
-      }));
-
-    const datas = await Promise.all(promiseList);
-    results.push(...datas.map((data, index) => ({
-      data,
-      full_name: reposArray[index].full_name
-    })));
+  let reposArray = [];
+  let reposPromiseArray = [];
+  for (let repository of repositories) {
+    const repositoryPromise = fetchDatas(func, {
+      verify: params,
+      fullname: repository.full_name
+    });
+    if (index === SPLIT_NUM) {
+      const datas = await Promise.all(reposPromiseArray);
+      results.push(...datas.map((data, i) => ({
+        data,
+        full_name: reposArray[i].full_name
+      })));
+      index = 0;
+      reposArray = [];
+      reposPromiseArray = [];
+    }
+    reposArray.push(repository);
+    reposPromiseArray.push(repositoryPromise);
+    index += 1;
   }
 
   return results;

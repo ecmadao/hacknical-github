@@ -1,4 +1,4 @@
-const SPLIT_NUM = 20;
+export const SPLIT_NUM = 20;
 const checkObject = obj =>
   Object.prototype.toString.call(obj) === '[object Object]';
 
