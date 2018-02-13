@@ -15,13 +15,11 @@
       "ns": "geeknical",
       "options": {}
     },
-    "qname-scientific": "github-scientific-local",
-    "qname-prediction": "github-prediction-local",
-    "qname-messenger": "messenger-local"
-  },
-  "services": {
-    "slack": {
-      "url": ""
+    "channels": {
+      "qname-scientific": "github-scientific-local",
+      "qname-prediction": "github-prediction-local",
+      "qname-messenger": "messenger-local",
+      "qname-crawler": "github-crawler-local"
     }
   },
   "app": {

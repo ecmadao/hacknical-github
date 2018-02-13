@@ -3,15 +3,19 @@ import UsersModel from '../../databases/github-users';
 import GitHubV3 from '../../services/github-v3';
 import GitHubV4 from '../../services/github-v4';
 import Helper from '../shared/helper';
-import Refresh from '../shared/refresh';
 import logger from '../../utils/logger';
 import {
   PER_PAGE,
 } from '../../utils/github';
-import SlackMsg from '../../services/slack';
+import {
+  CRAWLER_STATUS,
+  CRAWLER_STATUS_CODE,
+} from '../../utils/data';
 
 const app = config.get('app');
-
+const mqConfig = config.get('mq');
+const crawlerMqName = mqConfig.channels['qname-crawler'];
+const scientificMqName = mqConfig.channels['qname-scientific'];
 
 /* ================== router handler ================== */
 
@@ -57,7 +61,8 @@ const getLogin = async (ctx) => {
   const userInfo = await GitHubV4.getUserByToken(verify);
 
   ctx.mq.sendMessage({
-    message: userInfo.login
+    message: userInfo.login,
+    qname: scientificMqName
   });
   const user = await UsersModel.findOne(userInfo.login);
   if (!user) {
@@ -161,137 +166,51 @@ const getUserOrganizations = async (ctx) => {
   };
 };
 
-const refreshData = async (options = {}) => {
-  const {
-    func,
-    params,
-  } = options;
-
-  try {
-    await func({
-      ...params
-    });
-    return {
-      success: true,
-      result: new Date()
-    };
-  } catch (e) {
-    logger.error(e);
-  }
-  return {
-    success: false,
-    result: {
-      success: false,
-      error: 'Ops! Something broken..'
+const updateUserData = async (ctx) => {
+  const { login } = ctx.params;
+  const { verify } = ctx.request.query;
+  const user = await UsersModel.findOne(login);
+  if (user) {
+    const status = user.status;
+    if (status === CRAWLER_STATUS.PENDING || status === CRAWLER_STATUS.RUNNING) {
+      return ctx.body = {
+        success: true,
+        result: 'User data fetching'
+      };
     }
+  }
+  ctx.mq.sendMessage({
+    message: JSON.stringify({
+      login,
+      verify,
+    }),
+    qname: crawlerMqName
+  });
+
+  ctx.body = {
+    success: true,
+    result: 'User data fetching'
   };
 };
 
-const refreshUser = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-
-  const result = await refreshData({
-    func: Refresh.refreshUser,
-    params: {
-      login,
-      verify,
-    }
-  });
-
-  new SlackMsg(ctx.mq).send({
-    type: 'refresh',
-    data: `User ${login} refreshing`
-  });
-
-  ctx.body = result;
-};
-
-const refreshHotmap = async (ctx) => {
+const getUpdateStatus = async (ctx) => {
   const { login } = ctx.params;
   const user = await UsersModel.findOne(login);
-  const start = user.created_at;
-  const result = await refreshData({
-    func: Refresh.refreshHotmap,
-    params: {
-      login,
-      start,
-    }
-  });
-  ctx.body = result;
-};
-
-const refreshUserRepositories = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-
-  const result = await refreshData({
-    func: Refresh.refreshRepositories,
-    params: {
-      login,
-      verify,
-      perPage: PER_PAGE.REPOS
-    }
-  });
-  ctx.body = result;
-};
-
-const refreshUserCommits = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-
-  const result = await refreshData({
-    func: Refresh.refreshCommits,
-    params: {
-      login,
-      verify
-    }
-  });
-
-  ctx.body = result;
-};
-
-// WARNING: Can only update user who is the token owner
-// Cause can only use GitHub V4 API
-const refreshUserOrganizations = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-
-  const result = await refreshData({
-    func: Helper.updateOrganizations,
-    params: {
-      login,
-      verify
-    }
-  });
-  ctx.body = result;
-};
-
-// WARNING: Can only update user who is the token owner
-// Cause can only use GitHub V4 API
-const refreshUserContributed = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-
-  const result = await refreshData({
-    func: Helper.updateContributed,
-    params: {
-      login,
-      verify
-    }
-  });
-  ctx.body = result;
-};
-
-const getUserUpdateTime = async (ctx) => {
-  const { login } = ctx.params;
-  const findResult = await UsersModel.findOne(login);
-  if (!findResult) {
-    throw new Error('can not find target user');
+  if (!user) {
+    return ctx.body = {
+      success: false,
+    };
   }
+  const {
+    status,
+    lastUpdateTime
+  } = user;
   ctx.body = {
     success: true,
-    result: findResult.lastUpdateTime || findResult.created_at
+    result: {
+      lastUpdateTime,
+      status: CRAWLER_STATUS_CODE[status],
+    },
   };
 };
 
@@ -381,11 +300,6 @@ export default {
   getUserCommits,
   getUserOrganizations,
   /* ====== */
-  refreshUser,
-  refreshHotmap,
-  refreshUserRepositories,
-  refreshUserCommits,
-  refreshUserOrganizations,
-  refreshUserContributed,
-  getUserUpdateTime,
+  updateUserData,
+  getUpdateStatus,
 };

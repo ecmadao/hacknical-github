@@ -9,8 +9,8 @@ const verifyMiddlwware = () => async (ctx, next) => {
 
   if (appName) {
     const appToken = /\/api\/github\/login/.test(ctx.request.url)
-    ? ''
-    : app[appName].token;
+      ? ''
+      : app[appName].token;
     const token = ctx.request.query.token || ctx.request.body.token || appToken;
     const headers = { 'User-Agent': appName };
 

@@ -96,41 +96,17 @@ router.get(
   params.checkQuery(['verify']),
   GitHub.getUserOrganizations
 );
-router.get(
-  '/:login/updateTime',
-  GitHub.getUserUpdateTime
+
+// update
+router.put(
+  '/:login/update',
+  params.checkQuery(['verify']),
+  GitHub.updateUserData
 );
 
-// refresh
 router.get(
-  '/:login/refresh',
-  params.checkQuery(['verify']),
-  GitHub.refreshUser
-);
-router.get(
-  '/:login/hotmap/refresh',
-  params.checkQuery(['verify']),
-  GitHub.refreshHotmap
-);
-router.get(
-  '/:login/repositories/refresh',
-  params.checkQuery(['verify']),
-  GitHub.refreshUserRepositories
-);
-router.get(
-  '/:login/commits/refresh',
-  params.checkQuery(['verify']),
-  GitHub.refreshUserCommits
-);
-router.get(
-  '/:login/organizations/refresh',
-  params.checkQuery(['verify']),
-  GitHub.refreshUserOrganizations
-);
-router.get(
-  '/:login/contributed/refresh',
-  params.checkQuery(['verify']),
-  GitHub.refreshUserContributed
+  '/:login/update/status',
+  GitHub.getUpdateStatus
 );
 
 module.exports = router;
