@@ -14,44 +14,12 @@ const getRepositoryCommits = async (login, name) => {
   };
 };
 
-const setRepositoryCommits = async (login, data) => {
-  if (!data.name) return;
-  const {
-    name,
-    commits,
-    pushed_at,
-    created_at,
-    totalCommits,
-  } = data;
-  await clearUserCommits({
-    name,
-    login,
-  });
-  await GitHubCommits.create({
-    name,
-    login,
-    commits,
-    pushed_at,
-    created_at,
-    totalCommits,
-  });
-};
-
-const setCommits = async (login, datas) => {
-  await Promise.all(datas.map(async (data) => {
-    await setRepositoryCommits(login, data);
-  }));
-  return { success: true };
-};
-
 const getCommits = async (login) => {
   const findResults = await GitHubCommits.find({ login });
   return findResults;
 };
 
 export default {
-  setCommits,
   getCommits,
   getRepositoryCommits,
-  setRepositoryCommits
 };
