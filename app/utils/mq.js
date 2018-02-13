@@ -3,7 +3,6 @@ import config from 'config';
 import logger from './logger';
 
 const mqConfig = config.get('mq');
-const defaultMqName = mqConfig['qname-scientific'];
 
 const wrap = (func, ...params) =>
   new Promise((resolve, reject) => {
@@ -20,16 +19,16 @@ class MessageQueue {
     logger.info(`[MQ:CONNECT][${initOptions.host}:${initOptions.port}]`);
   }
 
-  createQueue(qname = defaultMqName) {
+  createQueue(qname) {
     return wrap(this.mq.createQueue, { qname });
   }
 
   sendMessage(options = {}) {
     const {
       message = '',
-      qname = defaultMqName,
+      qname = '',
     } = options;
-    if (!message) return;
+    if (!message || !qname) return;
     logger.info(`[MQ:SEND][${qname}:${message}]`);
     return wrap(this.mq.sendMessage, {
       qname,

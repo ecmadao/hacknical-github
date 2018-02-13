@@ -13,6 +13,7 @@ import mq from '../middlewares/mq';
 
 const appKey = config.get('appKey');
 const port = config.get('port');
+
 const app = new Koa();
 app.keys = [appKey];
 

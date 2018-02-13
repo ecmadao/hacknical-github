@@ -3,7 +3,7 @@ import logger from '../../utils/logger';
 import Helper from '../shared/helper';
 
 const mqConfig = config.get('mq');
-const predictionMqName = mqConfig['qname-prediction'];
+const predictionMqName = mqConfig.channels['qname-prediction'];
 
 const updateOne = async (col, doc, obj) => {
   try {
@@ -152,29 +152,33 @@ const getPredictions = async (ctx) => {
       fullName,
       liked = 0,
     } = prediction;
-    const repository = await Helper.getRepository(fullName, verify);
-    const {
-      name,
-      owner,
-      html_url,
-      language,
-      full_name,
-      description,
-      forks_count,
-      stargazers_count,
-    } = repository;
-    results.push({
-      name,
-      liked,
-      owner,
-      html_url,
-      language,
-      full_name,
-      description,
-      forks_count,
-      stargazers_count,
-      login: repository.login,
-    });
+    try {
+      const repository = await Helper.getRepository(fullName, verify);
+      const {
+        name,
+        owner,
+        html_url,
+        language,
+        full_name,
+        description,
+        forks_count,
+        stargazers_count,
+      } = repository;
+      results.push({
+        name,
+        liked,
+        owner,
+        html_url,
+        language,
+        full_name,
+        description,
+        forks_count,
+        stargazers_count,
+        login: repository.login,
+      });
+    } catch (e) {
+      logger.error(e);
+    }
   }));
   ctx.body = {
     success: true,

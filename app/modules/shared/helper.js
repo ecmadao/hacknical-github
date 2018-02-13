@@ -44,32 +44,6 @@ const fetchRepositories = async (options = {}) => {
   return multiRepos;
 };
 
-const updateContributed = async (options) => {
-  const {
-    login,
-    verify,
-    perPage = PER_PAGE.REPOS,
-  } = options;
-
-  const multiRepos =
-    await GitHubV4.getPersonalContributedRepos(login, verify, perPage);
-
-  const userContributeds = multiRepos.filter(
-    repository => repository.owner.login !== login
-  );
-  const contributions = userContributeds.map(
-    repository => repository.full_name
-  );
-
-  await Promise.all(userContributeds.map(async (repository) => {
-    const owner = repository.owner.login || repository.full_name.split('/')[0];
-    await ReposModel.setRepository(owner, repository);
-  }));
-
-  await UsersInfoModal.updateUserContributions(login, contributions);
-  return userContributeds;
-};
-
 const getRepository = async (fullname, verify, required = []) => {
   const findResult = await ReposModel.getRepository(fullname);
   if (!findResult || required.some(key => !findResult[key] || !findResult[key].length)) {
@@ -106,26 +80,12 @@ const getRepositories = async (fullnames, verify) => {
 
 const getUserRepositories = async (login, verify, fetch) => {
   const findResult = await ReposModel.getUserRepositories(login);
-  if (findResult.length) return findResult;
-
-  return await fetchRepositories({
-    login,
-    verify,
-    fetch,
-    perPage: PER_PAGE.REPOS,
-  });
+  return findResult;
 };
 
 const getUserContributed = async (login, verify) => {
   const userInfo = await UsersInfoModal.findOne(login);
-  const { contributions } = userInfo;
-  if (!contributions || !contributions.length) {
-    return await updateContributed({
-      login,
-      verify,
-      perPage: PER_PAGE.REPOS
-    });
-  }
+  const { contributions = [] } = userInfo;
   const repositories = [];
 
   await Promise.all(contributions.map(async (contribution) => {
@@ -185,43 +145,9 @@ const getUserStarred = async (options) => {
 /**
  * =============== commits ===============
  */
-const updateCommits = async ({ login, verify, repositories }) => {
-  const reposMap = validateReposMap(repositories);
-  try {
-    const fetchedResults =
-      await GitHubV3.getAllReposYearlyCommits(reposMap.values(), verify);
-    const results = fetchedResults.map((fetchedResult) => {
-      const { full_name, data } = fetchedResult;
-      const repository = reposMap.get(full_name);
-      if (!repository || !data.length) return {};
-      const { name, created_at, pushed_at } = repository;
-      const totalCommits = data.reduce(
-        (pre, next, i) => (i === 0 ? 0 : pre) + next.total, 0
-      );
-      return {
-        name,
-        pushed_at,
-        created_at,
-        totalCommits,
-        commits: data,
-      };
-    });
-    const sortResult = sortByCommits(results);
-    if (sortResult && sortResult.length) {
-      await CommitsModel.setCommits(login, sortResult);
-    }
-    return sortResult;
-  } catch (err) {
-    logger.error(err);
-    return [];
-  }
-};
-
 const getCommits = async (login, verify) => {
   const findCommits = await CommitsModel.getCommits(login);
-  if (findCommits.length) return findCommits;
-  const repositories = await getUserRepositories(login, verify);
-  return await updateCommits({ login, verify, repositories });
+  return findCommits;
 };
 
 /**
@@ -363,40 +289,12 @@ const getOrganizations = async (login, verify) => {
   return results;
 };
 
-const updateOrganizations = async ({ login, verify }) => {
-  try {
-    const userOrgs = await fetchUserOrganizations(login, verify);
-
-    await Promise.all(userOrgs.map(async (userOrg) => {
-      const orgLogin = userOrg.login;
-      const org = await GitHubV3.getOrg(orgLogin, verify);
-      await OrgsModel.update(org);
-      await getOrgRepositories({
-        org,
-        login,
-        verify,
-      });
-    }));
-  } catch (err) {
-    logger.error(err);
-  }
-};
-
 /*
  * =============== user ===============
  */
-const fetchUser = async (login, verify) => {
-  const userInfo = await GitHubV4.getUser(login, verify);
-  if (!userInfo) return null;
-
-  const addResut = await UsersModel.createGitHubUser(userInfo);
-  return addResut.result;
-};
-
 const getUser = async (login, verify) => {
   const user = await UsersModel.findOne(login);
-  if (user) return user;
-  return await fetchUser(login, verify);
+  return user;
 };
 
 /*
@@ -429,19 +327,15 @@ export default {
   getUser,
   // hotmap
   getHotmap,
-  fetchHotmap,
   // orgs
   getOrganizations,
-  updateOrganizations,
   // commits
   getCommits,
-  updateCommits,
   // repos
   getRepository,
   getRepositories,
   getUserStarred,
   getUserRepositories,
-  updateContributed,
   getUserContributed,
   getRepositoryReadme,
 };
