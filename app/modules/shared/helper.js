@@ -153,6 +153,8 @@ const getCommits = async (login, verify) => {
 /**
  * =============== orgs ===============
  */
+const getReposByFullnames = async repositoriesMap =>
+  await ReposModel.getRepositories([...repositoriesMap.values()]);
 
 const getOrgRepositories = async (options = {}) => {
   const {
@@ -175,11 +177,21 @@ const getOrgRepositories = async (options = {}) => {
   if (repositories && repositories.length) {
     try {
       const contributeds = await getUserContributed(login, verify);
+      const contributedsSet = new Set(
+        contributeds.map(item => item.full_name)
+      );
+      const contributedsInOrgSet = new Set();
+
       repositories.forEach((repository) => {
         if (repository.contributors && repository.contributors.length) {
           results.push(repository);
+        } else if (contributedsSet.has(repository.full_name)) {
+          contributedsInOrgSet.add(repository.full_name);
         }
       });
+      if (contributedsInOrgSet.size) {
+        results.push(...await getReposByFullnames(contributedsInOrgSet));
+      }
     } catch (err) {
       logger.error(err);
     }
