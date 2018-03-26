@@ -183,6 +183,7 @@ const updateUserData = async (ctx) => {
     message: JSON.stringify({
       login,
       verify,
+      date: new Date().toString()
     }),
     qname: crawlerMqName
   });

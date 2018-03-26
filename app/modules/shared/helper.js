@@ -153,28 +153,6 @@ const getCommits = async (login, verify) => {
 /**
  * =============== orgs ===============
  */
-const getReposContributors = async (options = {}) => {
-  const {
-    login,
-    verify,
-    repositoriesMap,
-  } = options;
-
-  const fetchedResults =
-    await GitHubV3.getAllReposContributors(
-      repositoriesMap.values(),
-      verify
-    );
-
-  fetchedResults.forEach((fetchedResult) => {
-    const { full_name, data } = fetchedResult;
-    const repository = repositoriesMap.get(full_name);
-    repository.contributors = repository && data.length ? data : [];
-  });
-
-  await ReposModel.setRepositories(login, repos);
-  return repos;
-};
 
 const getOrgRepositories = async (options = {}) => {
   const {
@@ -197,26 +175,11 @@ const getOrgRepositories = async (options = {}) => {
   if (repositories && repositories.length) {
     try {
       const contributeds = await getUserContributed(login, verify);
-      const contributedsSet = new Set(
-        contributeds.map(item => item.full_name)
-      );
-      const contributedsInOrgMap = new Map();
       repositories.forEach((repository) => {
         if (repository.contributors && repository.contributors.length) {
           results.push(repository);
-        } else if (contributedsSet.has(repository.full_name)) {
-          contributedsInOrgMap.set(repository.full_name, repository);
         }
       });
-
-      if (contributedsInOrgMap.size) {
-        const reposWithContributors = await getReposContributors({
-          verify,
-          login: org.login,
-          repositoriesMap: contributedsInOrgMap,
-        });
-        results.push(...reposWithContributors);
-      }
     } catch (err) {
       logger.error(err);
     }
