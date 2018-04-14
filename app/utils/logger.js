@@ -1,19 +1,16 @@
+
 import log4js from 'log4js';
 import config from 'config';
 
 const appName = config.get('appName');
+const logConfig = config.get('log');
 
 const logger = log4js.getLogger(`[${appName.toUpperCase()}]`);
 log4js.configure({
   appenders: [
-    { type: 'console' }
+    logConfig.appender
   ]
 });
-
-if (!config.logFile) {
-  logger.setLevel('DEBUG');
-} else {
-  logger.setLevel('INFO');
-}
+logger.setLevel(logConfig.level);
 
 export default logger;

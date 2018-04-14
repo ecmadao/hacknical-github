@@ -12,7 +12,7 @@ import {
   CRAWLER_STATUS_CODE,
 } from '../../utils/data';
 
-const app = config.get('app');
+const app = config.get('github');
 const mqConfig = config.get('mq');
 const crawlerMqName = mqConfig.channels['qname-crawler'];
 const scientificMqName = mqConfig.channels['qname-scientific'];
@@ -48,7 +48,10 @@ const getVerify = async (ctx) => {
 
 const getToken = async (ctx) => {
   const { code, verify } = ctx.request.query;
+  logger.debug(`code: ${code}, verify: ${verify}`);
   const result = await GitHubV3.getToken(code, verify);
+  logger.debug(result);
+
   const token = result.access_token;
   ctx.body = {
     success: true,
@@ -59,6 +62,7 @@ const getToken = async (ctx) => {
 const getLogin = async (ctx) => {
   const { verify } = ctx.request.query;
   const userInfo = await GitHubV4.getUserByToken(verify);
+  logger.debug(userInfo);
 
   ctx.mq.sendMessage({
     message: userInfo.login,

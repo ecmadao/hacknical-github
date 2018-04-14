@@ -1,7 +1,7 @@
 import config from 'config';
 import logger from '../utils/logger';
 
-const app = config.get('app');
+const app = config.get('github');
 
 const verifyMiddlwware = () => async (ctx, next) => {
   const { appName } = ctx.state;

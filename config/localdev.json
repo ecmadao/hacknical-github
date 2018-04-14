@@ -3,7 +3,6 @@
   "port": "5002",
   "appKey": "hacknical-github-local",
   "appName": "hacknical-github-local",
-  "logFile": null,
   "database": {
     "github": "mongodb://localhost:27017/hacknical-api",
     "scientific": "mongodb://localhost:27017/hacknical-scientific"
@@ -22,7 +21,7 @@
       "qname-crawler": "github-crawler-local"
     }
   },
-  "app": {
+  "github": {
     "hacknical-local": {
       "clientId": "e7fa43f07a9c1cc07663",
       "clientSecret": "1fff26cf75c66dcc02caa7e0eef7170a9940aa3c",

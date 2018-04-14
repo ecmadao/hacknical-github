@@ -7,6 +7,12 @@
     "github": "",
     "scientific": ""
   },
-  "app": {},
-  "timeouts": [8000, 10000, 12000, 15000]
+  "github": {},
+  "timeouts": [8000, 10000, 12000, 15000],
+  "log": {
+    "appender": {
+      "type": "console"
+    },
+    "level": "DEBUG"
+  }
 }

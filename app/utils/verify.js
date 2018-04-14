@@ -1,6 +1,6 @@
 import config from 'config';
 
-const app = config.get('app');
+const app = config.get('github');
 const validateApps = Object.keys(app);
 
 const verifyApp = (appName) => {

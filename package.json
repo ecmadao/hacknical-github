@@ -13,7 +13,7 @@
   },
   "betterScripts": {
     "pro:app:start": {
-      "command": "forever start --killSignal=SIGTERM -a -l /home/ecmadao/log/hacknical-github/forever_log -e /home/ecmadao/log/hacknical-github/error_log dist/bin/server.js",
+      "command": "forever start --killSignal=SIGTERM -a -l /var/log/ecmadao/hacknical-github/forever_log -e /var/log/ecmadao/hacknical-github/error_log dist/bin/server.js",
       "env": {
         "NODE_ENV": "production"
       }

@@ -16,6 +16,4 @@ fs.readdirSync(__dirname)
     router.use(route.routes(), route.allowedMethods());
   });
 
-router.get('/', async ctx => (ctx.body = 'welcome to hacknical GitHub server!'));
-
 export default router;
