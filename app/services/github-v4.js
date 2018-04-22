@@ -240,7 +240,7 @@ const getRepository = async (fullname, verify) => {
     repository(owner: "${owner}", name: "${names.join('/')}") ${REPOSITORY_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  return adapter.repository(result.repository);
+  return result ? adapter.repository(result.repository) : null;
 };
 
 const getOrg = async (login, verify) => {
@@ -248,7 +248,7 @@ const getOrg = async (login, verify) => {
     organization(login: "${login}") ${ORG_QUERY}
   }`;
   const result = await baseFetch(query, verify);
-  return adapter.organization(result.organization);
+  return result ? adapter.organization(result.organization) : null;
 };
 
 const getUserStarredCount = async (login, verify) => {

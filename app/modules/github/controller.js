@@ -48,7 +48,7 @@ const getVerify = async (ctx) => {
 
 const getToken = async (ctx) => {
   const { code, verify } = ctx.request.query;
-  logger.debug(`code: ${code}, verify: ${verify}`);
+  logger.debug(`code: ${code}, verify: ${JSON.stringify(verify)}`);
   const result = await GitHubV3.getToken(code, verify);
   logger.debug(result);
 
@@ -173,16 +173,7 @@ const getUserOrganizations = async (ctx) => {
 const updateUserData = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
-  const user = await UsersModel.findOne(login);
-  if (user) {
-    const status = user.status;
-    if (status === CRAWLER_STATUS.PENDING || status === CRAWLER_STATUS.RUNNING) {
-      return ctx.body = {
-        success: true,
-        result: 'User data fetching'
-      };
-    }
-  }
+
   ctx.mq.sendMessage({
     message: JSON.stringify({
       login,

@@ -19,6 +19,8 @@ const fetchRepository = async (fullname, verify, repository = {}) => {
   delete repository._id;
 
   const getReposResult = await GitHubV4.getRepository(fullname, verify);
+  if (!getReposResult) return null;
+
   const data = Object.assign({}, repository, getReposResult);
   const login = data.owner.login;
 
@@ -72,7 +74,7 @@ const getRepositories = async (fullnames, verify) => {
   await Promise.all(fullnames.map(
     async (fullname) => {
       const result = await getRepository(fullname, verify);
-      results.push(result);
+      result && results.push(result);
     }
   ));
   return results;
@@ -91,14 +93,18 @@ const getUserContributed = async (login, verify) => {
   await Promise.all(contributions.map(async (contribution) => {
     const fullname = contribution;
     const repository = await getRepository(fullname, verify);
-    repositories.push(repository);
+    repository && repositories.push(repository);
   }));
   return repositories;
 };
 
 const getStarredRepositories = async (starred, verify) => {
-  const repositories = await Promise.all(starred.map(
-    async fullname => await getRepository(fullname, verify)
+  const repositories = [];
+  await Promise.all(starred.map(
+    async (fullname) => {
+      const result = await getRepository(fullname, verify);
+      result && repositories.push(result);
+    }
   ));
 
   return {

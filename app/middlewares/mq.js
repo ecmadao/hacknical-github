@@ -7,7 +7,7 @@ const mqChannels = config.get('mq.channels');
 
 const mqMiddleware = (options = {}) => {
   if (!mq) mq = getMQ(options);
-  for (const key in mqChannels) {
+  for (const key of Object.keys(mqChannels)) {
     const qName = mqChannels[key];
     try {
       mq.createQueue(qName);
