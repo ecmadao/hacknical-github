@@ -174,6 +174,11 @@ const updateUserData = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
 
+  await UsersModel.updateUser({
+    login,
+    status: CRAWLER_STATUS.PENDING
+  });
+
   ctx.mq.sendMessage({
     message: JSON.stringify({
       login,
@@ -201,6 +206,7 @@ const getUpdateStatus = async (ctx) => {
     status,
     lastUpdateTime
   } = user;
+
   ctx.body = {
     success: true,
     result: {

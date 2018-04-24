@@ -23,11 +23,9 @@ const getGitHubInfo = userInfo => ({
 const findUser = async login => await GitHubUsers.findOne({ login });
 
 const updateUser = async (userInfo) => {
-  const newGitHubInfo = getGitHubInfo(userInfo);
   const lastUpdateTime = new Date();
-  newGitHubInfo.lastUpdateTime = lastUpdateTime;
   const user = await findUser(userInfo.login);
-  Object.assign(user, newGitHubInfo);
+  Object.assign(user, userInfo, { lastUpdateTime });
   await user.save();
   return {
     success: true,
