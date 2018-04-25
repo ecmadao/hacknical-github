@@ -4,6 +4,7 @@ export const CRAWLER_STATUS = {
   SUCCEED: 'succeed',
   FAILED: 'failed',
   INITIAL: 'initial',
+  FREQUENTLY: 'frequently',
 };
 
 export const CRAWLER_STATUS_CODE = {
@@ -12,4 +13,5 @@ export const CRAWLER_STATUS_CODE = {
   [CRAWLER_STATUS.PENDING]: 2,
   [CRAWLER_STATUS.RUNNING]: 3,
   [CRAWLER_STATUS.FAILED]: 4,
+  [CRAWLER_STATUS.FREQUENTLY]: 5,
 };
