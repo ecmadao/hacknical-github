@@ -174,7 +174,7 @@ const updateUserData = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
 
-  await UsersModel.updateUser({
+  await UsersModel.updateUserInfo({
     login,
     status: CRAWLER_STATUS.PENDING
   });
@@ -197,15 +197,17 @@ const updateUserData = async (ctx) => {
 const getUpdateStatus = async (ctx) => {
   const { login } = ctx.params;
   const user = await UsersModel.findOne(login);
-  if (!user) {
-    return ctx.body = {
-      success: false,
-    };
-  }
   const {
     status,
     lastUpdateTime
   } = user;
+
+  if (status === CRAWLER_STATUS.SUCCEED) {
+    await UsersModel.updateUserInfo({
+      login,
+      status: CRAWLER_STATUS.INITIAL
+    });
+  }
 
   ctx.body = {
     success: true,
