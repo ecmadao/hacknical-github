@@ -5,9 +5,6 @@ import GitHubV4 from '../../services/github-v4';
 import Helper from '../shared/helper';
 import logger from '../../utils/logger';
 import {
-  PER_PAGE,
-} from '../../utils/github';
-import {
   CRAWLER_STATUS,
   CRAWLER_STATUS_CODE,
 } from '../../utils/data';

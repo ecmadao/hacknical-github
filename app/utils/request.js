@@ -51,21 +51,15 @@ export const baseFetch = async (options, timeout = retryTimes, handler = handleB
   return null;
 };
 
-export default {
-  get: (options, timeout) => {
-    options.method = 'GET';
-    return baseFetch(options, timeout);
-  },
-  post: (options, timeout) => {
-    options.method = 'POST';
-    return baseFetch(options, timeout);
-  },
-  put: (options, timeout) => {
-    options.method = 'PUT';
-    return baseFetch(options, timeout);
-  },
-  delete: (options, timeout) => {
-    options.method = 'DELETE';
-    return baseFetch(options, timeout);
-  },
+const handler = {
+  get: (target, name) => {
+    return (...args) => {
+      const [options, timeout] = args;
+      options.method = name.toUpperCase();
+      return baseFetch(options, timeout);
+    };
+  }
 };
+
+const proxy = new Proxy({}, handler);
+export default proxy;

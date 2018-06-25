@@ -310,7 +310,7 @@ const getUserContributed = async ({ login, verify, after = null, first = 30 }) =
     verify,
     after,
     first,
-    what: 'contributedRepositories'
+    what: 'repositoriesContributedTo'
   });
 
 const getPersonalPubRepos = async (login, verify, perPage) =>

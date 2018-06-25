@@ -31,20 +31,6 @@ const fetchRepository = async (fullname, verify, repository = {}) => {
 /**
  * =============== repos ===============
  */
-const fetchRepositories = async (options = {}) => {
-  const {
-    login,
-    verify,
-    perPage,
-    fetch = GitHubV4.getPersonalPubRepos,
-  } = options;
-
-  const multiRepos =
-    await fetch(login, verify, perPage);
-
-  await ReposModel.setRepositories(login, multiRepos);
-  return multiRepos;
-};
 
 const getRepository = async (fullname, verify, required = []) => {
   const findResult = await ReposModel.getRepository(fullname);
