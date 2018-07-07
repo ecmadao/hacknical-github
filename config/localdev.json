@@ -62,11 +62,5 @@
       "publicKey": "8c8f46bfc5",
       "secretKey": "8afb114582821dcf43f7cb0984bce1"
     }
-  ],
-  "opbeat": {
-    "appId": "",
-    "organizationId": "",
-    "secretToken": "",
-    "active": false
-  }
+  ]
 }
