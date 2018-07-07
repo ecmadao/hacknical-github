@@ -2,7 +2,7 @@
   "name": "hacknical-github",
   "version": "0.0.5",
   "description": "GitHub data server for hacknical & jarvim",
-  "main": "dist/bin/server.js",
+  "main": "dist/index.js",
   "scripts": {
     "build-app": "babel app -d dist --copy-files",
     "start-dev": "bnr local:app:start",
@@ -13,19 +13,19 @@
   },
   "betterScripts": {
     "pro:app:start": {
-      "command": "forever start --killSignal=SIGTERM -a -l /var/log/ecmadao/hacknical-github/forever_log -e /var/log/ecmadao/hacknical-github/error_log dist/bin/server.js",
+      "command": "forever start --killSignal=SIGTERM -a -l /var/log/ecmadao/hacknical-github/forever_log -e /var/log/ecmadao/hacknical-github/error_log dist/index.js",
       "env": {
         "NODE_ENV": "production"
       }
     },
     "pro:app:stop": {
-      "command": "forever stop dist/bin/server.js",
+      "command": "forever stop dist/index.js",
       "env": {
         "NODE_ENV": "production"
       }
     },
     "local:app:start": {
-      "command": "./node_modules/.bin/nodemon app/index.js",
+      "command": "./node_modules/.bin/nodemon app/bin/index.js",
       "env": {
         "DEBUG": "hacknical-github-local*",
         "NODE_ENV": "localdev"

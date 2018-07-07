@@ -135,7 +135,6 @@ const setPredictionFeedback = async (ctx) => {
 
 const getPredictions = async (ctx) => {
   const { login } = ctx.params;
-  const { verify } = ctx.request.query;
   const predictionsCol = ctx.db.collection('predictions');
 
   const result = await predictionsCol.findOne({ login });
@@ -153,7 +152,7 @@ const getPredictions = async (ctx) => {
       liked = 0,
     } = prediction;
     try {
-      const repository = await Helper.getRepository(fullName, verify);
+      const repository = await Helper.getRepository(fullName);
       const {
         name,
         owner,

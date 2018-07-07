@@ -7,7 +7,7 @@ import logger from '../../utils/logger';
 import {
   CRAWLER_STATUS,
   CRAWLER_STATUS_CODE,
-} from '../../utils/data';
+} from '../../utils/constant';
 
 const app = config.get('github');
 const mqConfig = config.get('mq');
@@ -85,8 +85,7 @@ const getLogin = async (ctx) => {
 
 const getUser = async (ctx) => {
   const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-  const user = await Helper.getUser(login, verify);
+  const user = await Helper.getUser(login);
   ctx.body = {
     success: true,
     result: user,
@@ -95,8 +94,10 @@ const getUser = async (ctx) => {
 
 const getUserRepositories = async (ctx) => {
   const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-  const repos = await Helper.getUserRepositories(login, verify);
+  const repos = await Helper.getUserRepositories(login);
+
+  console.log(' ====== getUserRepositories ====== ')
+  console.log(repos)
 
   ctx.body = {
     success: true,
@@ -106,8 +107,7 @@ const getUserRepositories = async (ctx) => {
 
 const getUserContributed = async (ctx) => {
   const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-  const repos = await Helper.getUserContributed(login, verify);
+  const repos = await Helper.getUserContributed(login);
 
   ctx.body = {
     success: true,
@@ -117,18 +117,7 @@ const getUserContributed = async (ctx) => {
 
 const getUserStarred = async (ctx) => {
   const { login } = ctx.params;
-  const {
-    verify,
-    perPage,
-    after = null,
-  } = ctx.request.query;
-
-  const result = await Helper.getUserStarred({
-    after,
-    login,
-    verify,
-    perPage,
-  });
+  const result = await Helper.getUserStarred(login);
 
   ctx.body = {
     result,
@@ -148,8 +137,7 @@ const getUserStarredCount = async (ctx) => {
 
 const getUserCommits = async (ctx) => {
   const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-  const commits = await Helper.getCommits(login, verify);
+  const commits = await Helper.getCommits(login);
 
   ctx.body = {
     success: true,
@@ -159,8 +147,7 @@ const getUserCommits = async (ctx) => {
 
 const getUserOrganizations = async (ctx) => {
   const { login } = ctx.params;
-  const { verify } = ctx.query;
-  const organizations = await Helper.getOrganizations(login, verify);
+  const organizations = await Helper.getOrganizations(login);
   ctx.body = {
     success: true,
     result: organizations,
@@ -217,14 +204,10 @@ const getUpdateStatus = async (ctx) => {
 
 const getRepository = async (ctx) => {
   const {
-    verify,
     fullname,
-    required = '',
   } = ctx.request.query;
 
-  const repository = await Helper.getRepository(
-    fullname, verify, required.split(',')
-  );
+  const repository = await Helper.getRepository(fullname);
   ctx.body = {
     success: true,
     result: repository,
@@ -233,11 +216,10 @@ const getRepository = async (ctx) => {
 
 const getRepositoryReadme = async (ctx) => {
   const {
-    verify,
     fullname,
   } = ctx.request.query;
 
-  const data = await Helper.getRepositoryReadme(fullname, verify);
+  const data = await Helper.getRepositoryReadme(fullname);
 
   ctx.body = {
     success: true,

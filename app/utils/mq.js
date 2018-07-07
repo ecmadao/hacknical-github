@@ -1,4 +1,4 @@
-import RedisSMQ from 'rsmq';
+import RedisMQ from 'rsmq';
 import config from 'config';
 import logger from './logger';
 
@@ -15,7 +15,7 @@ const wrap = (func, ...params) =>
 class MessageQueue {
   constructor(options = {}) {
     const initOptions = Object.assign({}, mqConfig.config, options);
-    this.mq = new RedisSMQ(initOptions);
+    this.mq = new RedisMQ(initOptions);
     logger.info(`[MQ:CONNECT][${initOptions.host}:${initOptions.port}]`);
   }
 

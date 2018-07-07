@@ -1,5 +1,5 @@
 import mongoose from '../mongoose/index';
-import { CRAWLER_STATUS } from '../../utils/data';
+import { CRAWLER_STATUS } from '../../utils/constant';
 
 const Schema = mongoose.Schema;
 
@@ -22,7 +22,7 @@ const GitHubUsersSchema = new Schema({
   lastUpdateTime: Date,
   status: {
     type: String,
-    default: CRAWLER_STATUS.FAILED
+    default: CRAWLER_STATUS.INITIAL
   },
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
