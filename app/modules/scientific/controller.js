@@ -94,9 +94,15 @@ const setPredictionFeedback = async (ctx) => {
   const feedback = Number(liked);
 
   const predictionsCol = ctx.db.collection('predictions');
-  const prediction = await predictionsCol.findOne({ login });
   const usersCol = ctx.db.collection('users');
-  const user = await usersCol.findOne({ login });
+
+  const [
+    user,
+    prediction,
+  ] = await Promise.all([
+    usersCol.findOne({ login }),
+    predictionsCol.findOne({ login })
+  ]);
 
   const { predictions } = prediction;
   const index = predictions.findIndex(item => item.fullName === fullName);

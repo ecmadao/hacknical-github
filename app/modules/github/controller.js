@@ -96,9 +96,6 @@ const getUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const repos = await Helper.getUserRepositories(login);
 
-  console.log(' ====== getUserRepositories ====== ')
-  console.log(repos)
-
   ctx.body = {
     success: true,
     result: repos
@@ -182,15 +179,26 @@ const getUpdateStatus = async (ctx) => {
   const { login } = ctx.params;
   const user = await UsersModel.findOne(login);
   const {
-    status,
+    startUpdateAt,
     lastUpdateTime
   } = user;
+
+  let { status } = user;
 
   if (status === CRAWLER_STATUS.SUCCEED) {
     await UsersModel.updateUserInfo({
       login,
       status: CRAWLER_STATUS.INITIAL
     });
+  } else if (startUpdateAt) {
+    // 10 min ttl
+    if (new Date() - new Date(startUpdateAt) >= 10 * 60 * 1000) {
+      status = CRAWLER_STATUS.SUCCEED;
+      await UsersModel.updateUserInfo({
+        login,
+        status: CRAWLER_STATUS.INITIAL
+      });
+    }
   }
 
   ctx.body = {
@@ -206,8 +214,8 @@ const getRepository = async (ctx) => {
   const {
     fullname,
   } = ctx.request.query;
-
   const repository = await Helper.getRepository(fullname);
+
   ctx.body = {
     success: true,
     result: repository,
@@ -218,7 +226,6 @@ const getRepositoryReadme = async (ctx) => {
   const {
     fullname,
   } = ctx.request.query;
-
   const data = await Helper.getRepositoryReadme(fullname);
 
   ctx.body = {
