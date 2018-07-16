@@ -24,6 +24,7 @@ const GitHubUsersSchema = new Schema({
     type: String,
     default: CRAWLER_STATUS.INITIAL
   },
+  startUpdateAt: Date
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
