@@ -142,6 +142,16 @@ const getUserCommits = async (ctx) => {
   };
 };
 
+const getUserLanguages = async (ctx) => {
+  const { login } = ctx.params;
+  const languages = await Helper.getLanguages(login);
+
+  ctx.body = {
+    success: true,
+    result: languages
+  };
+};
+
 const getUserOrganizations = async (ctx) => {
   const { login } = ctx.params;
   const organizations = await Helper.getOrganizations(login);
@@ -276,18 +286,19 @@ export default {
   getToken,
   getVerify,
   /* ====== */
-  getLogin,
   getUser,
+  getLogin,
   getRepository,
-  getRepositoryReadme,
   starRepository,
   unstarRepository,
+  getRepositoryReadme,
   /* ====== */
-  getUserRepositories,
-  getUserContributed,
   getUserStarred,
-  getUserStarredCount,
   getUserCommits,
+  getUserLanguages,
+  getUserContributed,
+  getUserStarredCount,
+  getUserRepositories,
   getUserOrganizations,
   /* ====== */
   updateUserData,

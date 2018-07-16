@@ -92,6 +92,11 @@ router.get(
   GitHub.getUserCommits
 );
 router.get(
+  '/:login/languages',
+  params.checkQuery(['verify']),
+  GitHub.getUserLanguages
+);
+router.get(
   '/:login/organizations',
   params.checkQuery(['verify']),
   GitHub.getUserOrganizations

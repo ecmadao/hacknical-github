@@ -68,6 +68,14 @@ const getCommits = async login =>
   await CommitsModel.getCommits(login);
 
 /**
+ * =============== languages ===============
+ */
+const getLanguages = async (login) => {
+  const userInfo = await UsersInfoModal.findOne(login);
+  return userInfo.languages || {};
+};
+
+/**
  * =============== orgs ===============
  */
 const getReposByFullnames = async repositoriesMap =>
@@ -192,11 +200,13 @@ export default {
   getOrganizations,
   // commits
   getCommits,
+  // languages
+  getLanguages,
   // repos
   getRepository,
-  getRepositories,
   getUserStarred,
-  getUserRepositories,
+  getRepositories,
   getUserContributed,
   getRepositoryReadme,
+  getUserRepositories,
 };
