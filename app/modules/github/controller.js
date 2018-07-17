@@ -7,6 +7,7 @@ import logger from '../../utils/logger';
 import {
   CRAWLER_STATUS,
   CRAWLER_STATUS_CODE,
+  CRAWLER_STATUS_TEXT,
 } from '../../utils/constant';
 
 const app = config.get('github');
@@ -92,6 +93,21 @@ const getUser = async (ctx) => {
   };
 };
 
+const updateUser = async (ctx) => {
+  const { login } = ctx.params;
+  const { data } = ctx.request.body;
+
+  if (data.status !== undefined && !Number.isNaN(data.status)) {
+    data.status = CRAWLER_STATUS_TEXT[data.status];
+  }
+  data.login = login;
+  await UsersModel.updateUser(data);
+
+  ctx.body = {
+    success: true,
+  };
+};
+
 const getUserRepositories = async (ctx) => {
   const { login } = ctx.params;
   const repos = await Helper.getUserRepositories(login);
@@ -165,7 +181,7 @@ const updateUserData = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
 
-  await UsersModel.updateUserInfo({
+  await UsersModel.updateUser({
     login,
     status: CRAWLER_STATUS.PENDING
   });
@@ -196,15 +212,15 @@ const getUpdateStatus = async (ctx) => {
   let { status } = user;
 
   if (status === CRAWLER_STATUS.SUCCEED) {
-    await UsersModel.updateUserInfo({
+    await UsersModel.updateUser({
       login,
       status: CRAWLER_STATUS.INITIAL
     });
-  } else if (startUpdateAt) {
+  } else if (status !== CRAWLER_STATUS.INITIAL && startUpdateAt) {
     // 10 min ttl
     if (new Date() - new Date(startUpdateAt) >= 10 * 60 * 1000) {
       status = CRAWLER_STATUS.SUCCEED;
-      await UsersModel.updateUserInfo({
+      await UsersModel.updateUser({
         login,
         status: CRAWLER_STATUS.INITIAL
       });
@@ -287,6 +303,7 @@ export default {
   getVerify,
   /* ====== */
   getUser,
+  updateUser,
   getLogin,
   getRepository,
   starRepository,

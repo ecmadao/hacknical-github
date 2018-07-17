@@ -22,15 +22,6 @@ const getGitHubInfo = userInfo => ({
 
 const findUser = async login => await GitHubUsers.findOne({ login });
 
-const updateUserInfo = async (userInfo) => {
-  const user = await findUser(userInfo.login);
-  Object.assign(user, userInfo);
-  await user.save();
-  return {
-    success: true,
-  };
-};
-
 const updateUser = async (userInfo) => {
   const lastUpdateTime = new Date();
   const user = await findUser(userInfo.login);
@@ -58,7 +49,6 @@ const createGitHubUser = async (userInfo) => {
 
 export default {
   updateUser,
-  updateUserInfo,
   createGitHubUser,
   findOne: findUser,
 };

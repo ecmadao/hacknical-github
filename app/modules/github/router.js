@@ -36,6 +36,11 @@ router.get(
   params.checkQuery(['verify']),
   GitHub.getUser
 );
+router.patch(
+  '/:login',
+  params.checkQuery(['verify']),
+  GitHub.updateUser
+);
 
 router.get(
   '/repository',
