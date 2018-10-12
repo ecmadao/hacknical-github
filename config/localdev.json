@@ -8,16 +8,10 @@
     "scientific": "mongodb://localhost:27017/hacknical-scientific"
   },
   "mq": {
-    "config": {
-      "host": "127.0.0.1",
-      "port": 6379,
-      "ns": "geeknical",
-      "options": {}
-    },
     "channels": {
-      "qname-scientific": "github-scientific-local",
-      "qname-prediction": "github-prediction-local",
-      "qname-crawler": "github-crawler-local"
+      "scientific": "github-scientific-local",
+      "prediction": "github-prediction-local",
+      "crawler": "github-crawler-local"
     }
   },
   "github": {

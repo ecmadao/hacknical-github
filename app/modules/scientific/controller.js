@@ -1,9 +1,6 @@
-import config from 'config';
+
 import logger from '../../utils/logger';
 import Helper from '../shared/helper';
-
-const mqConfig = config.get('mq');
-const predictionMqName = mqConfig.channels['qname-prediction'];
 
 const updateOne = async (col, doc, obj) => {
   try {
@@ -16,12 +13,7 @@ const updateOne = async (col, doc, obj) => {
   }
 };
 
-const sendPredictionMq = (mq, login) => {
-  mq.sendMessage({
-    message: login,
-    qname: predictionMqName
-  });
-};
+const sendPredictionMq = (mq, login) => mq.sendMessage(login);
 
 const userScientificData = (obj, count = 10) => {
   const result = {};
@@ -82,7 +74,7 @@ const reomvePrediction = async (ctx) => {
     });
   }
 
-  sendPredictionMq(ctx.mq, login);
+  sendPredictionMq(ctx.mq.prediction, login);
   ctx.body = {
     success: true,
   };
@@ -133,7 +125,7 @@ const setPredictionFeedback = async (ctx) => {
     };
   }
   await updateOne(usersCol, user, newUserInfo);
-  sendPredictionMq(ctx.mq, login);
+  sendPredictionMq(ctx.mq.prediction, login);
   ctx.body = {
     success: true,
   };

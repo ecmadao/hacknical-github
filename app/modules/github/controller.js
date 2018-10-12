@@ -11,9 +11,6 @@ import {
 } from '../../utils/constant';
 
 const app = config.get('github');
-const mqConfig = config.get('mq');
-const crawlerMqName = mqConfig.channels['qname-crawler'];
-const scientificMqName = mqConfig.channels['qname-scientific'];
 
 /* ================== router handler ================== */
 
@@ -62,10 +59,7 @@ const getLogin = async (ctx) => {
   const userInfo = await GitHubV4.getUserByToken(verify);
   logger.debug(userInfo);
 
-  ctx.mq.sendMessage({
-    message: userInfo.login,
-    qname: scientificMqName
-  });
+  ctx.mq.scientific.sendMessage(userInfo.login);
   const user = await UsersModel.findOne(userInfo.login);
   if (!user) {
     await UsersModel.createGitHubUser(userInfo);
@@ -186,14 +180,11 @@ const updateUserData = async (ctx) => {
     status: CRAWLER_STATUS.PENDING
   });
 
-  ctx.mq.sendMessage({
-    message: JSON.stringify({
-      login,
-      verify,
-      date: new Date().toString()
-    }),
-    qname: crawlerMqName
-  });
+  ctx.mq.crawler.sendMessage(JSON.stringify({
+    login,
+    verify,
+    date: new Date().toString()
+  }));
 
   ctx.body = {
     success: true,
