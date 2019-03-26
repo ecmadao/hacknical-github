@@ -1,28 +1,27 @@
-import config from 'config';
-import UsersModel from '../../databases/github-users';
-import GitHubV3 from '../../services/github-v3';
-import GitHubV4 from '../../services/github-v4';
-import Helper from '../shared/helper';
-import logger from '../../utils/logger';
+import config from 'config'
+import UsersModel from '../../databases/github-users'
+import GitHubV3 from '../../services/github-v3'
+import GitHubV4 from '../../services/github-v4'
+import Helper from '../shared/helper'
+import logger from '../../utils/logger'
 import {
-  CRAWLER_STATUS,
   CRAWLER_STATUS_CODE,
   CRAWLER_STATUS_TEXT,
-} from '../../utils/constant';
+} from '../../utils/constant'
 
-const app = config.get('github');
+const app = config.get('github')
 
 /* ================== router handler ================== */
 
 const getZen = async (ctx) => {
-  const { verify } = ctx.request.query;
-  const result = await GitHubV3.getZen(verify);
+  const { verify } = ctx.request.query
+  const result = await GitHubV3.getZen(verify)
 
   ctx.body = {
     result,
-    success: true,
-  };
-};
+    success: true
+  }
+}
 
 const getOctocat = async (ctx) => {
   const { verify } = ctx.request.query;
@@ -175,11 +174,6 @@ const updateUserData = async (ctx) => {
   const { login } = ctx.params;
   const { verify } = ctx.request.query;
 
-  await UsersModel.updateUser({
-    login,
-    status: CRAWLER_STATUS.PENDING
-  });
-
   ctx.mq.crawler.sendMessage(JSON.stringify({
     login,
     verify,
@@ -193,39 +187,22 @@ const updateUserData = async (ctx) => {
 };
 
 const getUpdateStatus = async (ctx) => {
-  const { login } = ctx.params;
-  const user = await UsersModel.findOne(login);
+  const { login } = ctx.params
+  const user = await UsersModel.findOne(login)
   const {
+    status,
     startUpdateAt,
     lastUpdateTime
-  } = user;
-
-  let { status } = user;
-
-  if (status === CRAWLER_STATUS.SUCCEED) {
-    await UsersModel.updateUser({
-      login,
-      status: CRAWLER_STATUS.INITIAL
-    });
-  } else if (status !== CRAWLER_STATUS.INITIAL && startUpdateAt) {
-    // 10 min ttl
-    if (new Date() - new Date(startUpdateAt) >= 10 * 60 * 1000) {
-      status = CRAWLER_STATUS.SUCCEED;
-      await UsersModel.updateUser({
-        login,
-        status: CRAWLER_STATUS.INITIAL
-      });
-    }
-  }
+  } = user
 
   ctx.body = {
     success: true,
     result: {
-      lastUpdateTime,
-      status: CRAWLER_STATUS_CODE[status],
-    },
-  };
-};
+      lastUpdateTime: startUpdateAt || lastUpdateTime,
+      status: CRAWLER_STATUS_CODE[status]
+    }
+  }
+}
 
 const getRepository = async (ctx) => {
   const {
