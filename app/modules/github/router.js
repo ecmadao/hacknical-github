@@ -115,7 +115,7 @@ router.put(
 );
 
 router.get(
-  '/:login/update/status',
+  '/:login/update',
   GitHub.getUpdateStatus
 );
 
