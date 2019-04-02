@@ -5,6 +5,7 @@ import GitHubV4 from '../../services/github-v4'
 import Helper from '../shared/helper'
 import logger from '../../utils/logger'
 import {
+  CRAWLER_STATUS,
   CRAWLER_STATUS_CODE,
   CRAWLER_STATUS_TEXT,
 } from '../../utils/constant'
@@ -171,20 +172,25 @@ const getUserOrganizations = async (ctx) => {
 };
 
 const updateUserData = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
+  const { login } = ctx.params
+  const { verify } = ctx.request.query
 
-  ctx.mq.crawler.sendMessage(JSON.stringify({
+  await ctx.mq.crawler.sendMessage(JSON.stringify({
     login,
     verify,
     date: new Date().toString()
-  }));
+  }))
+
+  await UsersModel.updateUser({
+    login,
+    status: CRAWLER_STATUS.PENDING
+  })
 
   ctx.body = {
     success: true,
     result: 'User data fetching'
-  };
-};
+  }
+}
 
 const getUpdateStatus = async (ctx) => {
   const { login } = ctx.params
