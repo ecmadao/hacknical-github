@@ -1,24 +1,26 @@
-import config from 'config';
-import MessageQueue from '../utils/mq';
-import logger from '../utils/logger';
 
-const mqChannels = config.get('mq.channels');
+import config from 'config'
+import logger from '../utils/logger'
+import mq from 'mq-utils'
+
+const mqConfig = config.get('mq')
+const MQ = mq[mqConfig.source](mqConfig.config)
 
 const mqMiddleware = () => {
-  const mq = {};
-  for (const key of Object.keys(mqChannels)) {
-    const qName = mqChannels[key];
+  const mqDict = {}
+  for (const key of Object.keys(mqConfig.channels)) {
+    const qName = mqConfig.channels[key]
     try {
-      mq[key] = new MessageQueue(qName);
+      mqDict[key] = new MQ(qName, mqConfig.options)
     } catch (e) {
-      logger.error(e);
+      logger.error(e)
     }
   }
 
   return async (ctx, next) => {
-    ctx.mq = mq;
-    await next();
-  };
-};
+    ctx.mq = mqDict
+    await next()
+  }
+}
 
-export default mqMiddleware;
+export default mqMiddleware

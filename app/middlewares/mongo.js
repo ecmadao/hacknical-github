@@ -1,17 +1,19 @@
-import config from 'config';
-import getMongo from '../utils/database';
-import logger from '../utils/logger';
 
+import config from 'config'
+import getMongo from '../utils/database'
+import logger from '../utils/logger'
 
-const url = config.get('database.scientific');
+const scientificUrl = config.get('database.scientific')
+const githubUrl = config.get('database.github')
 
 const mongoMiddleware = () => async (ctx, next) => {
   try {
-    ctx.db = await getMongo(url);
+    ctx.scientificDB = await getMongo(scientificUrl)
+    ctx.githubDB = await getMongo(githubUrl)
   } catch (e) {
-    logger.error(e);
+    logger.error(e)
   }
-  await next();
-};
+  await next()
+}
 
-export default mongoMiddleware;
+export default mongoMiddleware

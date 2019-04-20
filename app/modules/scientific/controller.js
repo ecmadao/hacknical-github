@@ -1,19 +1,19 @@
 
-import logger from '../../utils/logger';
-import Helper from '../shared/helper';
+import logger from '../../utils/logger'
+import Helper from '../shared/helper'
 
 const updateOne = async (col, doc, obj) => {
   try {
     await col.updateOne(
       { _id: doc._id },
       { $set: obj }
-    );
+    )
   } catch (e) {
-    logger.error(e);
+    logger.error(e)
   }
-};
+}
 
-const sendPredictionMq = (mq, login) => mq.sendMessage(login);
+const sendPredictionMq = (mq, login) => mq.send(login)
 
 const userScientificData = (obj, count = 10) => {
   const result = {};
@@ -28,7 +28,7 @@ const userScientificData = (obj, count = 10) => {
 
 const getStatistic = async (ctx) => {
   const { login } = ctx.params;
-  const usersCol = ctx.db.collection('users');
+  const usersCol = ctx.scientificDB.collection('users');
 
   const user = await usersCol.findOne({ login });
   if (!user) {
@@ -60,7 +60,7 @@ const reomvePrediction = async (ctx) => {
   const { login } = ctx.params;
   const { fullName } = ctx.request.body;
 
-  const predictionsCol = ctx.db.collection('predictions');
+  const predictionsCol = ctx.scientificDB.collection('predictions');
   const prediction = await predictionsCol.findOne({ login });
 
   const { predictions } = prediction;
@@ -85,8 +85,8 @@ const setPredictionFeedback = async (ctx) => {
   const { fullName, liked } = ctx.request.body;
   const feedback = Number(liked);
 
-  const predictionsCol = ctx.db.collection('predictions');
-  const usersCol = ctx.db.collection('users');
+  const predictionsCol = ctx.scientificDB.collection('predictions')
+  const usersCol = ctx.scientificDB.collection('users')
 
   const [
     user,
@@ -133,7 +133,7 @@ const setPredictionFeedback = async (ctx) => {
 
 const getPredictions = async (ctx) => {
   const { login } = ctx.params;
-  const predictionsCol = ctx.db.collection('predictions');
+  const predictionsCol = ctx.scientificDB.collection('predictions')
 
   const result = await predictionsCol.findOne({ login });
   if (!result) {

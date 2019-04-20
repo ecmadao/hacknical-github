@@ -23,3 +23,12 @@ export const CRAWLER_STATUS_TEXT = Object.keys(CRAWLER_STATUS_CODE)
     dict[code] = key
     return dict
   }, {})
+
+export const COLLECTIONS = {
+  COMMITS: 'githubcommits',
+  USERS: 'githubusers',
+  REPOS: 'githubrepos',
+  ORGS: 'githuborgs',
+  USER_INFOS: 'githubusersinfos',
+  REPOS_README: 'githubreposreadmes'
+}

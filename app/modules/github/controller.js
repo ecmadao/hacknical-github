@@ -1,5 +1,7 @@
+
 import config from 'config'
 import UsersModel from '../../databases/github-users'
+import UsersInfoModal from '../../databases/github-users-info'
 import GitHubV3 from '../../services/github-v3'
 import GitHubV4 from '../../services/github-v4'
 import Helper from '../shared/helper'
@@ -25,45 +27,42 @@ const getZen = async (ctx) => {
 }
 
 const getOctocat = async (ctx) => {
-  const { verify } = ctx.request.query;
-  const result = await GitHubV3.getOctocat(verify);
+  const { verify } = ctx.request.query
+  const result = await GitHubV3.getOctocat(verify)
 
   ctx.body = {
     result,
-    success: true,
-  };
-};
+    success: true
+  }
+}
 
 const getVerify = async (ctx) => {
   ctx.body = {
     success: true,
     result: app[ctx.state.appName].clientId
-  };
-};
+  }
+}
 
 const getToken = async (ctx) => {
-  const { code, verify } = ctx.request.query;
-  logger.debug(`code: ${code}, verify: ${JSON.stringify(verify)}`);
-  const result = await GitHubV3.getToken(code, verify);
-  logger.debug(result);
+  const { code, verify } = ctx.request.query
+  logger.debug(`code: ${code}, verify: ${JSON.stringify(verify)}`)
+  const result = await GitHubV3.getToken(code, verify)
+  logger.debug(result)
 
-  const token = result.access_token;
+  const token = result.access_token
   ctx.body = {
     success: true,
     result: token,
-  };
-};
+  }
+}
 
 const getLogin = async (ctx) => {
-  const { verify } = ctx.request.query;
-  const userInfo = await GitHubV4.getUserByToken(verify);
-  logger.debug(userInfo);
+  const { verify } = ctx.request.query
+  const userInfo = await GitHubV4.getUserByToken(verify)
+  logger.debug(userInfo)
 
-  ctx.mq.scientific.sendMessage(userInfo.login);
-  const user = await UsersModel.findOne(userInfo.login);
-  if (!user) {
-    await UsersModel.createGitHubUser(userInfo);
-  }
+  // ctx.mq.scientific.send(userInfo.login)
+  await UsersModel.updateUser(ctx.githubDB, userInfo)
 
   ctx.body = {
     success: true,
@@ -75,113 +74,113 @@ const getLogin = async (ctx) => {
       avatar_url: userInfo.avatar_url || '',
       html_url: userInfo.html_url || ''
     }
-  };
-};
+  }
+}
 
 const getUser = async (ctx) => {
-  const { login } = ctx.params;
-  const user = await Helper.getUser(login);
+  const { login } = ctx.params
+  const user = await UsersModel.findUser(ctx.githubDB, login)
   ctx.body = {
     success: true,
-    result: user,
-  };
-};
+    result: user
+  }
+}
 
 const updateUser = async (ctx) => {
-  const { login } = ctx.params;
-  const { data } = ctx.request.body;
+  const { login } = ctx.params
+  const { data } = ctx.request.body
 
   if (data.status !== undefined && !Number.isNaN(data.status)) {
-    data.status = CRAWLER_STATUS_TEXT[data.status];
+    data.status = CRAWLER_STATUS_TEXT[data.status]
   }
-  data.login = login;
-  await UsersModel.updateUser(data);
+  data.login = login
+  await UsersModel.updateUser(ctx.githubDB, data)
 
   ctx.body = {
-    success: true,
-  };
-};
+    success: true
+  }
+}
 
 const getUserRepositories = async (ctx) => {
-  const { login } = ctx.params;
-  const repos = await Helper.getUserRepositories(login);
+  const { login } = ctx.params
+  const repos = await Helper.getUserRepositories(ctx.githubDB, login)
 
   ctx.body = {
     success: true,
     result: repos
-  };
-};
+  }
+}
 
 const getUserContributed = async (ctx) => {
-  const { login } = ctx.params;
-  const repos = await Helper.getUserContributed(login);
+  const { login } = ctx.params
+  const repos = await Helper.getUserContributed(ctx.githubDB, login)
 
   ctx.body = {
     success: true,
     result: repos
-  };
-};
+  }
+}
 
 const getUserStarred = async (ctx) => {
-  const { login } = ctx.params;
-  const result = await Helper.getUserStarred(login);
+  const { login } = ctx.params
+  const result = await Helper.getUserStarred(ctx.githubDB, login)
 
   ctx.body = {
     result,
-    success: true,
-  };
-};
+    success: true
+  }
+}
 
 const getUserStarredCount = async (ctx) => {
-  const { login } = ctx.params;
-  const { verify } = ctx.request.query;
-  const count = await GitHubV4.getUserStarredCount(login, verify);
+  const { login } = ctx.params
+  const { verify } = ctx.request.query
+  const count = await GitHubV4.getUserStarredCount(login, verify)
   ctx.body = {
     success: true,
-    result: count,
-  };
-};
+    result: count
+  }
+}
 
 const getUserCommits = async (ctx) => {
-  const { login } = ctx.params;
-  const commits = await Helper.getCommits(login);
+  const { login } = ctx.params
+  const commits = await Helper.getCommits(ctx.githubDB, login)
 
   ctx.body = {
     success: true,
     result: commits
-  };
-};
+  }
+}
 
 const getUserLanguages = async (ctx) => {
-  const { login } = ctx.params;
-  const languages = await Helper.getLanguages(login);
+  const { login } = ctx.params
+  const languages = await Helper.getLanguages(ctx.githubDB, login)
 
   ctx.body = {
     success: true,
     result: languages
-  };
-};
+  }
+}
 
 const getUserOrganizations = async (ctx) => {
-  const { login } = ctx.params;
-  const organizations = await Helper.getOrganizations(login);
+  const { login } = ctx.params
+  const organizations = await Helper.getOrganizations(ctx.githubDB, login)
   ctx.body = {
     success: true,
-    result: organizations,
-  };
-};
+    result: organizations
+  }
+}
 
 const updateUserData = async (ctx) => {
   const { login } = ctx.params
   const { verify } = ctx.request.query
 
-  await ctx.mq.crawler.sendMessage(JSON.stringify({
+  await ctx.mq.crawler.send(JSON.stringify({
     login,
     verify,
     date: new Date().toString()
   }))
 
-  await UsersModel.updateUser({
+  await UsersModel.updateUser(ctx.githubDB, {
     login,
     status: CRAWLER_STATUS.PENDING
   })
@@ -194,7 +193,7 @@ const updateUserData = async (ctx) => {
 
 const getUpdateStatus = async (ctx) => {
   const { login } = ctx.params
-  const user = await UsersModel.findOne(login)
+  const user = await UsersModel.findUser(ctx.githubDB, login)
   const {
     status,
     startUpdateAt,
@@ -213,58 +212,59 @@ const getUpdateStatus = async (ctx) => {
 const getRepository = async (ctx) => {
   const {
     fullname,
-  } = ctx.request.query;
-  const repository = await Helper.getRepository(fullname);
+  } = ctx.request.query
+  const repository = await Helper.getRepository(ctx.githubDB, fullname)
 
   ctx.body = {
     success: true,
-    result: repository,
-  };
-};
+    result: repository
+  }
+}
 
 const getRepositoryReadme = async (ctx) => {
   const {
     fullname,
-  } = ctx.request.query;
-  const data = await Helper.getRepositoryReadme(fullname);
+  } = ctx.request.query
+  const data = await Helper.getRepositoryReadme(ctx.githubDB, fullname)
 
   ctx.body = {
     success: true,
     result: data.readme,
-  };
-};
+  }
+}
 
 const starRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
-  const result = await GitHubV3.starRepository(fullname, verify);
+  const result = await GitHubV3.starRepository(fullname, verify)
 
   ctx.body = {
     result,
     success: true,
-  };
-};
+  }
+}
 
 const unstarRepository = async (ctx) => {
   const { verify } = ctx.request.query;
   const { fullname } = ctx.request.body;
-  const result = await GitHubV3.unstarRepository(fullname, verify);
+  const result = await GitHubV3.unstarRepository(fullname, verify)
 
   ctx.body = {
     result,
     success: true,
-  };
-};
+  }
+}
 
 const getHotmap = async (ctx) => {
-  const { login } = ctx.params;
-  const hotmap = await Helper.getHotmap(login);
+  const { login } = ctx.params
+  const userInfo = await UsersInfoModal.findUserInfo(ctx.githubDB, login)
+  const { hotmap } = userInfo
 
   ctx.body = {
     result: hotmap,
     success: true
-  };
-};
+  }
+}
 
 export default {
   /* ====== */
@@ -294,4 +294,4 @@ export default {
   /* ====== */
   updateUserData,
   getUpdateStatus,
-};
+}

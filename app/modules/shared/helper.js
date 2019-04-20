@@ -1,150 +1,157 @@
-import logger from '../../utils/logger';
-import OrgsModel from '../../databases/github-orgs';
-import ReposModel from '../../databases/github-repos';
-import ReposReadmeModel from '../../databases/github-repos-readme';
-import CommitsModel from '../../databases/github-commits';
-import UsersModel from '../../databases/github-users';
-import UsersInfoModal from '../../databases/github-users-info';
+
+import logger from '../../utils/logger'
+import OrgsModel from '../../databases/github-orgs'
+import ReposModel from '../../databases/github-repos'
+import ReposReadmeModel from '../../databases/github-repos-readme'
+import CommitsModel from '../../databases/github-commits'
+import UsersInfoModal from '../../databases/github-users-info'
 
 /**
  * =============== repos ===============
  */
 
-const getRepository = async fullname =>
-  await ReposModel.getRepository(fullname);
+const getRepository = async (db, fullname) =>
+  await ReposModel.getRepository(db, { full_name: fullname })
 
-const getRepositoryReadme = async fullname =>
-  await ReposReadmeModel.findOne(fullname);
+const getRepositoryReadme = async (db, fullname) =>
+  await ReposReadmeModel.findReadme(db, { fullname })
 
-const getRepositories = async fullnames =>
-  await ReposModel.getRepositories(fullnames);
+const getRepositories = async (db, fullnames) =>
+  await ReposModel.getRepositories(
+    db,
+    {
+      full_name: {
+        $in: fullnames
+      }
+    }
+  )
 
-const getUserRepositories = async login =>
-  await ReposModel.getUserRepositories(login);
+const getUserRepositories = async (db, login) =>
+  await ReposModel.getRepositories(db, { login })
 
-const getUserContributed = async (login) => {
-  const userInfo = await UsersInfoModal.findOne(login);
-  const { contributions = [] } = userInfo;
-  const repositories = [];
+const getUserContributed = async (db, login) => {
+  const userInfo = await UsersInfoModal.findUserInfo(db, login)
+  const { contributions = [] } = userInfo
+  const repositories = []
 
   await Promise.all(contributions.map(async (contribution) => {
-    const fullname = contribution;
-    const repository = await getRepository(fullname);
-    repository && repositories.push(repository);
-  }));
-  return repositories;
-};
+    const fullname = contribution
+    const repository = await getRepository(db, fullname)
+    repository && repositories.push(repository)
+  }))
+  return repositories
+}
 
-const getStarredRepositories = async (starred) => {
-  const repositories = [];
+const getStarredRepositories = async (db, starred) => {
+  const repositories = []
   await Promise.all(starred.map(
     async (fullname) => {
-      const result = await getRepository(fullname);
-      result && repositories.push(result);
+      const result = await getRepository(db, fullname)
+      result && repositories.push(result)
     }
-  ));
+  ))
 
-  return {
-    hasNextPage: false,
-    results: repositories,
-  };
-};
+  return repositories
+}
 
-const getUserStarred = async (login) => {
-  const userInfo = await UsersInfoModal.findOne(login);
+const getUserStarred = async (db, login) => {
+  const userInfo = await UsersInfoModal.findUserInfo(db, login)
   if (userInfo.starredFetched) {
-    logger.info(`[STARRED][get ${login} starred from database]`);
-    const result = await getStarredRepositories(userInfo.starred);
-    if (result.results.length) return result;
+    logger.info(`[STARRED][get ${login} starred from database]`)
+    const result = await getStarredRepositories(db, userInfo.starred)
+    if (result.length) return result
   }
 
-  return [];
-};
+  return []
+}
 
 /**
  * =============== commits ===============
  */
-const getCommits = async login =>
-  await CommitsModel.getCommits(login);
+const getCommits = async (db, login) =>
+  await CommitsModel.getCommits(db, login)
 
 /**
  * =============== languages ===============
  */
-const getLanguages = async (login) => {
-  const userInfo = await UsersInfoModal.findOne(login);
-  return userInfo.languages || {};
-};
+const getLanguages = async (db, login) => {
+  const userInfo = await UsersInfoModal.findUserInfo(db, login)
+  return userInfo.languages || {}
+}
 
 /**
  * =============== orgs ===============
  */
-const getReposByFullnames = async repositoriesMap =>
-  await ReposModel.getRepositories([...repositoriesMap.values()]);
+const getReposByFullnames = async (db, repositoriesMap) =>
+  await ReposModel.getRepositories(
+    db,
+    {
+      full_name: {
+        $in: [...repositoriesMap.values()]
+      }
+    }
+  )
 
-const getOrgRepositories = async (options = {}) => {
+const getOrgRepositories = async (db, options = {}) => {
   const {
     org,
     login,
-  } = options;
+  } = options
 
-  const results = [];
-  let repositories = [];
+  const results = []
+  let repositories = []
   try {
-    repositories = await getUserRepositories(org.login);
+    repositories = await getUserRepositories(db, org.login)
   } catch (e) {
-    repositories = [];
-    logger.error(e);
+    repositories = []
+    logger.error(e)
   }
 
   if (repositories && repositories.length) {
     try {
-      const contributeds = await getUserContributed(login);
+      const contributeds = await getUserContributed(db, login)
       const contributedsSet = new Set(
         contributeds.map(item => item.full_name)
-      );
-      const contributedsInOrgSet = new Set();
+      )
+      const contributedsInOrgSet = new Set()
 
       repositories.forEach((repository) => {
         if (repository.contributors && repository.contributors.length) {
-          results.push(repository);
+          results.push(repository)
         } else if (contributedsSet.has(repository.full_name)) {
-          contributedsInOrgSet.add(repository.full_name);
+          contributedsInOrgSet.add(repository.full_name)
         }
-      });
+      })
       if (contributedsInOrgSet.size) {
-        results.push(...await getReposByFullnames(contributedsInOrgSet));
+        results.push(...await getReposByFullnames(db, contributedsInOrgSet))
       }
     } catch (err) {
-      logger.error(err);
+      logger.error(err)
     }
   }
-  return results;
-};
+  return results
+}
 
+const getUserOrganizations = async (db, login) => {
+  const userInfo = await UsersInfoModal.findUserInfo(db, login)
+  const { organizations = [] } = userInfo
+  return organizations
+}
 
-const getUserOrganizations = async (login) => {
-  const userInfo = await UsersInfoModal.findOne(login);
-  const { organizations = [] } = userInfo;
-  return organizations;
-};
-
-const getOrganizationsInfo = async (pubOrgs) => {
-  const organizations = [];
-
-  await Promise.all(pubOrgs.map(async (pubOrg) => {
-    const orgLogin = pubOrg.login;
-    const organization = await OrgsModel.findOne(orgLogin);
-    if (organization) {
-      organizations.push(organization);
+const getOrganizationsInfo = async (db, pubOrgs) => {
+  const logins = pubOrgs.map(pubOrg => pubOrg.login).filter(login => login)
+  const organizations = await OrgsModel.find(db, {
+    login: {
+      $in: logins
     }
-  }));
-  return organizations;
-};
+  })
+  return organizations
+}
 
-const getOrganizations = async (login) => {
-  const userOrganizations = await getUserOrganizations(login);
+const getOrganizations = async (db, login) => {
+  const userOrganizations = await getUserOrganizations(db, login)
   const organizations =
-    await getOrganizationsInfo(userOrganizations);
+    await getOrganizationsInfo(db, userOrganizations)
 
   // get organizations repositories
   const results = await Promise.all(organizations.map(async (org) => {
@@ -155,12 +162,12 @@ const getOrganizations = async (login) => {
       created_at,
       avatar_url,
       description,
-      public_repos,
-    } = org;
-    const repositories = await getOrgRepositories({
+      public_repos
+    } = org
+    const repositories = await getOrgRepositories(db, {
       org,
       login,
-    });
+    })
     return {
       name,
       blog,
@@ -171,31 +178,12 @@ const getOrganizations = async (login) => {
       public_repos,
       login: org.login,
       repos: repositories
-    };
-  }));
-  return results;
-};
-
-/*
- * =============== user ===============
- */
-const getUser = async login => await UsersModel.findOne(login);
-
-/*
- * =============== hotmap ===============
- * */
-
-const getHotmap = async (login) => {
-  const userInfo = await UsersInfoModal.findOne(login);
-  return userInfo.hotmap
-};
-
+    }
+  }))
+  return results
+}
 
 export default {
-  // user
-  getUser,
-  // hotmap
-  getHotmap,
   // orgs
   getOrganizations,
   // commits
@@ -209,4 +197,4 @@ export default {
   getUserContributed,
   getRepositoryReadme,
   getUserRepositories,
-};
+}

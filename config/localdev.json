@@ -8,6 +8,12 @@
     "scientific": "mongodb://localhost:27017/hacknical-scientific"
   },
   "mq": {
+    "source": "redis",
+    "config": {
+      "host": "127.0.0.1",
+      "port": 6379
+    },
+    "options": {},
     "channels": {
       "scientific": "github-scientific-local",
       "prediction": "github-prediction-local",
