@@ -10,6 +10,8 @@ const mqMiddleware = () => {
   const mqDict = {}
   for (const key of Object.keys(mqConfig.channels)) {
     const qName = mqConfig.channels[key]
+    if (!qName) continue
+
     try {
       mqDict[key] = new MQ(qName, mqConfig.options)
     } catch (e) {

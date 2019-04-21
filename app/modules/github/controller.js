@@ -61,7 +61,7 @@ const getLogin = async (ctx) => {
   const userInfo = await GitHubV4.getUserByToken(verify)
   logger.debug(userInfo)
 
-  // ctx.mq.scientific.send(userInfo.login)
+  // ctx.mq.scientific && ctx.mq.scientific.send(userInfo.login)
   await UsersModel.updateUser(ctx.githubDB, userInfo)
   await UsersInfoModal.findUserInfo(ctx.githubDB, userInfo.login)
 

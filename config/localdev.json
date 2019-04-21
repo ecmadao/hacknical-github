@@ -15,8 +15,8 @@
     },
     "options": {},
     "channels": {
-      "scientific": "github-scientific-local",
-      "prediction": "github-prediction-local",
+      "scientific": "",
+      "prediction": "",
       "crawler": "github-crawler-local"
     }
   },

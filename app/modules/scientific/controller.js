@@ -13,7 +13,7 @@ const updateOne = async (col, doc, obj) => {
   }
 }
 
-const sendPredictionMq = (mq, login) => mq.send(login)
+const sendPredictionMq = (mq, login) => mq && mq.send(login)
 
 const userScientificData = (obj, count = 10) => {
   const result = {};
