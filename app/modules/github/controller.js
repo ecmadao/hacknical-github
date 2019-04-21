@@ -63,6 +63,7 @@ const getLogin = async (ctx) => {
 
   // ctx.mq.scientific.send(userInfo.login)
   await UsersModel.updateUser(ctx.githubDB, userInfo)
+  await UsersInfoModal.findUserInfo(ctx.githubDB, userInfo.login)
 
   ctx.body = {
     success: true,
