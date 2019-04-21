@@ -1,41 +1,41 @@
-import dateHelper from './date';
+import dateHelper from './date'
 
 export const getReposInYears = (repos, years = 1) => {
-  const oneYearBefore = dateHelper.getDateBeforeYears({ years });
-  const seconds = dateHelper.getSeconds(oneYearBefore);
+  const oneYearBefore = dateHelper.getDateBeforeYears({ years })
+  const seconds = dateHelper.getSeconds(oneYearBefore)
   return repos.filter(
     repository => dateHelper.getSeconds(repository.created_at) >= seconds
-  );
-};
+  )
+}
 
 export const validateReposMap = (repos) => {
-  const map = new Map();
+  const map = new Map()
   for (let repository of repos) {
-    if (repository.fork || map.has(repository.full_name)) continue;
-    const { name, full_name, created_at, pushed_at } = repository;
+    if (repository.fork || map.has(repository.full_name)) continue
+    const { name, full_name, created_at, pushed_at } = repository
     map.set(full_name, {
       name,
       pushed_at,
       created_at,
       full_name,
-    });
+    })
   }
-  return map;
-};
+  return map
+}
 
 const sortCommits = (thisRepos, nextRepos) =>
-  nextRepos.totalCommits - thisRepos.totalCommits;
+  nextRepos.totalCommits - thisRepos.totalCommits
 
-export const sortByCommits = repos => repos.sort(sortCommits);
+export const sortByCommits = repos => repos.sort(sortCommits)
 
 /* ========= CONST VALUE ========== */
 export const PER_PAGE = {
   REPOS: 50,
   ORGS: 20,
   STARRED: 70
-};
+}
 
-export const BASE_URL = 'https://api.github.com';
+export const BASE_URL = 'https://api.github.com'
 
 export const GITHUB = {
   BASE: 'https://github.com',
@@ -47,4 +47,4 @@ export const GITHUB = {
   ZEN: `${BASE_URL}/zen`,
   API_GRAPHQL: 'https://api.github.com/graphql',
   API_TOKEN: 'https://github.com/login/oauth/access_token'
-};
+}

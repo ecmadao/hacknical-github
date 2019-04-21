@@ -16,7 +16,7 @@ const convertUser = (v4UserInfo) => {
     websiteUrl,
     repositories,
     starredRepositories,
-  } = v4UserInfo;
+  } = v4UserInfo
 
   return {
     bio,
@@ -34,10 +34,10 @@ const convertUser = (v4UserInfo) => {
     following: following.totalCount,
     public_repos: repositories.totalCount,
     starred: starredRepositories.totalCount,
-  };
-};
+  }
+}
 
 
 export default {
-  user: convertUser,
-};
+  user: convertUser
+}

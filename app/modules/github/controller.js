@@ -235,19 +235,19 @@ const getRepositoryReadme = async (ctx) => {
 }
 
 const starRepository = async (ctx) => {
-  const { verify } = ctx.request.query;
-  const { fullname } = ctx.request.body;
+  const { verify } = ctx.request.query
+  const { fullname } = ctx.request.body
   const result = await GitHubV3.starRepository(fullname, verify)
 
   ctx.body = {
     result,
-    success: true,
+    success: true
   }
 }
 
 const unstarRepository = async (ctx) => {
-  const { verify } = ctx.request.query;
-  const { fullname } = ctx.request.body;
+  const { verify } = ctx.request.query
+  const { fullname } = ctx.request.body
   const result = await GitHubV3.unstarRepository(fullname, verify)
 
   ctx.body = {
