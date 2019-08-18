@@ -175,11 +175,13 @@ const updateUserData = async (ctx) => {
   const { login } = ctx.params
   const { verify } = ctx.request.query
 
-  await ctx.mq.crawler.send(JSON.stringify({
+  const msg = JSON.stringify({
     login,
     verify,
     date: new Date().toString()
-  }))
+  })
+  await ctx.mq.crawler.send(msg)
+  logger.info(`[github:update] ${msg}`)
 
   await UsersModel.updateUser(ctx.githubDB, {
     login,
