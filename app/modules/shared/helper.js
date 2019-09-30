@@ -32,24 +32,24 @@ const getUserRepositories = async (db, login) =>
 const getUserContributed = async (db, login) => {
   const userInfo = await UsersInfoModal.findUserInfo(db, login)
   const { contributions = [] } = userInfo
-  const repositories = []
 
-  await Promise.all(contributions.map(async (contribution) => {
-    const fullname = contribution
-    const repository = await getRepository(db, fullname)
-    repository && repositories.push(repository)
-  }))
+  const repositories = await ReposModel.getRepositories(db, {
+    full_name: {
+      $in: contributions
+        .map(contribution => contribution.fullname)
+        .filter(n => n)
+    }
+  })
+
   return repositories
 }
 
 const getStarredRepositories = async (db, starred) => {
-  const repositories = []
-  await Promise.all(starred.map(
-    async (fullname) => {
-      const result = await getRepository(db, fullname)
-      result && repositories.push(result)
+  const repositories = await ReposModel.getRepositories(db, {
+    full_name: {
+      $in: starred
     }
-  ))
+  })
 
   return repositories
 }

@@ -206,6 +206,7 @@ const getUpdateStatus = async (ctx) => {
   ctx.body = {
     success: true,
     result: {
+      startUpdateAt,
       lastUpdateTime: startUpdateAt || lastUpdateTime,
       status: CRAWLER_STATUS_CODE[status]
     }
