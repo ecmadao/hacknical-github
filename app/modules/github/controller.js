@@ -72,6 +72,7 @@ const getLogin = async (ctx) => {
       login: userInfo.login,
       email: userInfo.email,
       name: userInfo.name || userInfo.login,
+      avatar: userInfo.avatar_url || '',
       avatar_url: userInfo.avatar_url || '',
       html_url: userInfo.html_url || ''
     }
