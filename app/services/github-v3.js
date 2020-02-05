@@ -33,9 +33,9 @@ const unstarRepository = (fullname, verify) => {
 /* =========================== github api =========================== */
 
 const getOctocat = (verify) => {
-  const { qs, headers } = verify
+  const { headers } = verify
   return fetch.get({
-    qs,
+    qs: {},
     headers,
     url: GITHUB.OCTOCAT
   })
