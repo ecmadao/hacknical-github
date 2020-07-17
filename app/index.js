@@ -11,6 +11,7 @@ import auth from './middlewares/auth'
 import verify from './middlewares/verify'
 import mongo from './middlewares/mongo'
 import mq from './middlewares/mq'
+import loggerMiddleware from './middlewares/logger'
 import { initIndex } from './databases/db'
 
 const appKey = config.get('appKey')
@@ -42,7 +43,7 @@ app.use(auth({
 }))
 // verify token params
 app.use(verify())
-
+app.use(loggerMiddleware())
 // mq
 app.use(mq())
 // mongo

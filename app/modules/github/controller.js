@@ -58,8 +58,16 @@ const getToken = async (ctx) => {
 
 const getLogin = async (ctx) => {
   const { verify } = ctx.request.query
-  const userInfo = await GitHubV4.getUserByToken(verify)
-  logger.debug(userInfo)
+  let userInfo
+
+  try {
+    userInfo = await GitHubV4.getUserByToken(verify)
+  } catch (e) {
+    logger.error(e)
+    userInfo = await GitHubV3.getUserByToken(verify)
+  } finally {
+    logger.info(userInfo)
+  }
 
   // ctx.mq.scientific && ctx.mq.scientific.send(userInfo.login)
   await UsersModel.updateUser(ctx.githubDB, userInfo)

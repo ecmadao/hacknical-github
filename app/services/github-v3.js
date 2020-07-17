@@ -32,6 +32,15 @@ const unstarRepository = (fullname, verify) => {
 
 /* =========================== github api =========================== */
 
+const getUserByToken = async (verify) => {
+  const { headers } = verify
+  return fetch.get({
+    qs: {},
+    headers,
+    url: API_GET_USER
+  })
+}
+
 const getOctocat = (verify) => {
   const { headers } = verify
   return fetch.get({
@@ -62,6 +71,7 @@ export default {
   getZen,
   getOctocat,
   getToken,
+  getUserByToken,
   starRepository,
   unstarRepository,
 }
