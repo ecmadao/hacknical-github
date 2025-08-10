@@ -1,4 +1,5 @@
 import dateHelper from './date'
+import config from 'config'
 
 export const getReposInYears = (repos, years = 1) => {
   const oneYearBefore = dateHelper.getDateBeforeYears({ years })
@@ -35,17 +36,30 @@ export const PER_PAGE = {
   STARRED: 70
 }
 
-// export const BASE_URL = 'https://api.github.com'
-export const BASE_URL = 'https://github-api-proxy.wlecmadao.workers.dev/'
+export const BASE_URL = (function(){
+  let baseUrl = 'https://api.github.com'
+  const githubConfig = config.get('github')
+  if (githubConfig["proxy"] && githubConfig["proxy"].api) {
+    baseUrl = githubConfig["proxy"].api
+  }
+  return baseUrl
+})()
 
-export const GITHUB = {
-  BASE: 'https://github.com',
-  API_GET_USER: `${BASE_URL}/user`,
-  API_USERS: `${BASE_URL}/users`,
-  API_ORGS: `${BASE_URL}/orgs`,
-  API_REPOS: `${BASE_URL}/repos`,
-  OCTOCAT: `${BASE_URL}/octocat`,
-  ZEN: `${BASE_URL}/zen`,
-  API_GRAPHQL: `${BASE_URL}/graphql`,
-  API_TOKEN: 'https://github.com/login/oauth/access_token'
-}
+export const GITHUB = (function(){
+  const githubConfig = config.get('github')
+  const urls = {
+    BASE: 'https://github.com',
+    API_GET_USER: `${BASE_URL}/user`,
+    API_USERS: `${BASE_URL}/users`,
+    API_ORGS: `${BASE_URL}/orgs`,
+    API_REPOS: `${BASE_URL}/repos`,
+    OCTOCAT: `${BASE_URL}/octocat`,
+    ZEN: `${BASE_URL}/zen`,
+    API_GRAPHQL: `${BASE_URL}/graphql`,
+    API_TOKEN: 'https://github.com/login/oauth/access_token'
+  }
+  if (githubConfig["proxy"] && githubConfig["proxy"]["login-token"]) {
+    urls.API_TOKEN = githubConfig["proxy"]["login-token"]
+  }
+  return urls
+})()
